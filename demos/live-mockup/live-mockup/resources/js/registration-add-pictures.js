@@ -5,7 +5,7 @@ var RegistrationAddPictures = {
 	selectAllEl: null
 };
 
-RegistrationAddPictures.PAGE_SPACING = 32;
+RegistrationAddPictures.PAGE_SPACING = 35;
 RegistrationAddPictures.NUM_COLUMNS = 3;
 RegistrationAddPictures.SPACING = 5;
 
@@ -31,10 +31,10 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 	RegistrationAddPictures.numSelected = 0;
 	RegistrationAddPictures.footerEl = ui.toPage
 			.find('#add-pictures-footer')
-			.on('click', RegistrationAddPictures.clickFooterButton);
+			.on('touchstart', RegistrationAddPictures.clickFooterButton);
 	RegistrationAddPictures.selectAllEl = ui.toPage
 			.find('#select-all')
-			.on('click', RegistrationAddPictures.selectAll);
+			.on('touchstart', RegistrationAddPictures.selectAll);
 
   var pictures = ui.toPage.find('#pictures');
 	var pictureDimension = (ui.toPage.width() - RegistrationAddPictures.PAGE_SPACING -
@@ -93,7 +93,7 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 		};		
 		RegistrationAddPictures.pictures.push(picture);
 
-		thumbnailEl.on('mousedown',
+		thumbnailEl.on('touchstart',
 				RegistrationAddPictures.toggleSelectedStatus.bind(this, picture));
 	}
 };

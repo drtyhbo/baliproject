@@ -15,6 +15,8 @@
 @implementation WebViewController
 
 - (void)viewDidLoad {
+  self.view.backgroundColor = [UIColor colorWithRed:0.91 green:0.91 blue:0.91 alpha:1.0];
+
   CGRect bounds = [[UIScreen mainScreen] bounds];
   double statusHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
   
