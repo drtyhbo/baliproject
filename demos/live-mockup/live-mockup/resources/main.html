@@ -16,12 +16,21 @@
   
   <!-- Add pictures -->
   <div data-role="page" id="add-pictures">
-    <div data-role="header" data-position="fixed">
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
       <h1>Add to library</h1>
     </div>
     <div data-role="content">
+			<div style="margin-bottom: 5px; text-align: right">
+				<span id="select-all" style="color: blue; cursor: pointer">
+					Select all
+				</span>
+			</div>
       <div id="pictures" style="width: 100%"></div>
     </div>
+		<div data-role="footer" data-position="fixed" data-tap-toggle="false"
+				id="add-pictures-footer">
+			<h2>Skip</h2>
+		</div>
   </div>
 </body>
 

@@ -1,3 +1,10 @@
+var Images = {};
+
+Images.getPath = function(subpath) {
+//  return '../img/' + (subpath || '');
+  return '';
+};
+
 // The list of camera roll photos.
 //  - num: Can be turned into the image file name using the formula:
 //    IMG_0num.jpg
@@ -55,8 +62,7 @@ CameraRoll.getCameraRoll = function() {
 };
 
 CameraRoll.getBasePath = function() {
-//  return '../img/camera/';
-  return '';
+	return Images.getPath('camera/');
 }
 
 CameraRoll.getThumb = function(asset) {
