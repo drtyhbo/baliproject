@@ -16,10 +16,28 @@
   
   <!-- Add pictures -->
   <div data-role="page" id="add-pictures">
-    <div data-role="header" data-position="fixed" data-tap-toggle="false">
-      <h1>Add to library</h1>
-    </div>
+		<style type="text/css">
+		.circle {
+			background: #ddd;
+			border:1px solid #888;
+			border-radius: 50%;
+			display: inline-block;
+			height:50px;
+			line-height:50px;
+			text-align: center;
+			width: 50px;
+		}
+		</style>
     <div data-role="content">
+			<div style="margin-top: 20px; text-align: center">
+				<div class="circle"
+						 style="background: #bbb;
+										margin-right:10px">1</div>
+				<div class="circle"
+						 style="background: #ddd">2</div>
+        <h3 style="margin-bottom: 0.25em">Add to your personal stream</h2>
+        <h4 style="margin-top: 0.25em">(they're private till you share)</h3>
+			</div>
 			<div style="margin-bottom: 5px; text-align: right">
 				<span id="select-all" style="color: blue; cursor: pointer">
 					Select all
