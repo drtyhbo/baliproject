@@ -5,7 +5,7 @@ var RegistrationAddPictures = {
 	selectAllEl: null
 };
 
-RegistrationAddPictures.PAGE_SPACING = 35;
+RegistrationAddPictures.PAGE_SPACING = 32;
 RegistrationAddPictures.NUM_COLUMNS = 3;
 RegistrationAddPictures.SPACING = 5;
 
