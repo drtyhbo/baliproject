@@ -6,11 +6,21 @@
   <script type="text/javascript" src="jquery.mobile-1.4.0.min.js"></script>
   <script type="text/javascript" src="main.js"></script>
   <script type="text/javascript" src="camera-roll.js"></script>
+  <script type="text/javascript" src="add-pictures.js"></script>
 </head>
 
 <body>
-  <div data-role="page" id="page">
+  <!-- Main page -->
+  <div data-role="page" id="main">
+	</div>
+  
+  <!-- Add pictures -->
+  <div data-role="page" id="add-pictures">
+    <div data-role="header" data-position="fixed">
+      <h1>Add to library</h1>
+    </div>
     <div data-role="content">
+      <div id="pictures" style="width: 100%"></div>
     </div>
   </div>
 </body>

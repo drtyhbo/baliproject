@@ -47,3 +47,22 @@ var cameraRoll = [
 		moment: 101
 	}
 ];
+
+var CameraRoll = {};
+
+CameraRoll.getCameraRoll = function() {
+  return cameraRoll;
+};
+
+CameraRoll.getBasePath = function() {
+//  return '../img/camera/';
+  return '';
+}
+
+CameraRoll.getThumb = function(asset) {
+  return CameraRoll.getBasePath() + 'IMG_0' + asset.num + '_thumb.jpg';
+};
+
+CameraRoll.getSrc = function(asset) {
+  return CameraRoll.getBasePath() + 'IMG_0' + asset.num + '.jpg';
+};
