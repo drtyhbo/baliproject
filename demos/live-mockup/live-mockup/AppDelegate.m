@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 
-#import "LoginViewController.h"
 #import "WebViewController.h"
 
 @implementation AppDelegate
@@ -21,21 +20,7 @@
   self.window.backgroundColor = [UIColor whiteColor];
   [self.window makeKeyAndVisible];
 
-  UINavigationController *navigationController = [[UINavigationController alloc] init];
-  navigationController.navigationBarHidden = YES;
-  self.window.rootViewController = navigationController;
-  
-  // Whenever a person opens the app, check for a cached session
-  if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
-    // If there's one, just open the session silently, without showing the user the login UI
-    [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"] allowLoginUI:NO completionHandler:^(FBSession *session, FBSessionState state, NSError *error) {
-      if (state == FBSessionStateOpen) {
-        [navigationController pushViewController:[[WebViewController alloc] init] animated:NO];
-      } else {
-        [navigationController pushViewController:[[LoginViewController alloc] init] animated:NO];
-      }
-    }];
-  }
+  self.window.rootViewController = [[WebViewController alloc] init];
   
   return YES;
 }
