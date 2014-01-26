@@ -14,10 +14,13 @@
 
 @implementation WebViewController
 
-- (void)loadView {
-  _webView = [[UIWebView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  self.view = _webView;
-
+- (void)viewDidLoad {
+  CGRect bounds = [[UIScreen mainScreen] bounds];
+  double statusHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+  
+  _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, statusHeight, bounds.size.width, bounds.size.height - statusHeight)];
+  [self.view addSubview:_webView];
+  
   NSURL *htmlURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"main" ofType:@"html"]];
   NSURLRequest *htmlRequest = [NSURLRequest requestWithURL:htmlURL];
   [_webView loadRequest:htmlRequest];
