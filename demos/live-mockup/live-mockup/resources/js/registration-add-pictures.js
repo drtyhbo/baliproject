@@ -9,18 +9,18 @@ RegistrationAddPictures.PAGE_SPACING = 35;
 RegistrationAddPictures.NUM_COLUMNS = 3;
 RegistrationAddPictures.SPACING = 5;
 
-RegistrationAddPictures.show = function() {
+RegistrationAddPictures.show = function(animate) {
   $.mobile.pageContainer.on('pagecontainerbeforetransition',
 			RegistrationAddPictures.beforeTransition);
 	$.mobile.pageContainer.pagecontainer('change', '#registration-add-pictures', {
 		changeHash: false,
 		showLoadMsg: false,
-		transition: 'none'
+		transition: animate ? 'slide' : 'none'
 	});
 };
 
 RegistrationAddPictures.beforeTransition = function(event, ui) {
-  if (ui.absUrl.indexOf('#add-pictures') == -1) {
+  if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
     $.mobile.pageContainer.off('pagecontainerbeforetransition',
 				arguments.callee);
     return;
@@ -151,5 +151,6 @@ RegistrationAddPictures.toggleSelectedStatus = function(picture) {
 };
 
 RegistrationAddPictures.clickFooterButton = function() {
-	alert ('here');
+	localStorage.setItem('initialized', 1);
+	RegistrationCreateUser.show(true);
 };

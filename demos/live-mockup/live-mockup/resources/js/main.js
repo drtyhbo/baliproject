@@ -1,10 +1,13 @@
 $(document).ready(function() {
-	if (localStorage.getItem('initialized')) {
+	if (localStorage.getItem('initialized') || 0 < 2) {
 		setTimeout(function() {
-			RegistrationAddPictures.show();
+			if (localStorage.getItem('initialized') == 1) {
+				RegistrationCreateUser.show(false);
+			} else {
+				RegistrationAddPictures.show(false);
+			}
 		}, 100);
 	} else {
 //    $.mobile.pageContainer.pagecontainer('change', 'user-profile.html');
 	}
-	localStorage.setItem('initialized', true);
 });

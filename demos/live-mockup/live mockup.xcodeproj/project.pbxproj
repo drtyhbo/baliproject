@@ -89,6 +89,7 @@
 		96C3DB75189597210090B7C1 /* IMG_0180_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB51189597210090B7C1 /* IMG_0180_thumb.jpg */; };
 		96C3DB76189597210090B7C1 /* IMG_0183_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB52189597210090B7C1 /* IMG_0183_thumb.jpg */; };
 		96C3DB7818959AA70090B7C1 /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB7718959AA70090B7C1 /* check.png */; };
+		96C3DB7A1895AF6C0090B7C1 /* registration-create-user.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB791895AF6B0090B7C1 /* registration-create-user.js */; };
 		96D3278618942CB9001E9F40 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D3278518942CB9001E9F40 /* Foundation.framework */; };
 		96D3278818942CB9001E9F40 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D3278718942CB9001E9F40 /* CoreGraphics.framework */; };
 		96D3278A18942CB9001E9F40 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D3278918942CB9001E9F40 /* UIKit.framework */; };
@@ -198,6 +199,7 @@
 		96C3DB51189597210090B7C1 /* IMG_0180_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0180_thumb.jpg; path = resources/img/camera/IMG_0180_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB52189597210090B7C1 /* IMG_0183_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0183_thumb.jpg; path = resources/img/camera/IMG_0183_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB7718959AA70090B7C1 /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = check.png; path = resources/img/check.png; sourceTree = "<group>"; };
+		96C3DB791895AF6B0090B7C1 /* registration-create-user.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "registration-create-user.js"; path = "resources/js/registration-create-user.js"; sourceTree = "<group>"; };
 		96D3278218942CB8001E9F40 /* live-mockup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "live-mockup.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96D3278518942CB9001E9F40 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		96D3278718942CB9001E9F40 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -264,6 +266,7 @@
 				96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */,
 				96C3DB2718957ACD0090B7C1 /* camera-roll.js */,
 				96C3DB2D1895847B0090B7C1 /* registration-add-pictures.js */,
+				96C3DB791895AF6B0090B7C1 /* registration-create-user.js */,
 			);
 			name = js;
 			sourceTree = "<group>";
@@ -509,6 +512,7 @@
 				96C3DB02189579340090B7C1 /* IMG_0338.jpg in Resources */,
 				96C3DB1E189579340090B7C1 /* IMG_0178.jpg in Resources */,
 				96C3DB20189579340090B7C1 /* IMG_0183.jpg in Resources */,
+				96C3DB7A1895AF6C0090B7C1 /* registration-create-user.js in Resources */,
 				96C3DB5D189597210090B7C1 /* IMG_0291_thumb.jpg in Resources */,
 				96C3DB2818957ACD0090B7C1 /* camera-roll.js in Resources */,
 				96C3DB55189597210090B7C1 /* IMG_0338_thumb.jpg in Resources */,

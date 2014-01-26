@@ -7,6 +7,7 @@
   <script type="text/javascript" src="main.js"></script>
   <script type="text/javascript" src="camera-roll.js"></script>
   <script type="text/javascript" src="registration-add-pictures.js"></script>
+  <script type="text/javascript" src="registration-create-user.js"></script>
 </head>
 
 <body>
@@ -49,6 +50,44 @@
 				id="add-pictures-footer">
 			<h2>Skip</h2>
 		</div>
+  </div>
+
+  <!-- Registration create user -->
+  <div data-role="page" id="registration-create-user">
+    <style type="text/css">
+      .circle {
+        background: #ddd;
+        border:1px solid #888;
+        border-radius: 50%;
+        display: inline-block;
+        height:50px;
+        line-height:50px;
+        text-align: center;
+        width: 50px;
+      }
+    </style>
+    <div data-role="content">
+      <div style="margin-top: 20px;
+									text-align: center"
+						id="create-user-header">
+        <div class="circle"
+          style="background: #ddd;
+                 margin-right:10px">1</div>
+        <div class="circle"
+             style="background: #bbb">2</div>
+        <h3 style="margin-bottom: 0.25em">Create your account</h2>
+          <h4 style="margin-top: 0.25em">(we're uploading in the background)</h3>
+      </div>
+			<div style="margin-top: 100px">
+				<input type="text" placeholder="Name" id="create-user-name">
+				<input type="text" placeholder="Email" id="create-user-email">
+				<input type="text" placeholder="Password" id="create-user-password">
+			</div>
+    </div>
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+         id="create-user-footer">
+      <h2>Create</h2>
+    </div>
   </div>
 </body>
 
