@@ -1,5 +1,6 @@
 var RegistrationCreateUser = {
 	emailEl: null,
+	footerEl: null,
 	nameEl: null,
 	passwordEl: null
 };
@@ -22,12 +23,18 @@ RegistrationCreateUser.beforeTransition = function(event, ui) {
     return;
   }
 
-	RegistrationCreateUser.emailEl = ui.toPage.find('#create-user-email');
-	RegistrationCreateUser.nameEl = ui.toPage.find('#create-user-name');
-	RegistrationCreateUser.passwordEl = ui.toPage.find('#create-user-password');
+	RegistrationCreateUser.emailEl = ui.toPage.find('#create-user-email')
+			.focus(RegistrationCreateUser.focusInput)
+			.blur(RegistrationCreateUser.blurInput);
+	RegistrationCreateUser.nameEl = ui.toPage.find('#create-user-name')
+			.focus(RegistrationCreateUser.focusInput)
+			.blur(RegistrationCreateUser.blurInput);
+	RegistrationCreateUser.passwordEl = ui.toPage.find('#create-user-password')
+			.focus(RegistrationCreateUser.focusInput)
+			.blur(RegistrationCreateUser.blurInput);
 
-	ui.toPage.find('#create-user-footer').click(
-			RegistrationCreateUser.clickFooterButton);
+	RegistrationCreateUser.footerEl = ui.toPage.find('#create-user-footer')
+			.click(RegistrationCreateUser.clickFooterButton);
 };
 
 RegistrationCreateUser.clickFooterButton = function() {
@@ -42,4 +49,12 @@ RegistrationCreateUser.clickFooterButton = function() {
 		localStorage.setItem('email', RegistrationCreateUser.emailEl.val());
 		localStorage.setItem('password', RegistrationCreateUser.passwordEl.val());
 	}
+};
+
+RegistrationCreateUser.focusInput = function() {
+	RegistrationCreateUser.footerEl.hide();
+};
+
+RegistrationCreateUser.blurInput = function() {
+	RegistrationCreateUser.footerEl.show();
 };

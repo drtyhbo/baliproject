@@ -1,8 +1,7 @@
 var Images = {};
 
 Images.getPath = function(subpath) {
-//  return '../img/' + (subpath || '');
-  return '';
+  return isIOS ? '' : ('../img/' + (subpath || ''));
 };
 
 // The list of camera roll photos.
