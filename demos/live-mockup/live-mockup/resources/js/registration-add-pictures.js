@@ -96,6 +96,8 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 		thumbnailEl.on('touchstart',
 				RegistrationAddPictures.toggleSelectedStatus.bind(this, picture));
 	}
+	
+	RegistrationAddPictures.selectAll();
 };
 
 RegistrationAddPictures.areAllSelected = function() {

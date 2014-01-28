@@ -8,20 +8,37 @@
 	</script>
 
 	<script type="text/javascript">
-		var scriptSrcs = [
-		  'jquery-1.11.0.min.js',
-		  'jquery.mobile-1.4.0.min.js',
-		  'main.js',
-		  'camera-roll.js',
-		  'registration-add-pictures.js',
-		  'registration-create-user.js'
-		];
-		for (var i = 0, scriptSrc; scriptSrc = scriptSrcs[i]; i++) {
+		function addScript(src, isDeferred) {
 			var scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
-			scriptEl.src = isIOS ? scriptSrc : ('js/' + scriptSrc);
-			document.head.appendChild(scriptEl);
+			scriptEl.src = isIOS ? src : ('js/' + src);
+			if (isDeferred) {
+				scriptEl.deferred = 'true';
+			}
+			document.head.appendChild(scriptEl);			
 		}
+		
+		function addScripts() {
+			if (!window.$) {
+				setTimeout(addScripts, 50);
+			} else {
+				for (var i = 0, scriptSrc; scriptSrc = scriptSrcs[i]; i++) {
+					addScript(scriptSrc, true);
+				}
+			}
+		}
+		
+	  var scriptSrcs = [
+	    'jquery-1.11.0.min.js',
+	    'jquery.mobile-1.4.0.min.js',
+	    'main.js',
+	    'camera-roll.js',
+	    'registration-add-pictures.js',
+	    'registration-create-user.js'
+	  ];
+	
+		addScript('jquery-1.11.0.min.js', false);
+		addScripts();
 	</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
