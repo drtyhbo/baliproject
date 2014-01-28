@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		967CF10618983AA400AA6E86 /* PersonalLibrary.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10518983AA400AA6E86 /* PersonalLibrary.js */; };
-		967CF1081898546D00AA6E86 /* UserProfilePage.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF1071898546D00AA6E86 /* UserProfilePage.js */; };
 		96C3DAD61895790C0090B7C1 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD31895790C0090B7C1 /* main.js */; };
 		96C3DAD71895790C0090B7C1 /* jquery-1.11.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */; };
 		96C3DAD81895790C0090B7C1 /* jquery.mobile-1.4.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */; };
@@ -118,7 +117,6 @@
 
 /* Begin PBXFileReference section */
 		967CF10518983AA400AA6E86 /* PersonalLibrary.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = PersonalLibrary.js; path = resources/js/PersonalLibrary.js; sourceTree = "<group>"; };
-		967CF1071898546D00AA6E86 /* UserProfilePage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = UserProfilePage.js; path = resources/js/UserProfilePage.js; sourceTree = "<group>"; };
 		96C3DAD31895790C0090B7C1 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = resources/js/main.js; sourceTree = "<group>"; };
 		96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery-1.11.0.min.js"; path = "resources/js/jquery-1.11.0.min.js"; sourceTree = "<group>"; };
 		96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery.mobile-1.4.0.min.js"; path = "resources/js/jquery.mobile-1.4.0.min.js"; sourceTree = "<group>"; };
@@ -266,7 +264,6 @@
 				96C3DB2D1895847B0090B7C1 /* RegistrationAddPicturesPage.js */,
 				96C3DB791895AF6B0090B7C1 /* RegistrationCreateUserPage.js */,
 				967CF10518983AA400AA6E86 /* PersonalLibrary.js */,
-				967CF1071898546D00AA6E86 /* UserProfilePage.js */,
 			);
 			name = js;
 			sourceTree = "<group>";
@@ -517,7 +514,6 @@
 				96C3DB2818957ACD0090B7C1 /* CameraRoll.js in Resources */,
 				96C3DB55189597210090B7C1 /* IMG_0338_thumb.jpg in Resources */,
 				96C3DB65189597210090B7C1 /* IMG_0268_thumb.jpg in Resources */,
-				967CF1081898546D00AA6E86 /* UserProfilePage.js in Resources */,
 				96C3DAD81895790C0090B7C1 /* jquery.mobile-1.4.0.min.js in Resources */,
 				96C3DB73189597210090B7C1 /* IMG_0168_thumb.jpg in Resources */,
 				96C3DB66189597210090B7C1 /* IMG_0269_thumb.jpg in Resources */,
