@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		967CF10618983AA400AA6E86 /* personal-library.js in Sources */ = {isa = PBXBuildFile; fileRef = 967CF10518983AA400AA6E86 /* personal-library.js */; };
+		967CF10618983AA400AA6E86 /* personal-library.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10518983AA400AA6E86 /* personal-library.js */; };
 		96C3DAD61895790C0090B7C1 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD31895790C0090B7C1 /* main.js */; };
 		96C3DAD71895790C0090B7C1 /* jquery-1.11.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */; };
 		96C3DAD81895790C0090B7C1 /* jquery.mobile-1.4.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */; };
@@ -524,6 +524,7 @@
 				96C3DB73189597210090B7C1 /* IMG_0168_thumb.jpg in Resources */,
 				96C3DB66189597210090B7C1 /* IMG_0269_thumb.jpg in Resources */,
 				96C3DB62189597210090B7C1 /* IMG_0237_thumb.jpg in Resources */,
+				967CF10618983AA400AA6E86 /* personal-library.js in Resources */,
 				96C3DB6C189597210090B7C1 /* IMG_0225_thumb.jpg in Resources */,
 				96C3DAD61895790C0090B7C1 /* main.js in Resources */,
 				96C3DAD71895790C0090B7C1 /* jquery-1.11.0.min.js in Resources */,
@@ -617,7 +618,6 @@
 			files = (
 				96D3279618942CB9001E9F40 /* AppDelegate.m in Sources */,
 				96D327B618942E28001E9F40 /* WebViewController.m in Sources */,
-				967CF10618983AA400AA6E86 /* personal-library.js in Sources */,
 				96D3279218942CB9001E9F40 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

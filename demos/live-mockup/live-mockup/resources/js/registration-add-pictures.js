@@ -234,6 +234,6 @@ RegistrationAddPictures.touchFooterButton = function() {
 	}
 	PersonalLibrary.add(pictures);
 
-//	localStorage.setItem('initialized', 1);
-//	RegistrationCreateUser.show(true);
+	localStorage.setItem('initialized', 1);
+	RegistrationCreateUser.show(true);
 };
