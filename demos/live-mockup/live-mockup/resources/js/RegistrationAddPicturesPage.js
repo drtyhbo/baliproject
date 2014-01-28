@@ -1,4 +1,4 @@
-var RegistrationAddPictures = {
+var RegistrationAddPicturesPage = {
 	footerEl: null,
 	numSelected: 0,
 	pictures: null,
@@ -7,16 +7,16 @@ var RegistrationAddPictures = {
 	touchEndY: 0
 };
 
-RegistrationAddPictures.PAGE_SPACING = 35;
-RegistrationAddPictures.NUM_COLUMNS = 3;
-RegistrationAddPictures.SPACING = 5;
+RegistrationAddPicturesPage.PAGE_SPACING = 35;
+RegistrationAddPicturesPage.NUM_COLUMNS = 3;
+RegistrationAddPicturesPage.SPACING = 5;
 
 /**
  * Makes the add pictures registration page the current page.
  */
-RegistrationAddPictures.show = function(animate) {
+RegistrationAddPicturesPage.show = function(animate) {
   $.mobile.pageContainer.on('pagecontainerbeforetransition',
-			RegistrationAddPictures.beforeTransition);
+			RegistrationAddPicturesPage.beforeTransition);
 	$.mobile.pageContainer.pagecontainer('change', '#registration-add-pictures', {
 		changeHash: false,
 		showLoadMsg: false,
@@ -28,29 +28,29 @@ RegistrationAddPictures.show = function(animate) {
  * Event handler. Called before the add pictures registration page is made
  * visible.
  */
-RegistrationAddPictures.beforeTransition = function(event, ui) {
+RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
   if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
     $.mobile.pageContainer.off('pagecontainerbeforetransition',
 				arguments.callee);
     return;
   }
 
-	RegistrationAddPictures.pictures = [];
+	RegistrationAddPicturesPage.pictures = [];
 
-	RegistrationAddPictures.numSelected = 0;
-	RegistrationAddPictures.footerEl = ui.toPage
+	RegistrationAddPicturesPage.numSelected = 0;
+	RegistrationAddPicturesPage.footerEl = ui.toPage
 			.find('#add-pictures-footer')
-			.on(TOUCHSTART, RegistrationAddPictures.touchFooterButton);
-	RegistrationAddPictures.selectAllEl = ui.toPage
+			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
+	RegistrationAddPicturesPage.selectAllEl = ui.toPage
 			.find('#select-all')
-			.on(TOUCHSTART, RegistrationAddPictures.toggleSelectAll);
+			.on(TOUCHSTART, RegistrationAddPicturesPage.toggleSelectAll);
 
   var pictures = ui.toPage.find('#pictures');
 	var pictureDimension = (ui.toPage.width() -
-			RegistrationAddPictures.PAGE_SPACING -
-			RegistrationAddPictures.SPACING *
-					(RegistrationAddPictures.NUM_COLUMNS - 1)) /
-			RegistrationAddPictures.NUM_COLUMNS;
+			RegistrationAddPicturesPage.PAGE_SPACING -
+			RegistrationAddPicturesPage.SPACING *
+					(RegistrationAddPicturesPage.NUM_COLUMNS - 1)) /
+			RegistrationAddPicturesPage.NUM_COLUMNS;
 
 	var cameraRoll = CameraRoll.getCameraRoll();
 	for (var i = 0, asset; asset = cameraRoll[i]; i++) {
@@ -60,8 +60,8 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 					height: pictureDimension + 'px',
 					marginBottom: '5px',
 					marginLeft:
-							i % RegistrationAddPictures.NUM_COLUMNS != 0 ?
-									RegistrationAddPictures.SPACING + 'px' :
+							i % RegistrationAddPicturesPage.NUM_COLUMNS != 0 ?
+									RegistrationAddPicturesPage.SPACING + 'px' :
 									0,
 					position: 'relative',
 				  width: pictureDimension + 'px'
@@ -110,22 +110,22 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 			fadedEl: fadedEl,
 			checkedEl: checkedEl
 		};		
-		RegistrationAddPictures.pictures.push(picture);
+		RegistrationAddPicturesPage.pictures.push(picture);
 
-		thumbnailEl.on(TOUCHSTART, RegistrationAddPictures.touchStart);
-		thumbnailEl.on('touchmove', RegistrationAddPictures.touchMove);
+		thumbnailEl.on(TOUCHSTART, RegistrationAddPicturesPage.touchStart);
+		thumbnailEl.on('touchmove', RegistrationAddPicturesPage.touchMove);
 		thumbnailEl.on(TOUCHEND,
-				RegistrationAddPictures.touchEnd.bind(this, picture));
+				RegistrationAddPicturesPage.touchEnd.bind(this, picture));
 	}
 	
-	RegistrationAddPictures.toggleSelectAll();
+	RegistrationAddPicturesPage.toggleSelectAll();
 };
 
 /**
  * Returns true if all the pictures are selected.
  */
-RegistrationAddPictures.areAllSelected = function() {
-	for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
+RegistrationAddPicturesPage.areAllSelected = function() {
+	for (var i = 0, picture; picture = RegistrationAddPicturesPage.pictures[i]; i++) {
 		if (!picture.isSelected) {
 			return false;
 		}
@@ -138,8 +138,8 @@ RegistrationAddPictures.areAllSelected = function() {
  *   All are already selected: "Select none".
  *   Some are unselected: "Select all".
  */
-RegistrationAddPictures.setSelectAllText = function(areAllSelected) {
-	RegistrationAddPictures.selectAllEl.text(
+RegistrationAddPicturesPage.setSelectAllText = function(areAllSelected) {
+	RegistrationAddPicturesPage.selectAllEl.text(
 			areAllSelected ? 'Select none' : 'Select all');
 };
 
@@ -148,55 +148,55 @@ RegistrationAddPictures.setSelectAllText = function(areAllSelected) {
  *   All are already selected: Unselects all of them.
  *   Some are unselected: Selects all of them.
  */
-RegistrationAddPictures.toggleSelectAll = function(e) {
-	if (RegistrationAddPictures.areAllSelected()) {
-		for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
-			RegistrationAddPictures.toggleSelectedStatus(picture);
+RegistrationAddPicturesPage.toggleSelectAll = function(e) {
+	if (RegistrationAddPicturesPage.areAllSelected()) {
+		for (var i = 0, picture; picture = RegistrationAddPicturesPage.pictures[i]; i++) {
+			RegistrationAddPicturesPage.toggleSelectedStatus(picture);
 		}
-		RegistrationAddPictures.setSelectAllText(false);
-		RegistrationAddPictures.numSelected = 0;
+		RegistrationAddPicturesPage.setSelectAllText(false);
+		RegistrationAddPicturesPage.numSelected = 0;
 	} else {
-		for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
+		for (var i = 0, picture; picture = RegistrationAddPicturesPage.pictures[i]; i++) {
 			if (!picture.isSelected) {
-				RegistrationAddPictures.toggleSelectedStatus(picture);
+				RegistrationAddPicturesPage.toggleSelectedStatus(picture);
 			}
 		}
-		RegistrationAddPictures.setSelectAllText(true);
-		RegistrationAddPictures.numSelected = RegistrationAddPictures.pictures.length;
+		RegistrationAddPicturesPage.setSelectAllText(true);
+		RegistrationAddPicturesPage.numSelected = RegistrationAddPicturesPage.pictures.length;
 	}
 };
 
 /**
  * Toggles the selected status of an individual image.
  */
-RegistrationAddPictures.toggleSelectedStatus = function(picture) {
+RegistrationAddPicturesPage.toggleSelectedStatus = function(picture) {
 	var isSelected = picture.isSelected;
 	picture.isSelected = !picture.isSelected;
 
 	if (!isSelected) {
 		picture.fadedEl.show();
 		picture.checkedEl.show();
-		RegistrationAddPictures.setSelectAllText(
-				RegistrationAddPictures.areAllSelected());
-		RegistrationAddPictures.numSelected++;
+		RegistrationAddPicturesPage.setSelectAllText(
+				RegistrationAddPicturesPage.areAllSelected());
+		RegistrationAddPicturesPage.numSelected++;
 	} else {
 		picture.fadedEl.hide();
 		picture.checkedEl.hide();		
-		RegistrationAddPictures.setSelectAllText(false);
-		RegistrationAddPictures.numSelected--;
+		RegistrationAddPicturesPage.setSelectAllText(false);
+		RegistrationAddPicturesPage.numSelected--;
 	}
 
-	RegistrationAddPictures.footerEl.find('h2').text(
-			RegistrationAddPictures.numSelected ?
-					'Add ' + RegistrationAddPictures.numSelected :
+	RegistrationAddPicturesPage.footerEl.find('h2').text(
+			RegistrationAddPicturesPage.numSelected ?
+					'Add ' + RegistrationAddPicturesPage.numSelected :
 					'Skip');
 };
 
 /**
  * Event handler. Called when the user first touches an image.
  */
-RegistrationAddPictures.touchStart = function(e) {
-	RegistrationAddPictures.touchStartY = RegistrationAddPictures.touchEndY =
+RegistrationAddPicturesPage.touchStart = function(e) {
+	RegistrationAddPicturesPage.touchStartY = RegistrationAddPicturesPage.touchEndY =
 			e.originalEvent.pageY;
 };
 
@@ -204,18 +204,18 @@ RegistrationAddPictures.touchStart = function(e) {
  * Event handler. Called when the user moves her finger. We intercept this event
  * to keep track of how far the user is moving her finger.
  */
-RegistrationAddPictures.touchMove = function(e) {
-	RegistrationAddPictures.touchEndY = e.originalEvent.pageY;
+RegistrationAddPicturesPage.touchMove = function(e) {
+	RegistrationAddPicturesPage.touchEndY = e.originalEvent.pageY;
 };
 
 /**
  * Event handler. Called when the touch ends. Only toggle the select status of
  * the image if the user hasn't moved her finger by very much.
  */
-RegistrationAddPictures.touchEnd = function(picture) {
-	if (Math.abs(RegistrationAddPictures.touchEndY -
-							 RegistrationAddPictures.touchStartY) < 5) {
-		RegistrationAddPictures.toggleSelectedStatus(picture);
+RegistrationAddPicturesPage.touchEnd = function(picture) {
+	if (Math.abs(RegistrationAddPicturesPage.touchEndY -
+							 RegistrationAddPicturesPage.touchStartY) < 5) {
+		RegistrationAddPicturesPage.toggleSelectedStatus(picture);
 	}
 };
 
@@ -223,10 +223,10 @@ RegistrationAddPictures.touchEnd = function(picture) {
  * Event handler. Called when the user touches the footer button. Moves the
  * user to the second step of the registration flow.
  */
-RegistrationAddPictures.touchFooterButton = function() {
+RegistrationAddPicturesPage.touchFooterButton = function() {
 	// "Upload" those pictures which are selected.
 	var pictures = [];
-	for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
+	for (var i = 0, picture; picture = RegistrationAddPicturesPage.pictures[i]; i++) {
 		if (!picture.isSelected) {
 			continue;
 		}
@@ -235,5 +235,5 @@ RegistrationAddPictures.touchFooterButton = function() {
 	PersonalLibrary.add(pictures);
 
 	localStorage.setItem('initialized', 1);
-	RegistrationCreateUser.show(true);
+	RegistrationCreateUserPage.show(true);
 };

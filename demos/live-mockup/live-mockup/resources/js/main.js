@@ -6,9 +6,9 @@ $(document).ready(function() {
       localStorage.getItem('initialized') < 2) {
 		setTimeout(function() {
 			if (localStorage.getItem('initialized') == 1) {
-				RegistrationCreateUser.show(false);
+				RegistrationCreateUserPage.show(false);
 			} else {
-				RegistrationAddPictures.show(false);
+				RegistrationAddPicturesPage.show(false);
 			}
 		}, 100);
 	} else {
