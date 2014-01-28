@@ -11,6 +11,9 @@ RegistrationAddPictures.PAGE_SPACING = 35;
 RegistrationAddPictures.NUM_COLUMNS = 3;
 RegistrationAddPictures.SPACING = 5;
 
+/**
+ * Makes the add pictures registration page the current page.
+ */
 RegistrationAddPictures.show = function(animate) {
   $.mobile.pageContainer.on('pagecontainerbeforetransition',
 			RegistrationAddPictures.beforeTransition);
@@ -21,6 +24,10 @@ RegistrationAddPictures.show = function(animate) {
 	});
 };
 
+/**
+ * Event handler. Called before the add pictures registration page is made
+ * visible.
+ */
 RegistrationAddPictures.beforeTransition = function(event, ui) {
   if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
     $.mobile.pageContainer.off('pagecontainerbeforetransition',
@@ -33,10 +40,10 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 	RegistrationAddPictures.numSelected = 0;
 	RegistrationAddPictures.footerEl = ui.toPage
 			.find('#add-pictures-footer')
-			.on('touchstart', RegistrationAddPictures.clickFooterButton);
+			.on('touchstart', RegistrationAddPictures.touchFooterButton);
 	RegistrationAddPictures.selectAllEl = ui.toPage
 			.find('#select-all')
-			.on('touchstart', RegistrationAddPictures.selectAll);
+			.on('touchstart', RegistrationAddPictures.toggleSelectAll);
 
   var pictures = ui.toPage.find('#pictures');
 	var pictureDimension = (ui.toPage.width() -
@@ -111,9 +118,12 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 				RegistrationAddPictures.touchEnd.bind(this, picture));
 	}
 	
-	RegistrationAddPictures.selectAll();
+	RegistrationAddPictures.toggleSelectAll();
 };
 
+/**
+ * Returns true if all the pictures are selected.
+ */
 RegistrationAddPictures.areAllSelected = function() {
 	for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
 		if (!picture.selected) {
@@ -123,12 +133,22 @@ RegistrationAddPictures.areAllSelected = function() {
 	return true;
 };
 
+/**
+ * Sets the text on the Select all/Select none link. Sets text to:
+ *   All are already selected: "Select none".
+ *   Some are unselected: "Select all".
+ */
 RegistrationAddPictures.setSelectAllText = function(areAllSelected) {
 	RegistrationAddPictures.selectAllEl.text(
 			areAllSelected ? 'Select none' : 'Select all');
 };
 
-RegistrationAddPictures.selectAll = function(e) {
+/**
+ * Toggles the selected status of the images. When:
+ *   All are already selected: Unselects all of them.
+ *   Some are unselected: Selects all of them.
+ */
+RegistrationAddPictures.toggleSelectAll = function(e) {
 	if (RegistrationAddPictures.areAllSelected()) {
 		for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
 			RegistrationAddPictures.toggleSelectedStatus(picture);
@@ -146,22 +166,9 @@ RegistrationAddPictures.selectAll = function(e) {
 	}
 };
 
-RegistrationAddPictures.touchStart = function(e) {
-	RegistrationAddPictures.touchStartY = RegistrationAddPictures.touchEndY =
-			e.originalEvent.pageY;
-};
-
-RegistrationAddPictures.touchMove = function(e) {
-	RegistrationAddPictures.touchEndY = e.originalEvent.pageY;
-};
-
-RegistrationAddPictures.touchEnd = function(picture) {
-	if (Math.abs(RegistrationAddPictures.touchEndY -
-							 RegistrationAddPictures.touchStartY) < 5) {
-		RegistrationAddPictures.toggleSelectedStatus(picture);
-	}
-};
-
+/**
+ * Toggles the selected status of an individual image.
+ */
 RegistrationAddPictures.toggleSelectedStatus = function(picture) {
 	var isSelected = picture.selected;
 	picture.selected = !picture.selected;
@@ -185,7 +192,38 @@ RegistrationAddPictures.toggleSelectedStatus = function(picture) {
 					'Skip');
 };
 
-RegistrationAddPictures.clickFooterButton = function() {
+/**
+ * Event handler. Called when the user first touches an image.
+ */
+RegistrationAddPictures.touchStart = function(e) {
+	RegistrationAddPictures.touchStartY = RegistrationAddPictures.touchEndY =
+			e.originalEvent.pageY;
+};
+
+/**
+ * Event handler. Called when the user moves her finger. We intercept this event
+ * to keep track of how far the user is moving her finger.
+ */
+RegistrationAddPictures.touchMove = function(e) {
+	RegistrationAddPictures.touchEndY = e.originalEvent.pageY;
+};
+
+/**
+ * Event handler. Called when the touch ends. Only toggle the select status of
+ * the image if the user hasn't moved her finger by very much.
+ */
+RegistrationAddPictures.touchEnd = function(picture) {
+	if (Math.abs(RegistrationAddPictures.touchEndY -
+							 RegistrationAddPictures.touchStartY) < 5) {
+		RegistrationAddPictures.toggleSelectedStatus(picture);
+	}
+};
+
+/**
+ * Event handler. Called when the user touches the footer button. Moves the
+ * user to the second step of the registration flow.
+ */
+RegistrationAddPictures.touchFooterButton = function() {
 	localStorage.setItem('initialized', 1);
 	RegistrationCreateUser.show(true);
 };
