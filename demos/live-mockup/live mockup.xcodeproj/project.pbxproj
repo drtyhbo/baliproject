@@ -51,8 +51,6 @@
 		96C3DB24189579340090B7C1 /* IMG_0163.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAFF189579340090B7C1 /* IMG_0163.jpg */; };
 		96C3DB261895793F0090B7C1 /* jquery.mobile-1.4.0.min.css in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB251895793F0090B7C1 /* jquery.mobile-1.4.0.min.css */; };
 		96C3DB2818957ACD0090B7C1 /* camera-roll.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2718957ACD0090B7C1 /* camera-roll.js */; };
-		96C3DB2A189580EC0090B7C1 /* user-profile.html in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB29189580EC0090B7C1 /* user-profile.html */; };
-		96C3DB2C1895814B0090B7C1 /* home.html in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2B1895814B0090B7C1 /* home.html */; };
 		96C3DB2E1895847B0090B7C1 /* registration-add-pictures.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2D1895847B0090B7C1 /* registration-add-pictures.js */; };
 		96C3DB53189597210090B7C1 /* IMG_0333_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2F189597210090B7C1 /* IMG_0333_thumb.jpg */; };
 		96C3DB54189597210090B7C1 /* IMG_0334_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB30189597210090B7C1 /* IMG_0334_thumb.jpg */; };
@@ -163,8 +161,6 @@
 		96C3DAFF189579340090B7C1 /* IMG_0163.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0163.jpg; path = resources/img/camera/IMG_0163.jpg; sourceTree = "<group>"; };
 		96C3DB251895793F0090B7C1 /* jquery.mobile-1.4.0.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = "jquery.mobile-1.4.0.min.css"; path = "resources/jquery.mobile-1.4.0.min.css"; sourceTree = "<group>"; };
 		96C3DB2718957ACD0090B7C1 /* camera-roll.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "camera-roll.js"; path = "resources/js/camera-roll.js"; sourceTree = "<group>"; };
-		96C3DB29189580EC0090B7C1 /* user-profile.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "user-profile.html"; path = "resources/user-profile.html"; sourceTree = "<group>"; };
-		96C3DB2B1895814B0090B7C1 /* home.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = home.html; path = resources/home.html; sourceTree = "<group>"; };
 		96C3DB2D1895847B0090B7C1 /* registration-add-pictures.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "registration-add-pictures.js"; path = "resources/js/registration-add-pictures.js"; sourceTree = "<group>"; };
 		96C3DB2F189597210090B7C1 /* IMG_0333_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0333_thumb.jpg; path = resources/img/camera/IMG_0333_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB30189597210090B7C1 /* IMG_0334_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0334_thumb.jpg; path = resources/img/camera/IMG_0334_thumb.jpg; sourceTree = "<group>"; };
@@ -256,8 +252,6 @@
 				96C3DAD9189579100090B7C1 /* img */,
 				96C3DAD2189579000090B7C1 /* js */,
 				96D327BB1894356A001E9F40 /* main.html */,
-				96C3DB29189580EC0090B7C1 /* user-profile.html */,
-				96C3DB2B1895814B0090B7C1 /* home.html */,
 			);
 			name = html;
 			sourceTree = "<group>";
@@ -265,9 +259,9 @@
 		96C3DAD2189579000090B7C1 /* js */ = {
 			isa = PBXGroup;
 			children = (
-				96C3DAD31895790C0090B7C1 /* main.js */,
 				96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */,
 				96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */,
+				96C3DAD31895790C0090B7C1 /* main.js */,
 				96C3DB2718957ACD0090B7C1 /* camera-roll.js */,
 				96C3DB2D1895847B0090B7C1 /* registration-add-pictures.js */,
 				96C3DB791895AF6B0090B7C1 /* registration-create-user.js */,
@@ -583,7 +577,6 @@
 				96C3DB03189579340090B7C1 /* IMG_0339.jpg in Resources */,
 				96C3DB23189579340090B7C1 /* IMG_0161.jpg in Resources */,
 				96C3DB74189597210090B7C1 /* IMG_0178_thumb.jpg in Resources */,
-				96C3DB2C1895814B0090B7C1 /* home.html in Resources */,
 				96C3DB1D189579340090B7C1 /* IMG_0168.jpg in Resources */,
 				96C3DB261895793F0090B7C1 /* jquery.mobile-1.4.0.min.css in Resources */,
 				96C3DB09189579340090B7C1 /* IMG_0301.jpg in Resources */,
@@ -598,7 +591,6 @@
 				96C3DB58189597210090B7C1 /* IMG_0344_thumb.jpg in Resources */,
 				96C3DB13189579340090B7C1 /* IMG_0267.jpg in Resources */,
 				96D3279818942CB9001E9F40 /* Images.xcassets in Resources */,
-				96C3DB2A189580EC0090B7C1 /* user-profile.html in Resources */,
 				96C3DB6E189597210090B7C1 /* IMG_0229_thumb.jpg in Resources */,
 				96C3DB60189597210090B7C1 /* IMG_0330_thumb.jpg in Resources */,
 				96C3DB18189579340090B7C1 /* IMG_0230.jpg in Resources */,
