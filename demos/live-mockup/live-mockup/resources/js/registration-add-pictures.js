@@ -40,10 +40,10 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 	RegistrationAddPictures.numSelected = 0;
 	RegistrationAddPictures.footerEl = ui.toPage
 			.find('#add-pictures-footer')
-			.on('touchstart', RegistrationAddPictures.touchFooterButton);
+			.on(TOUCHSTART, RegistrationAddPictures.touchFooterButton);
 	RegistrationAddPictures.selectAllEl = ui.toPage
 			.find('#select-all')
-			.on('touchstart', RegistrationAddPictures.toggleSelectAll);
+			.on(TOUCHSTART, RegistrationAddPictures.toggleSelectAll);
 
   var pictures = ui.toPage.find('#pictures');
 	var pictureDimension = (ui.toPage.width() -
@@ -105,16 +105,16 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 				.appendTo(thumbnailEl);
 
 		var picture = {
-			selected: false,
+			isSelected: false,
 			asset: asset,
 			fadedEl: fadedEl,
 			checkedEl: checkedEl
 		};		
 		RegistrationAddPictures.pictures.push(picture);
 
-		thumbnailEl.on('touchstart', RegistrationAddPictures.touchStart);
+		thumbnailEl.on(TOUCHSTART, RegistrationAddPictures.touchStart);
 		thumbnailEl.on('touchmove', RegistrationAddPictures.touchMove);
-		thumbnailEl.on('touchend',
+		thumbnailEl.on(TOUCHEND,
 				RegistrationAddPictures.touchEnd.bind(this, picture));
 	}
 	
@@ -126,7 +126,7 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
  */
 RegistrationAddPictures.areAllSelected = function() {
 	for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
-		if (!picture.selected) {
+		if (!picture.isSelected) {
 			return false;
 		}
 	}
@@ -157,7 +157,7 @@ RegistrationAddPictures.toggleSelectAll = function(e) {
 		RegistrationAddPictures.numSelected = 0;
 	} else {
 		for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
-			if (!picture.selected) {
+			if (!picture.isSelected) {
 				RegistrationAddPictures.toggleSelectedStatus(picture);
 			}
 		}
@@ -170,8 +170,8 @@ RegistrationAddPictures.toggleSelectAll = function(e) {
  * Toggles the selected status of an individual image.
  */
 RegistrationAddPictures.toggleSelectedStatus = function(picture) {
-	var isSelected = picture.selected;
-	picture.selected = !picture.selected;
+	var isSelected = picture.isSelected;
+	picture.isSelected = !picture.isSelected;
 
 	if (!isSelected) {
 		picture.fadedEl.show();
@@ -224,6 +224,16 @@ RegistrationAddPictures.touchEnd = function(picture) {
  * user to the second step of the registration flow.
  */
 RegistrationAddPictures.touchFooterButton = function() {
-	localStorage.setItem('initialized', 1);
-	RegistrationCreateUser.show(true);
+	// "Upload" those pictures which are selected.
+	var pictures = [];
+	for (var i = 0, picture; picture = RegistrationAddPictures.pictures[i]; i++) {
+		if (!picture.isSelected) {
+			continue;
+		}
+		pictures.push(picture.asset);
+	}
+	PersonalLibrary.add(pictures);
+
+//	localStorage.setItem('initialized', 1);
+//	RegistrationCreateUser.show(true);
 };

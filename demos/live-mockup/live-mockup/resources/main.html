@@ -5,6 +5,8 @@
 	<script type="text/javascript">
 		var isIOS =
 				navigator.userAgent.indexOf('iPhone; CPU iPhone OS') != -1;
+		var TOUCHSTART = isIOS ? 'touchstart' : 'mousedown';
+		var TOUCHEND = isIOS ? 'touchend' : 'mouseup';
 	</script>
 
 	<script type="text/javascript">
@@ -34,7 +36,8 @@
 	    'main.js',
 	    'camera-roll.js',
 	    'registration-add-pictures.js',
-	    'registration-create-user.js'
+	    'registration-create-user.js',
+			'personal-library.js'
 	  ];
 	
 		addScript('jquery-1.11.0.min.js', false);

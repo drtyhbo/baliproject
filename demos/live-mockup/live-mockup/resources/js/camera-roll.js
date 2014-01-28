@@ -34,9 +34,6 @@ var cameraRoll = [
 	}, {
 		num: 180,
 		moment: 100
-	}, {
-		num: 155,
-		moment: 100
 	},
 	// Speed boat
 	{
