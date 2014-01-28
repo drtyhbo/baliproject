@@ -2,7 +2,9 @@ var RegistrationAddPictures = {
 	footerEl: null,
 	numSelected: 0,
 	pictures: null,
-	selectAllEl: null
+	selectAllEl: null,
+	touchStartY: 0,
+	touchEndY: 0
 };
 
 RegistrationAddPictures.PAGE_SPACING = 35;
@@ -37,51 +39,61 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 			.on('touchstart', RegistrationAddPictures.selectAll);
 
   var pictures = ui.toPage.find('#pictures');
-	var pictureDimension = (ui.toPage.width() - RegistrationAddPictures.PAGE_SPACING -
-			RegistrationAddPictures.SPACING * (RegistrationAddPictures.NUM_COLUMNS - 1)) /
+	var pictureDimension = (ui.toPage.width() -
+			RegistrationAddPictures.PAGE_SPACING -
+			RegistrationAddPictures.SPACING *
+					(RegistrationAddPictures.NUM_COLUMNS - 1)) /
 			RegistrationAddPictures.NUM_COLUMNS;
 
 	var cameraRoll = CameraRoll.getCameraRoll();
 	for (var i = 0, asset; asset = cameraRoll[i]; i++) {
 		var thumbnailEl = $('<span></span>')
-        .css('display', 'inline-block')
-				.css('width', pictureDimension + 'px')
-				.css('height', pictureDimension + 'px')
-		    .css('margin-bottom', '5px')
-		    .css('margin-left',
-						i % RegistrationAddPictures.NUM_COLUMNS != 0 ?
-								RegistrationAddPictures.SPACING + 'px' :
-								0)
-				.css('position', 'relative')
+        .css({
+					display: 'inline-block',
+					height: pictureDimension + 'px',
+					marginBottom: '5px',
+					marginLeft:
+							i % RegistrationAddPictures.NUM_COLUMNS != 0 ?
+									RegistrationAddPictures.SPACING + 'px' :
+									0,
+					position: 'relative',
+				  width: pictureDimension + 'px'
+				})
 				.appendTo(pictures);
 
 		var imageEl = $('<span></span>')
-        .css('background-image', 'url(' + CameraRoll.getThumb(asset) + ')')
-        .css('background-size', 'cover')
-				.css('display', 'inline-block')
-				.css('height', '100%')
-				.css('left', 0)
-				.css('position', 'absolute')
-				.css('top', 0)
-				.css('width', '100%')
+        .css({
+					backgroundImage: 'url(' + CameraRoll.getThumb(asset) + ')',
+	        backgroundSize: 'cover',
+					display: 'inline-block',
+					height: '100%',
+					left: 0,
+					position: 'absolute',
+					top: 0,
+					width: '100%'
+				})
 				.appendTo(thumbnailEl);
 
 		var fadedEl = $('<span></span>')
-        .css('background', '#ffffff')
-				.css('display', 'none')
-				.css('height', '100%')
-				.css('left', 0)
-				.css('opacity', 0.35)
-				.css('position', 'absolute')
-				.css('top', 0)
-				.css('width', '100%')
+				.css({
+	        background: '#ffffff',
+					display: 'none',
+					height: '100%',
+					left: 0,
+					opacity: 0.35,
+					position: 'absolute',
+					top: 0,
+					width: '100%'
+				})
 				.appendTo(thumbnailEl);
 
 		var checkedEl = $('<img></img>')
-				.css('bottom', 5)
-				.css('display', 'none')
-				.css('position', 'absolute')
-				.css('right', 5)
+				.css({
+					bottom: 5,
+					display: 'none',
+					position: 'absolute',
+					right: 5
+				})
 				.attr('src', Images.getPath() + 'check.png')
 				.appendTo(thumbnailEl);
 
@@ -93,8 +105,10 @@ RegistrationAddPictures.beforeTransition = function(event, ui) {
 		};		
 		RegistrationAddPictures.pictures.push(picture);
 
-		thumbnailEl.on('touchstart',
-				RegistrationAddPictures.toggleSelectedStatus.bind(this, picture));
+		thumbnailEl.on('touchstart', RegistrationAddPictures.touchStart);
+		thumbnailEl.on('touchmove', RegistrationAddPictures.touchMove);
+		thumbnailEl.on('touchend',
+				RegistrationAddPictures.touchEnd.bind(this, picture));
 	}
 	
 	RegistrationAddPictures.selectAll();
@@ -110,7 +124,8 @@ RegistrationAddPictures.areAllSelected = function() {
 };
 
 RegistrationAddPictures.setSelectAllText = function(areAllSelected) {
-	RegistrationAddPictures.selectAllEl.text(areAllSelected ? 'Select none' : 'Select all');
+	RegistrationAddPictures.selectAllEl.text(
+			areAllSelected ? 'Select none' : 'Select all');
 };
 
 RegistrationAddPictures.selectAll = function(e) {
@@ -131,6 +146,22 @@ RegistrationAddPictures.selectAll = function(e) {
 	}
 };
 
+RegistrationAddPictures.touchStart = function(e) {
+	RegistrationAddPictures.touchStartY = RegistrationAddPictures.touchEndY =
+			e.originalEvent.pageY;
+};
+
+RegistrationAddPictures.touchMove = function(e) {
+	RegistrationAddPictures.touchEndY = e.originalEvent.pageY;
+};
+
+RegistrationAddPictures.touchEnd = function(picture) {
+	if (Math.abs(RegistrationAddPictures.touchEndY -
+							 RegistrationAddPictures.touchStartY) < 5) {
+		RegistrationAddPictures.toggleSelectedStatus(picture);
+	}
+};
+
 RegistrationAddPictures.toggleSelectedStatus = function(picture) {
 	var isSelected = picture.selected;
 	picture.selected = !picture.selected;
@@ -138,7 +169,8 @@ RegistrationAddPictures.toggleSelectedStatus = function(picture) {
 	if (!isSelected) {
 		picture.fadedEl.show();
 		picture.checkedEl.show();
-		RegistrationAddPictures.setSelectAllText(RegistrationAddPictures.areAllSelected());
+		RegistrationAddPictures.setSelectAllText(
+				RegistrationAddPictures.areAllSelected());
 		RegistrationAddPictures.numSelected++;
 	} else {
 		picture.fadedEl.hide();
@@ -147,9 +179,10 @@ RegistrationAddPictures.toggleSelectedStatus = function(picture) {
 		RegistrationAddPictures.numSelected--;
 	}
 
-	RegistrationAddPictures.footerEl.find('h2').text(RegistrationAddPictures.numSelected ?
-			('Add ' + RegistrationAddPictures.numSelected) :
-			'Skip');
+	RegistrationAddPictures.footerEl.find('h2').text(
+			RegistrationAddPictures.numSelected ?
+					'Add ' + RegistrationAddPictures.numSelected :
+					'Skip');
 };
 
 RegistrationAddPictures.clickFooterButton = function() {

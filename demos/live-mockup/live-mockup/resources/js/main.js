@@ -1,7 +1,8 @@
 $(document).ready(function() {
 	$(document.body).show();
 
-	if (localStorage.getItem('initialized') || 0 < 2) {
+	if (!localStorage.getItem('initialized') ||
+      localStorage.getItem('initialized') == 1) {
 		setTimeout(function() {
 			if (localStorage.getItem('initialized') == 1) {
 				RegistrationCreateUser.show(false);
@@ -10,6 +11,6 @@ $(document).ready(function() {
 			}
 		}, 100);
 	} else {
-//    $.mobile.pageContainer.pagecontainer('change', 'user-profile.html');
+    $.mobile.pageContainer.pagecontainer('change', 'user-profile.html');
 	}
 });
