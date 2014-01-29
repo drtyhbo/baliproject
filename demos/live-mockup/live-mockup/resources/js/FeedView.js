@@ -1,3 +1,154 @@
+var ShareElement = Class.extend({
+	init: function(share) {
+		this.share = share;
+		this.currentPicture = 0;
+	},
+	
+	getEl: function() {
+		this.el = $('<div></div>')
+				.css({
+					marginBottom: '40px'
+				});
+		
+		var headerEl = $('<div></div>')
+				.css({
+					marginBottom: '10px'
+				})
+				.appendTo(this.el);
+		var thumbnailEl = $('<span></span>')
+				.css({
+					backgroundImage: 'url(' + this.share.user.thumbnailSrc + ')',
+					backgroundSize: 'cover',
+					borderRadius: '32px',
+					display: 'inline-block',
+					float: 'left',
+					height: '32px',
+					width: '32px'
+				})
+				.appendTo(headerEl);
+
+		var nameContainerEl = $('<div></div>')
+				.css({
+					height: '32px',
+					marginLeft: '37px',
+					position: 'relative'
+				})
+				.appendTo(headerEl);
+		var nameEl = $('<div></div>')
+				.css({
+					fontSize: '18px',
+					fontWeight: 'bold',
+					left: 0,
+					lineHeight: '18px',
+					position: 'absolute',
+					top: 0
+				})
+				.text(this.share.user.name)
+				.appendTo(nameContainerEl);
+		var countEl = $('<div></div>')
+				.css({
+					bottom: 0,
+					fontSize: '11px',
+					left: 0,
+					lineHeight: '11px',
+					position: 'absolute'
+				})
+				.text(this.share.pictures.length + ' pictures')
+				.appendTo(nameContainerEl);
+		var timeEl = $('<div></div>')
+				.css({
+					bottom: 0,
+					fontSize: '11px',
+					right: 0,
+					lineHeight: '11px',
+					position: 'absolute'
+				})
+				.text(this.getElapsedTime())
+				.appendTo(nameContainerEl);
+
+		this.createPicturesEl();
+
+		var descriptionEl = $('<div></div>')
+				.css({
+					fontSize: '12px',
+					marginTop: '10px'
+				})		
+				.text(this.share.description)
+				.appendTo(this.el)
+
+		return this.el;
+	},
+	
+	getBackgroundPictureEl: function(offset) {
+		return $('<div></div>')
+				.css({
+					backgroundColor: '#ddd',
+					border: '1px solid #ccc',
+					bottom: -offset,
+					left: offset,
+					position: 'absolute',
+					right: -offset,
+					top: offset
+				});
+	},
+
+	createPicturesEl: function() {
+		var picturesContainerEl = $(
+				'<div>' +
+						'<div style="padding-top: 100%"></div>' +
+				'</div>')
+						.css({
+							position: 'relative'
+						})
+						.appendTo(this.el);
+
+		this.getBackgroundPictureEl(3)
+				.appendTo(picturesContainerEl);
+		this.getBackgroundPictureEl(2)
+				.appendTo(picturesContainerEl);
+		this.getBackgroundPictureEl(1)
+				.appendTo(picturesContainerEl);
+
+		this.pictureEl = $('<div></div>')
+				.css({
+					backgroundImage:
+						'url(' + this.share.pictures[0].getSrc() + ')',
+					backgroundSize: 'cover',
+					bottom: 0,
+					left: 0,
+					position: 'absolute',
+					right: 0,
+					top: 0
+				})
+				.on(TOUCHEND, this.onTouchEndPicture.bind(this))
+				.appendTo(picturesContainerEl);
+	},
+	
+	getElapsedTime: function() {
+		var elapsedMs = new Date().getTime() - this.share.timestampMs;
+
+		// seconds...
+		if (elapsedMs < 60 * 1000) {
+			return Math.floor(elapsedMs / 1000) + 's';
+		// minutes...
+		} else if (elapsedMs < 60 * 60 * 1000) {
+			return Math.floor(elapsedMs / 60 / 1000) + 'm';
+		// hours...
+		} else if (elapsedMs < 24 * 60 * 60 * 1000) {
+			return Math.floor(elapsedMs / (60 * 60) / 1000) + 'h';
+		}
+	},
+	
+	onTouchEndPicture: function(e) {
+		this.currentPicture = (this.currentPicture + 1) % this.share.pictures.length;
+		this.pictureEl
+				.css({
+					backgroundImage:
+						'url(' + this.share.pictures[this.currentPicture].getSrc() + ')'
+			  });
+	}
+})
+
 var FeedView = {
 	shares: [
 		{
@@ -8,7 +159,9 @@ var FeedView = {
 				CameraRoll.getCameraRoll()[1],
 				CameraRoll.getCameraRoll()[2],
 				CameraRoll.getCameraRoll()[3],
-			]
+			],
+			// 6 minutes ago
+			timestampMs: new Date().getTime() - 6 * 60 * 1000
 		},
 		{
 			user: Users.getUser('marcello'),
@@ -18,7 +171,9 @@ var FeedView = {
 				CameraRoll.getCameraRoll()[5],
 				CameraRoll.getCameraRoll()[6],
 				CameraRoll.getCameraRoll()[7],
-			]
+			],
+			// 2 hours ago
+			timestampMs: new Date().getTime() - 120 * 60 * 1000
 		}
 	]
 };
@@ -42,67 +197,7 @@ FeedView.show = function(animate) {
 FeedView.beforeTransition = function(event, ui) {
 	var sharesEl = ui.toPage.find('#shares');
 	for (var i = 0, share; share = FeedView.shares[i]; i++) {
-		var shareEl = $('<div></div>')
-				.css({
-					marginBottom: '40px'
-				})
-				.appendTo(sharesEl);
-		
-		var nameContainerEl = $('<div></div>')
-				.css({
-					marginBottom: '10px'
-				})
-				.appendTo(shareEl);
-		var thumbnailEl = $('<span></span>')
-				.css({
-					backgroundImage: 'url(' + share.user.thumbnailSrc + ')',
-					backgroundSize: 'cover',
-					borderRadius: '32px',
-					display: 'inline-block',
-					float: 'left',
-					height: '32px',
-					width: '32px'
-				})
-				.appendTo(nameContainerEl);
-		var nameEl = $('<div></div>')
-				.css({
-					display: 'inline-block',
-					fontSize: '18px',
-					fontWeight: 'bold',
-					lineHeight: '32px',
-					marginLeft: '5px'
-				})
-				.text(share.user.name)
-				.appendTo(nameContainerEl);
-
-		var descriptionEl = $('<div></div>')
-				.css({
-					fontSize: '14px',
-					margin: '0 20px 10px 20px'
-				})		
-				.text(share.description)
-				.appendTo(shareEl)
-				
-		var imagesContainerEl = $(
-				'<div>' +
-						'<div style="padding-top: 100%"></div>' +
-				'</div>')
-						.css({
-							margin: '0 20px',
-							position: 'relative'
-						})
-						.appendTo(shareEl);
-		var imageEl = $('<div></div>')
-				.css({
-					backgroundImage:
-						'url(' + share.pictures[0].getSrc() + ')',
-					backgroundSize: 'cover',
-					bottom: 0,
-					left: 0,
-					position: 'absolute',
-					right: 0,
-					top: 0
-				})
-				.appendTo(imagesContainerEl);
+		var shareElement = new ShareElement(share);
+		shareElement.getEl().appendTo(sharesEl);
 	}
 }
