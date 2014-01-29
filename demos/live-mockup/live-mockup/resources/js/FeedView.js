@@ -98,6 +98,7 @@ var ShareElement = Class.extend({
 						'<div style="padding-top: 100%"></div>' +
 				'</div>')
 						.css({
+							margin: '0 -20px',
 							position: 'relative'
 						})
 						.appendTo(this.el);
