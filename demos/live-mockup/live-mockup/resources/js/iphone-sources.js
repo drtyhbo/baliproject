@@ -80,7 +80,7 @@ a.extend(this,{_panelID:b.attr("id"),_closeLink:b.find(":jqmData(rel='close')"),
 $(document).ready(function(){
   $(document.body).show();
   setTimeout(function(){
-		RegistrationAddPicturesPage.show();
+		FeedView.show();
   },500);
 });
 var Images = {};
@@ -132,7 +132,26 @@ CameraRoll.addAssetsToCameraRoll(103, [267, 268, 269, 271, 272, 275, 277, 281,
 																			 291, 301, 314, 330, 333, 334, 338, 339]);
 // New Years
 CameraRoll.addAssetsToCameraRoll(104, [342, 344]);
-var RegistrationAddPicturesPage = {
+var User = Class.extend({
+	init: function (name, username, thumbnailSrc) {
+    this.name = name || null;
+    this.username = username || null;
+		this.thumbnailSrc = thumbnailSrc || null;
+  }
+});
+
+var Users = {
+	users: {}
+};
+
+Users.users['amine'] = new User('Amine Zejli', 'amine',
+		Images.getPath('users/') + 'amine.jpg');
+Users.users['marcello'] = new User('Marcello Chermak', 'marcello',
+ 		Images.getPath('users/') + 'marcello.jpg');
+
+Users.getUser = function(username) {
+	return Users.users[username];
+};var RegistrationAddPicturesPage = {
 	footerEl: null,
 	numSelected: 0,
 	pictures: null,
@@ -723,8 +742,8 @@ LifeStreamLoadView.ReadLifeStream = function (name, email, profilePicturePath, t
 var FeedView = {
 	shares: [
 		{
-			name: 'Amine Zejli',
-			description: 'Silly republicans...',
+			user: Users.getUser('amine'),
+			description: 'Silly republicans... we met in a bar and started arguing about a bunch of crap. Got heated for a second, but then we became fast friends. They couldn\'t resist my moroccan charms.',
 			pictures: [
 				CameraRoll.getCameraRoll()[0],
 				CameraRoll.getCameraRoll()[1],
@@ -733,7 +752,7 @@ var FeedView = {
 			]
 		},
 		{
-			name: 'Marcello Chermak',
+			user: Users.getUser('marcello'),
 			description: 'Isn\'t California wonderful?',
 			pictures: [
 				CameraRoll.getCameraRoll()[4],
@@ -765,17 +784,43 @@ FeedView.beforeTransition = function(event, ui) {
 	var sharesEl = ui.toPage.find('#shares');
 	for (var i = 0, share; share = FeedView.shares[i]; i++) {
 		var shareEl = $('<div></div>')
+				.css({
+					marginBottom: '40px'
+				})
 				.appendTo(sharesEl);
 		
+		var nameContainerEl = $('<div></div>')
+				.css({
+					marginBottom: '10px'
+				})
+				.appendTo(shareEl);
+		var thumbnailEl = $('<span></span>')
+				.css({
+					backgroundImage: 'url(' + share.user.thumbnailSrc + ')',
+					backgroundSize: 'cover',
+					borderRadius: '32px',
+					display: 'inline-block',
+					float: 'left',
+					height: '32px',
+					width: '32px'
+				})
+				.appendTo(nameContainerEl);
 		var nameEl = $('<div></div>')
 				.css({
+					display: 'inline-block',
 					fontSize: '18px',
-					fontWeight: 'bold'
+					fontWeight: 'bold',
+					lineHeight: '32px',
+					marginLeft: '5px'
 				})
-				.text(share.name)
-				.appendTo(shareEl)
+				.text(share.user.name)
+				.appendTo(nameContainerEl);
 
 		var descriptionEl = $('<div></div>')
+				.css({
+					fontSize: '14px',
+					margin: '0 20px 10px 20px'
+				})		
 				.text(share.description)
 				.appendTo(shareEl)
 				
@@ -801,24 +846,4 @@ FeedView.beforeTransition = function(event, ui) {
 				})
 				.appendTo(imagesContainerEl);
 	}
-}
-var User = Class.extend({
-	init: function (name, email, thumbnailSrc) {
-    this.name = name || null;
-    this.email = email || null;
-		this.thumbnailSrc = thumbnailSrc || null;
-  }
-});
-
-var Users = {
-	users: []
-};
-
-Users.init = function() {
-	this.users.push(
-			new User('Amine Zejli', 'amine@zejli.com',
-							 Images.getPath('users/amine.jpg')));
- 	this.users.push(
- 			new User('Marcello Chermak', 'marcello@chermak.com',
- 							 Images.getPath('users/marcello.jpg')));
 }

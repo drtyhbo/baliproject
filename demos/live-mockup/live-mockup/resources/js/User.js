@@ -1,20 +1,20 @@
 var User = Class.extend({
-	init: function (name, email, thumbnailSrc) {
+	init: function (name, username, thumbnailSrc) {
     this.name = name || null;
-    this.email = email || null;
+    this.username = username || null;
 		this.thumbnailSrc = thumbnailSrc || null;
   }
 });
 
 var Users = {
-	users: []
+	users: {}
 };
 
-Users.init = function() {
-	this.users.push(
-			new User('Amine Zejli', 'amine@zejli.com',
-							 Images.getPath('users/amine.jpg')));
- 	this.users.push(
- 			new User('Marcello Chermak', 'marcello@chermak.com',
- 							 Images.getPath('users/marcello.jpg')));
-}
+Users.users['amine'] = new User('Amine Zejli', 'amine',
+		Images.getPath('users/') + 'amine.jpg');
+Users.users['marcello'] = new User('Marcello Chermak', 'marcello',
+ 		Images.getPath('users/') + 'marcello.jpg');
+
+Users.getUser = function(username) {
+	return Users.users[username];
+};

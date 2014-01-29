@@ -1,6 +1,6 @@
 $(document).ready(function(){
   $(document.body).show();
   setTimeout(function(){
-		RegistrationAddPicturesPage.show();
+		FeedView.show();
   },500);
 });
