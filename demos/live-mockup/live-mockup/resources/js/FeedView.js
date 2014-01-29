@@ -76,6 +76,52 @@ var ShareElement = Class.extend({
 				.text(this.share.description)
 				.appendTo(this.el)
 
+		var commentsEl = $('<div></div>')
+				.css({
+					marginTop: '10px'
+				})
+				.appendTo(this.el);
+		for (var i = 0, comment; comment = this.share.comments[i]; i++) {
+			var commentEl = $('<div></div>')
+					.css({
+						fontSize: '12px',
+						lineHeight: '16px'
+					})
+					.appendTo(commentsEl);
+			var nameEl = $('<span></span>')
+				.css({
+					fontWeight: 'bold'
+				})
+				.text(comment.user.name + ': ')
+				.appendTo(commentEl);
+			var commentTextEl = $('<span></span>')
+				.text(comment.comment)
+				.appendTo(commentEl);
+		}
+
+		var buttonsEl = $('<div></div>')
+				.css({
+					marginTop: '10px',
+					textAlign: 'right'
+				})		
+				.appendTo(this.el)
+		var shareButtonEl = $('<button></button>')
+				.addClass('ui-btn ui-btn-inline')
+				.css({
+					fontSize: '11px',
+				})
+				.text('Comment')
+				.appendTo(buttonsEl);
+		var shareButtonEl = $('<button></button>')
+				.addClass('ui-btn ui-btn-inline')
+				.css({
+					fontSize: '11px',
+					marginRight: 0
+				})
+				.text('Share')
+				.appendTo(buttonsEl);
+
+
 		return this.el;
 	},
 	
@@ -102,13 +148,6 @@ var ShareElement = Class.extend({
 							position: 'relative'
 						})
 						.appendTo(this.el);
-
-		this.getBackgroundPictureEl(3)
-				.appendTo(picturesContainerEl);
-		this.getBackgroundPictureEl(2)
-				.appendTo(picturesContainerEl);
-		this.getBackgroundPictureEl(1)
-				.appendTo(picturesContainerEl);
 
 		this.pictureEl = $('<div></div>')
 				.css({
@@ -161,6 +200,14 @@ var FeedView = {
 				CameraRoll.getCameraRoll()[2],
 				CameraRoll.getCameraRoll()[3],
 			],
+			comments: [{
+					comment: 'Hah republicans are so funny...',
+					user: Users.getUser('amine')
+				}, {
+					comment: 'Yeah they really are',
+					user: Users.getUser('marcello')
+				}
+			],
 			// 6 minutes ago
 			timestampMs: new Date().getTime() - 6 * 60 * 1000
 		},
@@ -173,6 +220,7 @@ var FeedView = {
 				CameraRoll.getCameraRoll()[6],
 				CameraRoll.getCameraRoll()[7],
 			],
+			comments: [],
 			// 2 hours ago
 			timestampMs: new Date().getTime() - 120 * 60 * 1000
 		}
