@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		967CF10618983AA400AA6E86 /* PersonalLibrary.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10518983AA400AA6E86 /* PersonalLibrary.js */; };
+		967CF10A18986F2500AA6E86 /* FeedView.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10918986F2500AA6E86 /* FeedView.js */; };
 		96C3DAD61895790C0090B7C1 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD31895790C0090B7C1 /* main.js */; };
 		96C3DAD71895790C0090B7C1 /* jquery-1.11.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */; };
 		96C3DAD81895790C0090B7C1 /* jquery.mobile-1.4.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */; };
@@ -117,6 +118,7 @@
 
 /* Begin PBXFileReference section */
 		967CF10518983AA400AA6E86 /* PersonalLibrary.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = PersonalLibrary.js; path = resources/js/PersonalLibrary.js; sourceTree = "<group>"; };
+		967CF10918986F2500AA6E86 /* FeedView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = FeedView.js; path = resources/js/FeedView.js; sourceTree = "<group>"; };
 		96C3DAD31895790C0090B7C1 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = resources/js/main.js; sourceTree = "<group>"; };
 		96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery-1.11.0.min.js"; path = "resources/js/jquery-1.11.0.min.js"; sourceTree = "<group>"; };
 		96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery.mobile-1.4.0.min.js"; path = "resources/js/jquery.mobile-1.4.0.min.js"; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				96C3DB2D1895847B0090B7C1 /* RegistrationAddPicturesPage.js */,
 				96C3DB791895AF6B0090B7C1 /* RegistrationCreateUserPage.js */,
 				967CF10518983AA400AA6E86 /* PersonalLibrary.js */,
+				967CF10918986F2500AA6E86 /* FeedView.js */,
 			);
 			name = js;
 			sourceTree = "<group>";
@@ -505,6 +508,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				967CF10A18986F2500AA6E86 /* FeedView.js in Resources */,
 				96C3DB2E1895847B0090B7C1 /* RegistrationAddPicturesPage.js in Resources */,
 				96C3DB02189579340090B7C1 /* IMG_0338.jpg in Resources */,
 				96C3DB1E189579340090B7C1 /* IMG_0178.jpg in Resources */,

@@ -1,0 +1,6 @@
+live-mockupVS
+*.csproj*
+obj
+Properties
+bin
+web.*config
