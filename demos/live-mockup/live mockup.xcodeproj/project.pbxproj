@@ -10,6 +10,8 @@
 		9635E15818998BD800C23BD1 /* iphone-sources.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E15718998BD800C23BD1 /* iphone-sources.js */; };
 		9666BD0B18999EEB003C1AB4 /* amine.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9666BD0918999EEB003C1AB4 /* amine.jpg */; };
 		9666BD0C18999EEB003C1AB4 /* marcello.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9666BD0A18999EEB003C1AB4 /* marcello.jpg */; };
+		9666BD101899CB46003C1AB4 /* andreas.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9666BD0E1899CB46003C1AB4 /* andreas.jpg */; };
+		9666BD111899CB46003C1AB4 /* veronica.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9666BD0F1899CB46003C1AB4 /* veronica.jpg */; };
 		96B7C72B189993AA00A17C6C /* iphone-main.html in Resources */ = {isa = PBXBuildFile; fileRef = 96B7C72A189993AA00A17C6C /* iphone-main.html */; };
 		96C3DB00189579340090B7C1 /* IMG_0333.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DADB189579330090B7C1 /* IMG_0333.jpg */; };
 		96C3DB01189579340090B7C1 /* IMG_0334.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DADC189579330090B7C1 /* IMG_0334.jpg */; };
@@ -115,6 +117,8 @@
 		9635E15718998BD800C23BD1 /* iphone-sources.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "iphone-sources.js"; path = "resources/js/iphone-sources.js"; sourceTree = "<group>"; };
 		9666BD0918999EEB003C1AB4 /* amine.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = amine.jpg; path = resources/img/users/amine.jpg; sourceTree = "<group>"; };
 		9666BD0A18999EEB003C1AB4 /* marcello.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = marcello.jpg; path = resources/img/users/marcello.jpg; sourceTree = "<group>"; };
+		9666BD0E1899CB46003C1AB4 /* andreas.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = andreas.jpg; path = resources/img/users/andreas.jpg; sourceTree = "<group>"; };
+		9666BD0F1899CB46003C1AB4 /* veronica.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = veronica.jpg; path = resources/img/users/veronica.jpg; sourceTree = "<group>"; };
 		96B7C72A189993AA00A17C6C /* iphone-main.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "iphone-main.html"; path = "resources/iphone-main.html"; sourceTree = "<group>"; };
 		96C3DADB189579330090B7C1 /* IMG_0333.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0333.jpg; path = resources/img/camera/IMG_0333.jpg; sourceTree = "<group>"; };
 		96C3DADC189579330090B7C1 /* IMG_0334.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0334.jpg; path = resources/img/camera/IMG_0334.jpg; sourceTree = "<group>"; };
@@ -238,6 +242,8 @@
 		9666BD0D18999EFF003C1AB4 /* users */ = {
 			isa = PBXGroup;
 			children = (
+				9666BD0E1899CB46003C1AB4 /* andreas.jpg */,
+				9666BD0F1899CB46003C1AB4 /* veronica.jpg */,
 				9666BD0918999EEB003C1AB4 /* amine.jpg */,
 				9666BD0A18999EEB003C1AB4 /* marcello.jpg */,
 			);
@@ -562,11 +568,13 @@
 				96C3DB0C189579340090B7C1 /* IMG_0268.jpg in Resources */,
 				96C3DB05189579340090B7C1 /* IMG_0344.jpg in Resources */,
 				96C3DB61189597210090B7C1 /* IMG_0230_thumb.jpg in Resources */,
+				9666BD101899CB46003C1AB4 /* andreas.jpg in Resources */,
 				96C3DB03189579340090B7C1 /* IMG_0339.jpg in Resources */,
 				96C3DB23189579340090B7C1 /* IMG_0161.jpg in Resources */,
 				96C3DB74189597210090B7C1 /* IMG_0178_thumb.jpg in Resources */,
 				96C3DB1D189579340090B7C1 /* IMG_0168.jpg in Resources */,
 				96C3DB261895793F0090B7C1 /* jquery.mobile-1.4.0.min.css in Resources */,
+				9666BD111899CB46003C1AB4 /* veronica.jpg in Resources */,
 				96C3DB09189579340090B7C1 /* IMG_0301.jpg in Resources */,
 				96C3DB0B189579340090B7C1 /* IMG_0330.jpg in Resources */,
 				96C3DB0E189579340090B7C1 /* IMG_0271.jpg in Resources */,

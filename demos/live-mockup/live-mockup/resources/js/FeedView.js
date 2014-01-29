@@ -210,8 +210,7 @@ var FeedView = {
 			],
 			// 6 minutes ago
 			timestampMs: new Date().getTime() - 6 * 60 * 1000
-		},
-		{
+		}, {
 			user: Users.getUser('marcello'),
 			description: 'Isn\'t California wonderful?',
 			pictures: [
@@ -223,6 +222,32 @@ var FeedView = {
 			comments: [],
 			// 2 hours ago
 			timestampMs: new Date().getTime() - 120 * 60 * 1000
+		}, {
+			user: Users.getUser('andreas'),
+			description: 'Phuket, fuck yeah...',
+			pictures: [
+				CameraRoll.getCameraRoll()[8],
+				CameraRoll.getCameraRoll()[9],
+				CameraRoll.getCameraRoll()[10],
+				CameraRoll.getCameraRoll()[11],
+				CameraRoll.getCameraRoll()[12],
+				CameraRoll.getCameraRoll()[13],
+				CameraRoll.getCameraRoll()[14],
+				CameraRoll.getCameraRoll()[15],
+			],
+			comments: [{
+					comment: 'Be safe on those things!',
+					user: Users.getUser('veronica')
+				}, {
+					comment: 'Lol, what a fruity pink bike ;)',
+					user: Users.getUser('amine')
+				}, {
+					comment: 'At least it stays upright...',
+					user: Users.getUser('andreas')
+				} 
+			],
+			// 5 hours ago
+			timestampMs: new Date().getTime() - 300 * 60 * 1000
 		}
 	]
 };
