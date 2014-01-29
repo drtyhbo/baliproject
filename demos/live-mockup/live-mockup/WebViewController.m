@@ -23,7 +23,7 @@
   _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, statusHeight, bounds.size.width, bounds.size.height - statusHeight)];
   [self.view addSubview:_webView];
   
-  NSURL *htmlURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"main" ofType:@"html"]];
+  NSURL *htmlURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"iphone-main" ofType:@"html"]];
   NSURLRequest *htmlRequest = [NSURLRequest requestWithURL:htmlURL];
   [_webView loadRequest:htmlRequest];
 }

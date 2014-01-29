@@ -1,11 +1,3 @@
-﻿
-var User = Class.extend({
-    init: function (name, email) {
-        this.name = name || null;     //user: string
-        this.email = email || null;    //email: string
-    }
-});
-
 var Picture = Class.extend({
     init: function (path) {
         this.path = path || null;
@@ -152,8 +144,3 @@ LifeStreamLoadView.ReadLifeStream = function (name, email, profilePicturePath, t
     return lifeStream;
 
 }
-
-
-
-
-

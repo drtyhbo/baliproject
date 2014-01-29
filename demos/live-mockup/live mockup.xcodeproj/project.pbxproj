@@ -7,14 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9635E1521899877B00C23BD1 /* jquery-inheritance.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E1501899877B00C23BD1 /* jquery-inheritance.js */; };
-		9635E1531899877B00C23BD1 /* LifeStreamLoadView.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E1511899877B00C23BD1 /* LifeStreamLoadView.js */; };
-		9635E1551899897400C23BD1 /* User.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E1541899897400C23BD1 /* User.js */; };
-		967CF10618983AA400AA6E86 /* PersonalLibrary.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10518983AA400AA6E86 /* PersonalLibrary.js */; };
-		967CF10A18986F2500AA6E86 /* FeedView.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10918986F2500AA6E86 /* FeedView.js */; };
-		96C3DAD61895790C0090B7C1 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD31895790C0090B7C1 /* main.js */; };
-		96C3DAD71895790C0090B7C1 /* jquery-1.11.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */; };
-		96C3DAD81895790C0090B7C1 /* jquery.mobile-1.4.0.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */; };
+		9635E15818998BD800C23BD1 /* iphone-sources.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E15718998BD800C23BD1 /* iphone-sources.js */; };
+		96B7C72B189993AA00A17C6C /* iphone-main.html in Resources */ = {isa = PBXBuildFile; fileRef = 96B7C72A189993AA00A17C6C /* iphone-main.html */; };
 		96C3DB00189579340090B7C1 /* IMG_0333.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DADB189579330090B7C1 /* IMG_0333.jpg */; };
 		96C3DB01189579340090B7C1 /* IMG_0334.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DADC189579330090B7C1 /* IMG_0334.jpg */; };
 		96C3DB02189579340090B7C1 /* IMG_0338.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DADD189579330090B7C1 /* IMG_0338.jpg */; };
@@ -53,8 +47,6 @@
 		96C3DB23189579340090B7C1 /* IMG_0161.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAFE189579340090B7C1 /* IMG_0161.jpg */; };
 		96C3DB24189579340090B7C1 /* IMG_0163.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAFF189579340090B7C1 /* IMG_0163.jpg */; };
 		96C3DB261895793F0090B7C1 /* jquery.mobile-1.4.0.min.css in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB251895793F0090B7C1 /* jquery.mobile-1.4.0.min.css */; };
-		96C3DB2818957ACD0090B7C1 /* CameraRoll.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2718957ACD0090B7C1 /* CameraRoll.js */; };
-		96C3DB2E1895847B0090B7C1 /* RegistrationAddPicturesPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2D1895847B0090B7C1 /* RegistrationAddPicturesPage.js */; };
 		96C3DB53189597210090B7C1 /* IMG_0333_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB2F189597210090B7C1 /* IMG_0333_thumb.jpg */; };
 		96C3DB54189597210090B7C1 /* IMG_0334_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB30189597210090B7C1 /* IMG_0334_thumb.jpg */; };
 		96C3DB55189597210090B7C1 /* IMG_0338_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB31189597210090B7C1 /* IMG_0338_thumb.jpg */; };
@@ -92,7 +84,6 @@
 		96C3DB75189597210090B7C1 /* IMG_0180_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB51189597210090B7C1 /* IMG_0180_thumb.jpg */; };
 		96C3DB76189597210090B7C1 /* IMG_0183_thumb.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB52189597210090B7C1 /* IMG_0183_thumb.jpg */; };
 		96C3DB7818959AA70090B7C1 /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB7718959AA70090B7C1 /* check.png */; };
-		96C3DB7A1895AF6C0090B7C1 /* RegistrationCreateUserPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DB791895AF6B0090B7C1 /* RegistrationCreateUserPage.js */; };
 		96D3278618942CB9001E9F40 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D3278518942CB9001E9F40 /* Foundation.framework */; };
 		96D3278818942CB9001E9F40 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D3278718942CB9001E9F40 /* CoreGraphics.framework */; };
 		96D3278A18942CB9001E9F40 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96D3278918942CB9001E9F40 /* UIKit.framework */; };
@@ -106,7 +97,6 @@
 		96D327A918942CB9001E9F40 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96D327A718942CB9001E9F40 /* InfoPlist.strings */; };
 		96D327AB18942CB9001E9F40 /* live_mockupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96D327AA18942CB9001E9F40 /* live_mockupTests.m */; };
 		96D327B618942E28001E9F40 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96D327B518942E28001E9F40 /* WebViewController.m */; };
-		96D327BC1894356A001E9F40 /* main.html in Resources */ = {isa = PBXBuildFile; fileRef = 96D327BB1894356A001E9F40 /* main.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,14 +110,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		9635E1501899877B00C23BD1 /* jquery-inheritance.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery-inheritance.js"; path = "resources/js/jquery-inheritance.js"; sourceTree = "<group>"; };
-		9635E1511899877B00C23BD1 /* LifeStreamLoadView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = LifeStreamLoadView.js; path = resources/js/LifeStreamLoadView.js; sourceTree = "<group>"; };
-		9635E1541899897400C23BD1 /* User.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = User.js; path = resources/js/User.js; sourceTree = "<group>"; };
-		967CF10518983AA400AA6E86 /* PersonalLibrary.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = PersonalLibrary.js; path = resources/js/PersonalLibrary.js; sourceTree = "<group>"; };
-		967CF10918986F2500AA6E86 /* FeedView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = FeedView.js; path = resources/js/FeedView.js; sourceTree = "<group>"; };
-		96C3DAD31895790C0090B7C1 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = resources/js/main.js; sourceTree = "<group>"; };
-		96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery-1.11.0.min.js"; path = "resources/js/jquery-1.11.0.min.js"; sourceTree = "<group>"; };
-		96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery.mobile-1.4.0.min.js"; path = "resources/js/jquery.mobile-1.4.0.min.js"; sourceTree = "<group>"; };
+		9635E15718998BD800C23BD1 /* iphone-sources.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "iphone-sources.js"; path = "resources/js/iphone-sources.js"; sourceTree = "<group>"; };
+		96B7C72A189993AA00A17C6C /* iphone-main.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "iphone-main.html"; path = "resources/iphone-main.html"; sourceTree = "<group>"; };
 		96C3DADB189579330090B7C1 /* IMG_0333.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0333.jpg; path = resources/img/camera/IMG_0333.jpg; sourceTree = "<group>"; };
 		96C3DADC189579330090B7C1 /* IMG_0334.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0334.jpg; path = resources/img/camera/IMG_0334.jpg; sourceTree = "<group>"; };
 		96C3DADD189579330090B7C1 /* IMG_0338.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0338.jpg; path = resources/img/camera/IMG_0338.jpg; sourceTree = "<group>"; };
@@ -166,8 +150,6 @@
 		96C3DAFE189579340090B7C1 /* IMG_0161.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0161.jpg; path = resources/img/camera/IMG_0161.jpg; sourceTree = "<group>"; };
 		96C3DAFF189579340090B7C1 /* IMG_0163.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0163.jpg; path = resources/img/camera/IMG_0163.jpg; sourceTree = "<group>"; };
 		96C3DB251895793F0090B7C1 /* jquery.mobile-1.4.0.min.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = "jquery.mobile-1.4.0.min.css"; path = "resources/jquery.mobile-1.4.0.min.css"; sourceTree = "<group>"; };
-		96C3DB2718957ACD0090B7C1 /* CameraRoll.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = CameraRoll.js; path = resources/js/CameraRoll.js; sourceTree = "<group>"; };
-		96C3DB2D1895847B0090B7C1 /* RegistrationAddPicturesPage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = RegistrationAddPicturesPage.js; path = resources/js/RegistrationAddPicturesPage.js; sourceTree = "<group>"; };
 		96C3DB2F189597210090B7C1 /* IMG_0333_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0333_thumb.jpg; path = resources/img/camera/IMG_0333_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB30189597210090B7C1 /* IMG_0334_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0334_thumb.jpg; path = resources/img/camera/IMG_0334_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB31189597210090B7C1 /* IMG_0338_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0338_thumb.jpg; path = resources/img/camera/IMG_0338_thumb.jpg; sourceTree = "<group>"; };
@@ -205,7 +187,6 @@
 		96C3DB51189597210090B7C1 /* IMG_0180_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0180_thumb.jpg; path = resources/img/camera/IMG_0180_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB52189597210090B7C1 /* IMG_0183_thumb.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = IMG_0183_thumb.jpg; path = resources/img/camera/IMG_0183_thumb.jpg; sourceTree = "<group>"; };
 		96C3DB7718959AA70090B7C1 /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = check.png; path = resources/img/check.png; sourceTree = "<group>"; };
-		96C3DB791895AF6B0090B7C1 /* RegistrationCreateUserPage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = RegistrationCreateUserPage.js; path = resources/js/RegistrationCreateUserPage.js; sourceTree = "<group>"; };
 		96D3278218942CB8001E9F40 /* live-mockup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "live-mockup.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96D3278518942CB9001E9F40 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		96D3278718942CB9001E9F40 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -224,7 +205,6 @@
 		96D327AA18942CB9001E9F40 /* live_mockupTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = live_mockupTests.m; sourceTree = "<group>"; };
 		96D327B418942E28001E9F40 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		96D327B518942E28001E9F40 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
-		96D327BB1894356A001E9F40 /* main.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = main.html; path = resources/main.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,7 +237,7 @@
 				96C3DB251895793F0090B7C1 /* jquery.mobile-1.4.0.min.css */,
 				96C3DAD9189579100090B7C1 /* img */,
 				96C3DAD2189579000090B7C1 /* js */,
-				96D327BB1894356A001E9F40 /* main.html */,
+				96B7C72A189993AA00A17C6C /* iphone-main.html */,
 			);
 			name = html;
 			sourceTree = "<group>";
@@ -265,17 +245,7 @@
 		96C3DAD2189579000090B7C1 /* js */ = {
 			isa = PBXGroup;
 			children = (
-				9635E1501899877B00C23BD1 /* jquery-inheritance.js */,
-				9635E1511899877B00C23BD1 /* LifeStreamLoadView.js */,
-				96C3DAD41895790C0090B7C1 /* jquery-1.11.0.min.js */,
-				96C3DAD51895790C0090B7C1 /* jquery.mobile-1.4.0.min.js */,
-				96C3DAD31895790C0090B7C1 /* main.js */,
-				96C3DB2718957ACD0090B7C1 /* CameraRoll.js */,
-				96C3DB2D1895847B0090B7C1 /* RegistrationAddPicturesPage.js */,
-				96C3DB791895AF6B0090B7C1 /* RegistrationCreateUserPage.js */,
-				967CF10518983AA400AA6E86 /* PersonalLibrary.js */,
-				967CF10918986F2500AA6E86 /* FeedView.js */,
-				9635E1541899897400C23BD1 /* User.js */,
+				9635E15718998BD800C23BD1 /* iphone-sources.js */,
 			);
 			name = js;
 			sourceTree = "<group>";
@@ -451,6 +421,7 @@
 			buildPhases = (
 				96D3277E18942CB8001E9F40 /* Sources */,
 				96D3277F18942CB8001E9F40 /* Frameworks */,
+				9635E15618998BB300C23BD1 /* Run Script */,
 				96D3278018942CB8001E9F40 /* Resources */,
 			);
 			buildRules = (
@@ -517,27 +488,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9635E1551899897400C23BD1 /* User.js in Resources */,
-				967CF10A18986F2500AA6E86 /* FeedView.js in Resources */,
-				96C3DB2E1895847B0090B7C1 /* RegistrationAddPicturesPage.js in Resources */,
 				96C3DB02189579340090B7C1 /* IMG_0338.jpg in Resources */,
 				96C3DB1E189579340090B7C1 /* IMG_0178.jpg in Resources */,
+				9635E15818998BD800C23BD1 /* iphone-sources.js in Resources */,
 				96C3DB20189579340090B7C1 /* IMG_0183.jpg in Resources */,
-				96C3DB7A1895AF6C0090B7C1 /* RegistrationCreateUserPage.js in Resources */,
-				9635E1521899877B00C23BD1 /* jquery-inheritance.js in Resources */,
-				9635E1531899877B00C23BD1 /* LifeStreamLoadView.js in Resources */,
 				96C3DB5D189597210090B7C1 /* IMG_0291_thumb.jpg in Resources */,
-				96C3DB2818957ACD0090B7C1 /* CameraRoll.js in Resources */,
 				96C3DB55189597210090B7C1 /* IMG_0338_thumb.jpg in Resources */,
 				96C3DB65189597210090B7C1 /* IMG_0268_thumb.jpg in Resources */,
-				96C3DAD81895790C0090B7C1 /* jquery.mobile-1.4.0.min.js in Resources */,
 				96C3DB73189597210090B7C1 /* IMG_0168_thumb.jpg in Resources */,
 				96C3DB66189597210090B7C1 /* IMG_0269_thumb.jpg in Resources */,
 				96C3DB62189597210090B7C1 /* IMG_0237_thumb.jpg in Resources */,
-				967CF10618983AA400AA6E86 /* PersonalLibrary.js in Resources */,
 				96C3DB6C189597210090B7C1 /* IMG_0225_thumb.jpg in Resources */,
-				96C3DAD61895790C0090B7C1 /* main.js in Resources */,
-				96C3DAD71895790C0090B7C1 /* jquery-1.11.0.min.js in Resources */,
 				96C3DB54189597210090B7C1 /* IMG_0334_thumb.jpg in Resources */,
 				96C3DB70189597210090B7C1 /* IMG_0155_thumb.jpg in Resources */,
 				96C3DB71189597210090B7C1 /* IMG_0161_thumb.jpg in Resources */,
@@ -551,6 +512,7 @@
 				96C3DB17189579340090B7C1 /* IMG_0229.jpg in Resources */,
 				96C3DB7818959AA70090B7C1 /* check.png in Resources */,
 				96C3DB72189597210090B7C1 /* IMG_0166_thumb.jpg in Resources */,
+				96B7C72B189993AA00A17C6C /* iphone-main.html in Resources */,
 				96C3DB15189579340090B7C1 /* IMG_0225.jpg in Resources */,
 				96C3DB69189597210090B7C1 /* IMG_0186_thumb.jpg in Resources */,
 				96C3DB63189597210090B7C1 /* IMG_0239_thumb.jpg in Resources */,
@@ -585,7 +547,6 @@
 				96C3DB0C189579340090B7C1 /* IMG_0268.jpg in Resources */,
 				96C3DB05189579340090B7C1 /* IMG_0344.jpg in Resources */,
 				96C3DB61189597210090B7C1 /* IMG_0230_thumb.jpg in Resources */,
-				96D327BC1894356A001E9F40 /* main.html in Resources */,
 				96C3DB03189579340090B7C1 /* IMG_0339.jpg in Resources */,
 				96C3DB23189579340090B7C1 /* IMG_0161.jpg in Resources */,
 				96C3DB74189597210090B7C1 /* IMG_0178_thumb.jpg in Resources */,
@@ -618,6 +579,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9635E15618998BB300C23BD1 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"\" > \"${SRCROOT}/live-mockup/resources/js/iphone-sources.js\"\ncat \"${SRCROOT}/live-mockup/resources/main.html\" | grep '<script.*src=' | sed 's/<script type=\"text\\/javascript\" src=\"\\([^\"]*\\)\"><\\/script>/\\1/' | xargs -n 1 echo ${SRCROOT}/live-mockup/resources/ | sed 's/ //g' | xargs cat > \"${SRCROOT}/live-mockup/resources/js/iphone-sources.js\"\ncat \"${SRCROOT}/live-mockup/resources/main.html\" | sed 's/<script type=\"text\\/javascript\" src=\"\\([^\"]*\\)\"><\\/script>//g' | sed 's/<\\/head>/<script type=\"text\\/javascript\" src=\"iphone-sources.js\"><\\/script>&/' > \"${SRCROOT}/live-mockup/resources/iphone-main.html\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		96D3277E18942CB8001E9F40 /* Sources */ = {
