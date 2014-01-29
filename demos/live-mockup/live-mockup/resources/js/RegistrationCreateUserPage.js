@@ -38,7 +38,7 @@ RegistrationCreateUserPage.beforeTransition = function(event, ui) {
 };
 
 RegistrationCreateUserPage.clickFooterButton = function() {
-	FeedView.show();
+	FeedView.show(true);
 	return;
 	if (!RegistrationCreateUserPage.nameEl.val()) {
 		RegistrationCreateUserPage.nameEl.focus();

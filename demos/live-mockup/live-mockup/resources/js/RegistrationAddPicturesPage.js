@@ -70,7 +70,7 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
 
 		var imageEl = $('<span></span>')
         .css({
-					backgroundImage: 'url(' + CameraRoll.getThumb(asset) + ')',
+					backgroundImage: 'url(' + asset.getThumbSrc() + ')',
 	        backgroundSize: 'cover',
 					display: 'inline-block',
 					height: '100%',

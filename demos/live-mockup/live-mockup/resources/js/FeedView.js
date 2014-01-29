@@ -4,20 +4,20 @@ var FeedView = {
 			name: 'Amine Zejli',
 			description: 'Silly republicans...',
 			pictures: [
-				cameraRoll[0],
-				cameraRoll[0],
-				cameraRoll[0],
-				cameraRoll[0]
+				CameraRoll.getCameraRoll()[0],
+				CameraRoll.getCameraRoll()[1],
+				CameraRoll.getCameraRoll()[2],
+				CameraRoll.getCameraRoll()[3],
 			]
 		},
 		{
 			name: 'Marcello Chermak',
 			description: 'Isn\'t California wonderful?',
 			pictures: [
-				cameraRoll[1],
-				cameraRoll[1],
-				cameraRoll[1],
-				cameraRoll[1]
+				CameraRoll.getCameraRoll()[4],
+				CameraRoll.getCameraRoll()[5],
+				CameraRoll.getCameraRoll()[6],
+				CameraRoll.getCameraRoll()[7],
 			]
 		}
 	]
@@ -26,13 +26,13 @@ var FeedView = {
 /**
  * Makes the feed view the current view.
  */
-FeedView.show = function() {
+FeedView.show = function(animate) {
   $.mobile.pageContainer.on('pagecontainerbeforetransition',
 			FeedView.beforeTransition);
 	$.mobile.pageContainer.pagecontainer('change', '#feed-view', {
 		changeHash: false,
 		showLoadMsg: false,
-    transition: 'slide'
+    transition: animate ? 'slide' : 'none'
   });
 };
 
@@ -69,7 +69,7 @@ FeedView.beforeTransition = function(event, ui) {
 		var imageEl = $('<div></div>')
 				.css({
 					backgroundImage:
-						'url(' + CameraRoll.getSrc(share.pictures[0]) + ')',
+						'url(' + share.pictures[0].getSrc() + ')',
 					backgroundSize: 'cover',
 					bottom: 0,
 					left: 0,
