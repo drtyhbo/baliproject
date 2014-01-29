@@ -1,0 +1,5 @@
+C:\Users\amine\Documents\GitHub\baliproject\demos\live-mockup\live-mockup\resources\obj\Debug\baliprojectui.csprojResolveAssemblyReference.cache
+C:\Users\amine\Documents\GitHub\baliproject\demos\live-mockup\live-mockup\resources\bin\baliprojectui.dll
+C:\Users\amine\Documents\GitHub\baliproject\demos\live-mockup\live-mockup\resources\bin\baliprojectui.pdb
+C:\Users\amine\Documents\GitHub\baliproject\demos\live-mockup\live-mockup\resources\obj\Debug\baliprojectui.dll
+C:\Users\amine\Documents\GitHub\baliproject\demos\live-mockup\live-mockup\resources\obj\Debug\baliprojectui.pdb
