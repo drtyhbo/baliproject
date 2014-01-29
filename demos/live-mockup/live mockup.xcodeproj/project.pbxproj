@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9635E1521899877B00C23BD1 /* jquery-inheritance.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E1501899877B00C23BD1 /* jquery-inheritance.js */; };
 		9635E1531899877B00C23BD1 /* LifeStreamLoadView.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E1511899877B00C23BD1 /* LifeStreamLoadView.js */; };
+		9635E1551899897400C23BD1 /* User.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E1541899897400C23BD1 /* User.js */; };
 		967CF10618983AA400AA6E86 /* PersonalLibrary.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10518983AA400AA6E86 /* PersonalLibrary.js */; };
 		967CF10A18986F2500AA6E86 /* FeedView.js in Resources */ = {isa = PBXBuildFile; fileRef = 967CF10918986F2500AA6E86 /* FeedView.js */; };
 		96C3DAD61895790C0090B7C1 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 96C3DAD31895790C0090B7C1 /* main.js */; };
@@ -121,6 +122,7 @@
 /* Begin PBXFileReference section */
 		9635E1501899877B00C23BD1 /* jquery-inheritance.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "jquery-inheritance.js"; path = "resources/js/jquery-inheritance.js"; sourceTree = "<group>"; };
 		9635E1511899877B00C23BD1 /* LifeStreamLoadView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = LifeStreamLoadView.js; path = resources/js/LifeStreamLoadView.js; sourceTree = "<group>"; };
+		9635E1541899897400C23BD1 /* User.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = User.js; path = resources/js/User.js; sourceTree = "<group>"; };
 		967CF10518983AA400AA6E86 /* PersonalLibrary.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = PersonalLibrary.js; path = resources/js/PersonalLibrary.js; sourceTree = "<group>"; };
 		967CF10918986F2500AA6E86 /* FeedView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = FeedView.js; path = resources/js/FeedView.js; sourceTree = "<group>"; };
 		96C3DAD31895790C0090B7C1 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = resources/js/main.js; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 				96C3DB791895AF6B0090B7C1 /* RegistrationCreateUserPage.js */,
 				967CF10518983AA400AA6E86 /* PersonalLibrary.js */,
 				967CF10918986F2500AA6E86 /* FeedView.js */,
+				9635E1541899897400C23BD1 /* User.js */,
 			);
 			name = js;
 			sourceTree = "<group>";
@@ -514,6 +517,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9635E1551899897400C23BD1 /* User.js in Resources */,
 				967CF10A18986F2500AA6E86 /* FeedView.js in Resources */,
 				96C3DB2E1895847B0090B7C1 /* RegistrationAddPicturesPage.js in Resources */,
 				96C3DB02189579340090B7C1 /* IMG_0338.jpg in Resources */,
