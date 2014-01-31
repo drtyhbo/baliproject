@@ -21,6 +21,7 @@
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/CameraRoll.js"></script>
 		<script type="text/javascript" src="js/User.js"></script>
+		<script type="text/javascript" src="js/AddPictures.js"></script>
     <script type="text/javascript" src="js/RegistrationAddPicturesPage.js"></script>
     <script type="text/javascript" src="js/RegistrationCreateUserPage.js"></script>
     <script type="text/javascript" src="js/PersonalLibrary.js"></script>
@@ -63,11 +64,7 @@
                 <h3 style="margin: 5px 0">Add to your personal stream</h3>
                 <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
             </div>
-            <div style="margin-bottom: 10px; text-align: right">
-                <span id="select-all" style="color: blue; cursor: pointer">Select all
-                </span>
-            </div>
-            <div id="pictures" style="width: 100%"></div>
+            <div id="pictures" style="margin: 0 5px"></div>
         </div>
         <div data-role="footer" data-position="fixed" data-tap-toggle="false"
             id="add-pictures-footer">
@@ -103,7 +100,7 @@
                 <h3 style="margin: 5px 0">Create your account</h3>
                 <h3 style="margin: 5px 0 20px">(we're uploading in the background)</h3>
             </div>
-            <div style="margin-top: 100px">
+            <div style="margin: 100px 10px 0 10px">
                 <input type="text" placeholder="Name" id="create-user-name">
                 <input type="email" placeholder="Email" id="create-user-email">
                 <input type="password" placeholder="Password"
