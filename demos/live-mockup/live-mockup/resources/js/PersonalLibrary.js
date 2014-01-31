@@ -38,14 +38,26 @@ PersonalLibrary.MAX_UPLOAD_DURATION_MS = 2000;
  */
 PersonalLibrary.UPLOAD_BAR_ANIMATION_DURATION_MS = 400;
 
+function getPersonalLibrary() {
+  var personalLibraryString = localStorage.getItem('personal-library') || "";
+  if (!personalLibraryString) {
+    return [];
+  }
+  
+  var personalLibrary = personalLibraryString.split(',');
+  for (var i = 0; i < personalLibrary.length; i++) {
+    personalLibrary[i] = parseInt(personalLibrary[i]);
+  }
+  return personalLibrary;
+}
+
 /**
  * Initializes the PersonalLibrary from local storage.
  */
 PersonalLibrary.init = function() {
-	var personalLibrary =
-			(localStorage.getItem('personal-library') || "").split(',');
+	var personalLibrary = getPersonalLibrary();
 	for (var i = 0, pictureNum; pictureNum = personalLibrary[i]; i++) {
-		PersonalLibrary.pictures[parseInt(pictureNum)] = {
+		PersonalLibrary.pictures[pictureNum] = {
 			isUploaded: true
 		};
 	}
@@ -62,19 +74,21 @@ PersonalLibrary.init = function() {
  * Adds pictures to the user's personal library.
  */
 PersonalLibrary.add = function(pictures) {
-	var personalLibrary = localStorage.getItem('personal-library') || [];
-	for (var i = 0, picture; picture = pictures[i]; i++) {
-		if (picture.num in PersonalLibrary.pictures) {
-			continue;
-		}
+	var personalLibrary = getPersonalLibrary();
+  if (pictures && pictures.length) {
+  	for (var i = 0, picture; picture = pictures[i]; i++) {
+  		if (picture.num in PersonalLibrary.pictures) {
+  			continue;
+  		}
 
-		PersonalLibrary.pictures[picture.num] = {
-			picture: picture,
-			isUploaded: false
-		};
+  		PersonalLibrary.pictures[picture.num] = {
+  			picture: picture,
+  			isUploaded: false
+  		};
 		
-		personalLibrary.push(picture.num);
-	}
+  		personalLibrary.push(picture.num);
+    }
+  }
 	localStorage.setItem('personal-library', personalLibrary);
 	
 	PersonalLibrary.startUpload();
@@ -98,7 +112,8 @@ PersonalLibrary.startUpload = function() {
       left: 0,
 			opacity: 0,
       position: 'fixed',
-      top: 0
+      top: 0,
+      zIndex: 2000
 		})
 		.appendTo($(document.body));
 	}

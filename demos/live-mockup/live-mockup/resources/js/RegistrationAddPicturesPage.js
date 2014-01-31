@@ -31,7 +31,7 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
 			.find('#add-pictures-footer')
 			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
 
-	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(),
+	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(), true,
 			RegistrationAddPicturesPage.onSelectionChanged);
 	RegistrationAddPicturesPage.addPictures.getEl()
 			.appendTo(ui.toPage.find('#pictures'));
@@ -55,5 +55,6 @@ RegistrationAddPicturesPage.touchFooterButton = function() {
 	// "Upload" those pictures which are selected.
 	PersonalLibrary.add(
 			RegistrationAddPicturesPage.addPictures.getSelected());
-	RegistrationCreateUserPage.show(true);
+//	RegistrationCreateUserPage.show(true);
+  FeedView.show(true);
 };

@@ -37,7 +37,7 @@ CameraRoll.addAssetsToCameraRoll = function(moment, assetNumbers) {
 }
 
 // Kuala Lumpur
-CameraRoll.addAssetsToCameraRoll(100, [151, 155, 161, 163, 166, 168, 178, 180]);
+CameraRoll.addAssetsToCameraRoll(100, [151, 155, 161, 166, 168, 178, 180]);
 // Speed boat
 CameraRoll.addAssetsToCameraRoll(101, [183, 184, 186, 187, 223]);
 // Koh lanta

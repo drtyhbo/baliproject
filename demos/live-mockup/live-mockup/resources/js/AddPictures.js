@@ -111,6 +111,10 @@ var AddPictures = Class.extend({
 		
 		return this.picturesEl;
 	},
+  
+  getPictures: function() {
+    return this.pictures;
+  },
 
 	getSelected: function() {
 		var pictures = [];
@@ -201,7 +205,7 @@ var AddPictures = Class.extend({
 	/**
 	 * Removes all the selected pictures.
 	 */
-	removeSelected: function() {
+	removeSelected: function(onRemoved) {
 		var selectedPicturesEl = this.picturesEl.find('.selected');
     var alreadyRemoved = false;
 		selectedPicturesEl.animate({
@@ -230,6 +234,8 @@ var AddPictures = Class.extend({
 								ADD_PICTURES_SPACING + 'px' :
 								0);
 			}
+
+      onRemoved();
 		}).bind(this));
 	},
 

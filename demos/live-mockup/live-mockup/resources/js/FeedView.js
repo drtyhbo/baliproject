@@ -382,7 +382,8 @@ var FeedView = {
 				Users.getUser('veronica')
 			]
 		}
-	]
+	],
+  isShown: false
 };
 
 /**
@@ -402,11 +403,18 @@ FeedView.show = function(animate) {
  * Event handler. Called before the feed view is made visible.
  */
 FeedView.beforeTransition = function(event, ui) {
-  if (ui.absUrl.indexOf('#feed-view') == -1) {
-    $.mobile.pageContainer.off('pagecontainerbeforetransition',
-				arguments.callee);
+  $.mobile.pageContainer.off('pagecontainerbeforetransition',
+			arguments.callee);
+
+  if (FeedView.isShown) {
     return;
   }
+  FeedView.isShown = true;
+
+	var addPicturesBtn = ui.toPage.find('#add-pictures-btn')
+			.on(TOUCHSTART, function() {
+				AddPicturesView.show();
+			});
 
 	var sharesEl = ui.toPage.find('#shares');
 	sharesEl.empty();
@@ -415,9 +423,4 @@ FeedView.beforeTransition = function(event, ui) {
 		var shareElement = new ShareElement(share);
 		shareElement.getEl().appendTo(sharesEl);
 	}
-	var addPicturesBtn = ui.toPage.find('#add-pictures-btn')
-			.on(TOUCHEND, function() {
-				addPicturesBtn.off(TOUCHEND, arguments.callee);
-				AddPicturesView.show();
-			});
 }

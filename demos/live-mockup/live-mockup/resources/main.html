@@ -39,32 +39,12 @@
 
     <!-- Registration add pictures -->
     <div data-role="page" id="registration-add-pictures">
-        <style type="text/css">
-            .circle {
-                background: #ddd;
-                border: 1px solid #888;
-                border-radius: 50%;
-                display: inline-block;
-                height: 50px;
-                line-height: 50px;
-                text-align: center;
-                width: 50px;
-            }
-        </style>
         <div data-role="content">
-            <div style="text-align: center">
-                <div class="circle"
-                    style="background: #bbb; margin-right: 10px">
-                    1
-                </div>
-                <div class="circle"
-                    style="background: #ddd">
-                    2
-                </div>
-                <h3 style="margin: 5px 0">Add to your personal stream</h3>
-                <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
-            </div>
-            <div id="pictures" style="margin: 0 5px"></div>
+      			<div data-role="header" data-position="fixed" data-tap-toggle="false"
+      			     id="header">
+      		    <h2>Camera roll</h2>
+        		</div>
+            <div id="pictures" style="margin: 10px 5px"></div>
         </div>
         <div data-role="footer" data-position="fixed" data-tap-toggle="false"
             id="add-pictures-footer">
@@ -74,32 +54,11 @@
 
     <!-- Registration create user -->
     <div data-role="page" id="registration-create-user">
-        <style type="text/css">
-            .circle {
-                background: #ddd;
-                border: 1px solid #888;
-                border-radius: 50%;
-                display: inline-block;
-                height: 50px;
-                line-height: 50px;
-                text-align: center;
-                width: 50px;
-            }
-        </style>
         <div data-role="content">
-            <div style="text-align: center"
-                id="create-user-header">
-                <div class="circle"
-                    style="background: #ddd; margin-right: 10px">
-                    1
-                </div>
-                <div class="circle"
-                    style="background: #bbb">
-                    2
-                </div>
-                <h3 style="margin: 5px 0">Create your account</h3>
-                <h3 style="margin: 5px 0 20px">(we're uploading in the background)</h3>
-            </div>
+      			<div data-role="header" data-position="fixed" data-tap-toggle="false"
+      			     id="header">
+      		    <h2>Create account</h2>
+        		</div>
             <div style="margin: 100px 10px 0 10px">
                 <input type="text" placeholder="Name" id="create-user-name">
                 <input type="email" placeholder="Email" id="create-user-email">
@@ -171,7 +130,7 @@
     <div data-role="content">
 			<div id="shares"></div>
 			<div data-role="footer" data-position="fixed" data-tap-toggle="false"
-			     id="footer">
+			     id="footer" data-id="main-footer">
 				<div data-role="navbar" id="navbar">
 	        <ul>
 	          <li><a href="#" data-icon="home"
@@ -190,17 +149,18 @@
 			<div data-role="header" data-position="fixed" data-tap-toggle="false"
 			     id="header">
 		    <h2>Camera roll</h2>
-				<a href="#" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right" id="add-button">Add</a>
+				<button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
+				   id="add-button">Add</button>
   		</div>
 			<div id="pictures" style="margin: 5px"></div>
 			<div data-role="footer" data-position="fixed" data-tap-toggle="false"
-			     id="footer">
+			     id="footer" data-id="main-footer">
 				<div data-role="navbar" id="navbar">
 	        <ul>
 	          <li><a href="#" id="home-btn" data-icon="home"></a></li>
 	          <li><a href="#" data-icon="delete"
 								   class="ui-btn-active"></a></li>
-	          <li><a href="#" data-icon="info"></a></li>
+	          <li><a href="#" id="profile-btn" data-icon="info"></a></li>
 	        </ul>
 	      </div>
 			</div>
