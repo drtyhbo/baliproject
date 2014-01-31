@@ -2,35 +2,37 @@ var ShareElement = Class.extend({
 	init: function(share) {
 		this.share = share;
 		this.currentPicture = 0;
+		this.commentsEl = null;
+		this.newCommentEl = null;
+		this.isCommenting = false;
 	},
 	
 	getEl: function() {
 		this.el = $('<div></div>')
 				.css({
-					marginBottom: '40px'
+					marginBottom: '10px'
 				});
 		
 		var headerEl = $('<div></div>')
-				.css({
-					marginBottom: '10px'
-				})
+				.addClass('header')
 				.appendTo(this.el);
 		var thumbnailEl = $('<span></span>')
 				.css({
 					backgroundImage: 'url(' + this.share.user.thumbnailSrc + ')',
 					backgroundSize: 'cover',
-					borderRadius: '32px',
+					borderRadius: '36px',
 					display: 'inline-block',
 					float: 'left',
-					height: '32px',
-					width: '32px'
+					height: '36px',
+					marginTop: '-2px',
+					width: '36px'
 				})
 				.appendTo(headerEl);
 
 		var nameContainerEl = $('<div></div>')
 				.css({
 					height: '32px',
-					marginLeft: '37px',
+					marginLeft: '41px',
 					position: 'relative'
 				})
 				.appendTo(headerEl);
@@ -45,7 +47,7 @@ var ShareElement = Class.extend({
 				})
 				.text(this.share.user.name)
 				.appendTo(nameContainerEl);
-		var countEl = $('<div></div>')
+		var locationEl = $('<div></div>')
 				.css({
 					bottom: 0,
 					fontSize: '11px',
@@ -53,7 +55,7 @@ var ShareElement = Class.extend({
 					lineHeight: '11px',
 					position: 'absolute'
 				})
-				.text(this.share.pictures.length + ' pictures')
+				.text(this.share.location)
 				.appendTo(nameContainerEl);
 		var timeEl = $('<div></div>')
 				.css({
@@ -68,36 +70,21 @@ var ShareElement = Class.extend({
 
 		this.createPicturesEl();
 
-		var descriptionEl = $('<div></div>')
-				.css({
-					fontSize: '12px',
-					marginTop: '10px'
-				})		
-				.text(this.share.description)
-				.appendTo(this.el)
-
-		var commentsEl = $('<div></div>')
+		this.commentsEl = $('<div></div>')
 				.css({
 					marginTop: '10px'
 				})
 				.appendTo(this.el);
-		for (var i = 0, comment; comment = this.share.comments[i]; i++) {
-			var commentEl = $('<div></div>')
-					.css({
-						fontSize: '12px',
-						lineHeight: '16px'
-					})
-					.appendTo(commentsEl);
-			var nameEl = $('<span></span>')
-				.css({
-					fontWeight: 'bold'
-				})
-				.text(comment.user.name + ': ')
-				.appendTo(commentEl);
-			var commentTextEl = $('<span></span>')
-				.text(comment.comment)
-				.appendTo(commentEl);
+		if (this.share.description) {
+			this.getCommentEl(this.share.user, this.share.description)
+					.appendTo(this.commentsEl);
 		}
+
+		for (var i = 0, comment; comment = this.share.comments[i]; i++) {
+			this.getCommentEl(comment.user, comment.comment)
+					.appendTo(this.commentsEl);
+		}
+		this.addNewCommentEl();
 
 		var buttonsEl = $('<div></div>')
 				.css({
@@ -105,26 +92,27 @@ var ShareElement = Class.extend({
 					textAlign: 'right'
 				})		
 				.appendTo(this.el)
-		var shareButtonEl = $('<button></button>')
+		this.commentButtonEl = $('<button></button>')
 				.addClass('ui-btn ui-btn-inline')
 				.css({
 					fontSize: '11px',
 				})
 				.text('Comment')
+				.on(TOUCHEND, this.onCommentButton.bind(this))
 				.appendTo(buttonsEl);
-		var shareButtonEl = $('<button></button>')
+		this.shareButtonEl = $('<button></button>')
 				.addClass('ui-btn ui-btn-inline')
 				.css({
 					fontSize: '11px',
 					marginRight: 0
 				})
 				.text('Share')
+				.on(TOUCHEND, this.onShareButton.bind(this))
 				.appendTo(buttonsEl);
-
 
 		return this.el;
 	},
-	
+
 	getBackgroundPictureEl: function(offset) {
 		return $('<div></div>')
 				.css({
@@ -164,6 +152,66 @@ var ShareElement = Class.extend({
 				.appendTo(picturesContainerEl);
 	},
 	
+	getCommentEl: function(user, comment) {
+		var commentEl = $('<div></div>')
+				.css({
+					clear: 'left',
+					fontSize: '12px',
+					lineHeight: '12px',
+					marginBottom: '10px'
+				});
+		var commentThumbnailEl = $('<div></div>')
+				.css({
+					backgroundImage: 'url(' + user.thumbnailSrc + ')',
+					backgroundSize: 'cover',
+					borderRadius: '5px',
+					display: 'inline-block',
+					float: 'left',
+					height: '24px',
+					width: '24px'
+				})
+				.appendTo(commentEl);
+		var commentContainerEl = $('<div></div>')
+				.css({
+					marginLeft: '29px'
+				})
+				.appendTo(commentEl);
+		if (comment) {
+			var commentUserNameEl = $('<div></div>')
+					.css({
+						fontWeight: 'bold'
+					})
+					.text(user.name)
+					.appendTo(commentContainerEl);
+			var commentUserCommentEl = $('<div></div>')
+					.text(comment)
+					.appendTo(commentContainerEl);
+		} else {
+			var commentUserCommentEl = $('<input></input>')
+					.css({
+						width: '100%'
+					})
+					.attr('placeholder', 'Your comment...')
+					.text(comment)
+					.appendTo(commentContainerEl);			
+		}
+		
+		return commentEl;
+	},
+	
+	addNewCommentEl: function() {
+		this.newCommentEl = $('<form></form>')
+				.css('display', 'none')
+				.on('submit', (function(e) {
+						this.postComment();
+						e.preventDefault();
+				}).bind(this))
+				.appendTo(this.commentsEl);
+		
+		this.getCommentEl(Users.getUser('andreas'), null)
+				.appendTo(this.newCommentEl);
+	},
+	
 	getElapsedTime: function() {
 		var elapsedMs = new Date().getTime() - this.share.timestampMs;
 
@@ -180,12 +228,70 @@ var ShareElement = Class.extend({
 	},
 	
 	onTouchEndPicture: function(e) {
-		this.currentPicture = (this.currentPicture + 1) % this.share.pictures.length;
+		var pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+		
+		// Next picture...
+		if (pageX > this.pictureEl.width() / 2) {
+			this.currentPicture = (this.currentPicture + 1) % this.share.pictures.length;
+		} else {
+			this.currentPicture--;
+			if (this.currentPicture < 0) {
+				this.currentPicture = this.share.pictures.length - 1;
+			}
+		}
+
 		this.pictureEl
 				.css({
 					backgroundImage:
 						'url(' + this.share.pictures[this.currentPicture].getSrc() + ')'
 			  });
+	},
+	
+	showAddComment: function() {
+		this.isCommenting = true;
+
+		this.newCommentEl.css('display', 'block');
+
+		setTimeout((function() {
+			this.newCommentEl.find('input').focus();
+		}).bind(this), 0);
+	
+		this.commentButtonEl.text('Save');
+		this.shareButtonEl.text('Cancel');		
+	},
+	
+	hideAddComment: function() {
+		this.isCommenting = false;
+
+		this.newCommentEl.remove();
+		this.addNewCommentEl();
+		this.commentButtonEl.text('Comment');
+		this.shareButtonEl.text('Share');				
+	},
+	
+	postComment: function() {
+		this.getCommentEl(Users.getUser('andreas'),
+											this.newCommentEl.find('input').val())
+				.css('opacity', 0)
+				.appendTo(this.commentsEl)
+				.animate({
+					opacity: 1
+				}, 200);
+		this.hideAddComment();
+	},
+	
+	onCommentButton: function(e) {
+		if (!this.isCommenting) {
+			this.showAddComment();
+		} else {
+			this.postComment();
+		}
+	},
+	
+	onShareButton: function(e) {
+		if (this.isCommenting) {
+			this.hideAddComment();
+		}
 	}
 })
 
@@ -193,7 +299,8 @@ var FeedView = {
 	shares: [
 		{
 			user: Users.getUser('amine'),
-			description: 'Silly republicans... we met in a bar and started arguing about a bunch of crap. Got heated for a second, but then we became fast friends. They couldn\'t resist my moroccan charms.',
+			location: 'Kuala Lumpur, Malaysia',
+			description: 'me in kuala lumpur <3',
 			pictures: [
 				CameraRoll.getCameraRoll()[0],
 				CameraRoll.getCameraRoll()[1],
@@ -201,18 +308,28 @@ var FeedView = {
 				CameraRoll.getCameraRoll()[3],
 			],
 			comments: [{
-					comment: 'Hah republicans are so funny...',
+					comment: 'are you grabbing the shaft?',
+					user: Users.getUser('marcello')
+				}, {
+					comment: 'it looked cooler in my mind...',
 					user: Users.getUser('amine')
 				}, {
-					comment: 'Yeah they really are',
+					comment: 'dont forget to play with the... mall?',
 					user: Users.getUser('marcello')
 				}
 			],
 			// 6 minutes ago
-			timestampMs: new Date().getTime() - 6 * 60 * 1000
+			timestampMs: new Date().getTime() - 6 * 60 * 1000,
+			visibleTo: [
+				Users.getUser('amine'),
+				Users.getUser('andreas'),
+				Users.getUser('marcello'),
+				Users.getUser('veronica')
+			]
 		}, {
-			user: Users.getUser('marcello'),
-			description: 'Isn\'t California wonderful?',
+			user: Users.getUser('andreas'),
+			location: 'Kuala Lumpur, Malaysia',
+			description: 'Kuala lumpur, standing in front of a big ass building.',
 			pictures: [
 				CameraRoll.getCameraRoll()[4],
 				CameraRoll.getCameraRoll()[5],
@@ -221,10 +338,14 @@ var FeedView = {
 			],
 			comments: [],
 			// 2 hours ago
-			timestampMs: new Date().getTime() - 120 * 60 * 1000
+			timestampMs: new Date().getTime() - 120 * 60 * 1000,
+			visibleTo: [
+				Users.getUser('amine')
+			]
 		}, {
 			user: Users.getUser('andreas'),
-			description: 'Phuket, fuck yeah...',
+			location: 'Phuket, Thailand',
+			description: 'Beach, bay, babes and bikes :)',
 			pictures: [
 				CameraRoll.getCameraRoll()[8],
 				CameraRoll.getCameraRoll()[9],
@@ -247,7 +368,13 @@ var FeedView = {
 				} 
 			],
 			// 5 hours ago
-			timestampMs: new Date().getTime() - 300 * 60 * 1000
+			timestampMs: new Date().getTime() - 300 * 60 * 1000,
+			visibleTo: [
+				Users.getUser('amine'),
+				Users.getUser('andreas'),
+				Users.getUser('marcello'),
+				Users.getUser('veronica')
+			]
 		}
 	]
 };
@@ -269,6 +396,23 @@ FeedView.show = function(animate) {
  * Event handler. Called before the feed view is made visible.
  */
 FeedView.beforeTransition = function(event, ui) {
+/*	var lastTop = 0;
+	var isHidden = false;
+	$(document).scroll(function() {
+		var currentScrollTop = document.body.scrollTop;
+		if (currentScrollTop > lastTop && currentScrollTop > 30 && !isHidden) {
+			$('#footer').stop().animate({
+				bottom: '-50px'
+			}, 200);
+			isHidden = true;
+		} else if (currentScrollTop < lastTop && isHidden) {
+			$('#footer').stop().animate({
+				bottom: '-1px'
+			}, 200);
+			isHidden = false;
+		}
+		lastTop = document.body.scrollTop;
+	});*/
 	var sharesEl = ui.toPage.find('#shares');
 	for (var i = 0, share; share = FeedView.shares[i]; i++) {
 		var shareElement = new ShareElement(share);
