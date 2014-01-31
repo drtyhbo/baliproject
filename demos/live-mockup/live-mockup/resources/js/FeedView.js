@@ -148,6 +148,9 @@ var ShareElement = Class.extend({
 					right: 0,
 					top: 0
 				})
+				.on(TOUCHEND, function(e) {
+					e.preventDefault();
+				})
 				.on(TOUCHEND, this.onTouchEndPicture.bind(this))
 				.appendTo(picturesContainerEl);
 	},
