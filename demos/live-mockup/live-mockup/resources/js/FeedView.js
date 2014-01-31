@@ -1,3 +1,5 @@
+var SHOW_THUMBNAIL_IN_COMMENTS = false;
+
 var ShareElement = Class.extend({
 	init: function(share) {
 		this.share = share;
@@ -72,7 +74,7 @@ var ShareElement = Class.extend({
 
 		this.commentsEl = $('<div></div>')
 				.css({
-					marginTop: '10px'
+					margin: '10px 10px 0 10px'
 				})
 				.appendTo(this.el);
 		if (this.share.description) {
@@ -88,7 +90,7 @@ var ShareElement = Class.extend({
 
 		var buttonsEl = $('<div></div>')
 				.css({
-					marginTop: '10px',
+					margin: '10px 10px 0 0',
 					textAlign: 'right'
 				})		
 				.appendTo(this.el)
@@ -113,26 +115,12 @@ var ShareElement = Class.extend({
 		return this.el;
 	},
 
-	getBackgroundPictureEl: function(offset) {
-		return $('<div></div>')
-				.css({
-					backgroundColor: '#ddd',
-					border: '1px solid #ccc',
-					bottom: -offset,
-					left: offset,
-					position: 'absolute',
-					right: -offset,
-					top: offset
-				});
-	},
-
 	createPicturesEl: function() {
 		var picturesContainerEl = $(
 				'<div>' +
 						'<div style="padding-top: 100%"></div>' +
 				'</div>')
 						.css({
-							margin: '0 -20px',
 							position: 'relative'
 						})
 						.appendTo(this.el);
@@ -161,34 +149,48 @@ var ShareElement = Class.extend({
 					clear: 'left',
 					fontSize: '12px',
 					lineHeight: '12px',
-					marginBottom: '10px'
+					marginBottom: '5px'
 				});
-		var commentThumbnailEl = $('<div></div>')
-				.css({
-					backgroundImage: 'url(' + user.thumbnailSrc + ')',
-					backgroundSize: 'cover',
-					borderRadius: '5px',
-					display: 'inline-block',
-					float: 'left',
-					height: '24px',
-					width: '24px'
-				})
-				.appendTo(commentEl);
+		if (SHOW_THUMBNAIL_IN_COMMENTS) {
+			var commentThumbnailEl = $('<div></div>')
+					.css({
+						backgroundImage: 'url(' + user.thumbnailSrc + ')',
+						backgroundSize: 'cover',
+						borderRadius: '24px',
+						display: 'inline-block',
+						float: 'left',
+						height: '24px',
+						width: '24px'
+					})
+					.appendTo(commentEl);
+		}
 		var commentContainerEl = $('<div></div>')
 				.css({
-					marginLeft: '29px'
+					marginLeft: SHOW_THUMBNAIL_IN_COMMENTS ? '29px' : 'auto'
 				})
 				.appendTo(commentEl);
 		if (comment) {
-			var commentUserNameEl = $('<div></div>')
-					.css({
-						fontWeight: 'bold'
-					})
-					.text(user.name)
-					.appendTo(commentContainerEl);
-			var commentUserCommentEl = $('<div></div>')
-					.text(comment)
-					.appendTo(commentContainerEl);
+			if (SHOW_THUMBNAIL_IN_COMMENTS) {
+				var commentUserNameEl = $('<div></div>')
+						.css({
+							fontWeight: 'bold'
+						})
+						.text(user.name)
+						.appendTo(commentContainerEl);
+				var commentUserCommentEl = $('<div></div>')
+						.text(comment)
+						.appendTo(commentContainerEl);
+			} else {
+				var commentUserNameEl = $('<span></span>')
+						.css({
+							fontWeight: 'bold'
+						})
+						.text(user.firstName)
+						.appendTo(commentContainerEl);
+				var commentUserCommentEl = $('<span></span>')
+						.text(': ' + comment)
+						.appendTo(commentContainerEl);
+			}
 		} else {
 			var commentUserCommentEl = $('<input></input>')
 					.css({
@@ -399,26 +401,22 @@ FeedView.show = function(animate) {
  * Event handler. Called before the feed view is made visible.
  */
 FeedView.beforeTransition = function(event, ui) {
-/*	var lastTop = 0;
-	var isHidden = false;
-	$(document).scroll(function() {
-		var currentScrollTop = document.body.scrollTop;
-		if (currentScrollTop > lastTop && currentScrollTop > 30 && !isHidden) {
-			$('#footer').stop().animate({
-				bottom: '-50px'
-			}, 200);
-			isHidden = true;
-		} else if (currentScrollTop < lastTop && isHidden) {
-			$('#footer').stop().animate({
-				bottom: '-1px'
-			}, 200);
-			isHidden = false;
-		}
-		lastTop = document.body.scrollTop;
-	});*/
+  if (ui.absUrl.indexOf('#feed-view') == -1) {
+    $.mobile.pageContainer.off('pagecontainerbeforetransition',
+				arguments.callee);
+    return;
+  }
+
 	var sharesEl = ui.toPage.find('#shares');
+	sharesEl.empty();
+
 	for (var i = 0, share; share = FeedView.shares[i]; i++) {
 		var shareElement = new ShareElement(share);
 		shareElement.getEl().appendTo(sharesEl);
 	}
+	var addPicturesBtn = ui.toPage.find('#add-pictures-btn')
+			.on(TOUCHEND, function() {
+				addPicturesBtn.off(TOUCHEND, arguments.callee);
+				AddPicturesView.show();
+			});
 }

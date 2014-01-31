@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="jquery.mobile-1.4.0.min.css"></link>
 		<style type="text/css">
 			.ui-content {
-				padding-top: 0;
+				padding: 0;
 			}
 		</style>
     <script type="text/javascript">
@@ -26,6 +26,7 @@
     <script type="text/javascript" src="js/PersonalLibrary.js"></script>
     <script type="text/javascript" src="js/LifeStreamLoadView.js"></script>
 		<script type="text/javascript" src="js/FeedView.js"></script>
+		<script type="text/javascript" src="js/AddPicturesView.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -167,8 +168,7 @@
 			.header {
 				background: #eee;
 				border-top: 1px solid #ddd;
-				margin: 0 -20px 0 -20px;
-				padding: 10px 20px;
+				padding: 10px;
 			}
 		</style>
     <div data-role="content">
@@ -177,10 +177,33 @@
 			     id="footer">
 				<div data-role="navbar" id="navbar">
 	        <ul>
-	          <li><a href="#feed-view" data-icon="home"
+	          <li><a href="#" data-icon="home"
 							     class="ui-btn-active"></a></li>
-	          <li><a href="#add-view" data-icon="delete"></a></li>
-	          <li><a href="#profile-view" data-icon="info"></a></li>
+	          <li><a href="#" id="add-pictures-btn" data-icon="delete"></a></li>
+	          <li><a href="#" data-icon="info"></a></li>
+	        </ul>
+	      </div>
+			</div>
+		</div>
+  </div>
+
+  <!-- Add pictures view -->
+  <div data-role="page" id="add-pictures-view">
+    <div data-role="content">
+			<div data-role="header" data-position="fixed" data-tap-toggle="false"
+			     id="header">
+	 			<h2>Import</h2>
+				<a class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-icon-check" data-role="button" role="button">Add</a>
+  		</div>
+			<div id="pictures"></div>
+			<div data-role="footer" data-position="fixed" data-tap-toggle="false"
+			     id="footer">
+				<div data-role="navbar" id="navbar">
+	        <ul>
+	          <li><a href="#" id="home-btn" data-icon="home"></a></li>
+	          <li><a href="#" data-icon="delete"
+								   class="ui-btn-active"></a></li>
+	          <li><a href="#" data-icon="info"></a></li>
 	        </ul>
 	      </div>
 			</div>

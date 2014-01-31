@@ -3,6 +3,8 @@ var User = Class.extend({
     this.name = name || null;
     this.username = username || null;
 		this.thumbnailSrc = thumbnailSrc || null;
+		this.firstName = name.split(' ')[0];
+		this.lastName = name.split(' ')[1];
   }
 });
 
