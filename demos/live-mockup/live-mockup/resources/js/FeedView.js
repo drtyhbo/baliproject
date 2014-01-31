@@ -198,6 +198,7 @@ var ShareElement = Class.extend({
 					})
 					.attr('placeholder', 'Your comment...')
 					.text(comment)
+					.blur(this.hideAddComment.bind(this))
 					.appendTo(commentContainerEl);			
 		}
 		
