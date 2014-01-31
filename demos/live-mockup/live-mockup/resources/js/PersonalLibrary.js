@@ -20,7 +20,7 @@
  */
 
 var PersonalLibrary = {
-	pictures: localStorage.getItem('personal-library') || {},
+	pictures: {},
 	uploadTimerId: 0,
 	toUpload: [],
   uploadEl: null,
@@ -39,9 +39,30 @@ PersonalLibrary.MAX_UPLOAD_DURATION_MS = 2000;
 PersonalLibrary.UPLOAD_BAR_ANIMATION_DURATION_MS = 400;
 
 /**
+ * Initializes the PersonalLibrary from local storage.
+ */
+PersonalLibrary.init = function() {
+	var personalLibrary =
+			(localStorage.getItem('personal-library') || "").split(',');
+	for (var i = 0, pictureNum; pictureNum = personalLibrary[i]; i++) {
+		PersonalLibrary.pictures[parseInt(pictureNum)] = {
+			isUploaded: true
+		};
+	}
+	
+	var cameraRoll = CameraRoll.getCameraRoll();
+	for (var i = 0, picture; picture = cameraRoll[i]; i++) {
+		if (picture.num in PersonalLibrary.pictures) {
+			PersonalLibrary.pictures[picture.num] = picture;
+		}
+	}
+};
+
+/**
  * Adds pictures to the user's personal library.
  */
 PersonalLibrary.add = function(pictures) {
+	var personalLibrary = localStorage.getItem('personal-library') || [];
 	for (var i = 0, picture; picture = pictures[i]; i++) {
 		if (picture.num in PersonalLibrary.pictures) {
 			continue;
@@ -51,9 +72,19 @@ PersonalLibrary.add = function(pictures) {
 			picture: picture,
 			isUploaded: false
 		};
+		
+		personalLibrary.push(picture.num);
 	}
+	localStorage.setItem('personal-library', personalLibrary);
 	
 	PersonalLibrary.startUpload();
+};
+
+/**
+ * Returns true if the specified picture is already in the library.
+ */
+PersonalLibrary.hasPicture = function(picture) {
+	return picture.num in PersonalLibrary.pictures;
 };
 
 /**

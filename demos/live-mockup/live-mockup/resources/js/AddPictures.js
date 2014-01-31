@@ -3,11 +3,12 @@ var ADD_PICTURES_NUM_COLUMNS = 3;
 var ADD_PICTURES_SPACING = 5;
 
 var AddPictures = Class.extend({
-	init: function(width, onSelectionChanged) {
+	init: function(width, showSelectAll, onSelectionChanged) {
 		this.numSelected = 0;
 		this.onSelectionChanged = onSelectionChanged;
 		this.pictures = [];
 		this.selectAllEl = null;
+		this.showSelectAll = showSelectAll;
 		this.touchStartY = 0;
 		this.touchEndY = 0;
 		this.width = width;
@@ -18,42 +19,49 @@ var AddPictures = Class.extend({
 				ADD_PICTURES_SPACING * (ADD_PICTURES_NUM_COLUMNS - 1)) /
 				ADD_PICTURES_NUM_COLUMNS;
 		
-		var picturesEl = $('<div></div>');
-		
-		var selectAllContainerEl = $('<div></div>')
-				.css({
-					marginBottom: '10px',
-					textAlign: 'right'
-				})
-				.appendTo(picturesEl);				
-		this.selectAllEl = $('<span></span>')
-				.css({
-					color: 'blue',
-					cursor: 'pointer'
-				})
-				.text('Select all')
-				.on(TOUCHEND, this.toggleSelectAll.bind(this))
-				.appendTo(selectAllContainerEl);
+		this.picturesEl = $('<div></div>');
+
+		if (this.showSelectAll) {
+			var selectAllContainerEl = $('<div></div>')
+					.css({
+						marginBottom: '10px',
+						textAlign: 'right'
+					})
+					.appendTo(this.picturesEl);				
+			this.selectAllEl = $('<span></span>')
+					.css({
+						color: 'blue',
+						cursor: 'pointer'
+					})
+					.text('Select all')
+					.on(TOUCHEND, this.toggleSelectAll.bind(this))
+					.appendTo(selectAllContainerEl);
+		}
 
 		var cameraRoll = CameraRoll.getCameraRoll();
-		for (var i = 0, asset; asset = cameraRoll[i]; i++) {
+		var numPictures = 0;
+ 		for (var i = 0, picture; picture = cameraRoll[i]; i++) {
+			if (PersonalLibrary.hasPicture(picture)) {
+				continue;
+			}
+
 			var thumbnailEl = $('<span></span>')
 		      .css({
 						display: 'inline-block',
 						height: pictureDimension + 'px',
 						marginBottom: '5px',
 						marginLeft:
-								i % ADD_PICTURES_NUM_COLUMNS != 0 ?
+								numPictures++ % ADD_PICTURES_NUM_COLUMNS != 0 ?
 										ADD_PICTURES_SPACING + 'px' :
 										0,
 						position: 'relative',
 					  width: pictureDimension + 'px'
 					})
-					.appendTo(picturesEl);
+					.appendTo(this.picturesEl);
 
 			var imageEl = $('<span></span>')
 		      .css({
-						backgroundImage: 'url(' + asset.getThumbSrc() + ')',
+						backgroundImage: 'url(' + picture.getThumbSrc() + ')',
 		        backgroundSize: 'cover',
 						display: 'inline-block',
 						height: '100%',
@@ -89,9 +97,10 @@ var AddPictures = Class.extend({
 
 			var picture = {
 				isSelected: false,
-				asset: asset,
+				picture: picture,
 				fadedEl: fadedEl,
-				checkedEl: checkedEl
+				checkedEl: checkedEl,
+				thumbnailEl: thumbnailEl
 			};
 			this.pictures.push(picture);
 
@@ -100,9 +109,7 @@ var AddPictures = Class.extend({
 			thumbnailEl.on(TOUCHEND, this.touchEnd.bind(this, picture));
 		}
 		
-		this.toggleSelectAll();
-		
-		return picturesEl;
+		return this.picturesEl;
 	},
 
 	getSelected: function() {
@@ -111,7 +118,7 @@ var AddPictures = Class.extend({
 			if (!picture.isSelected) {
 				continue;
 			}
-			pictures.push(picture.asset);
+			pictures.push(picture.picture);
 		}
 		return pictures;
 	},
@@ -124,11 +131,13 @@ var AddPictures = Class.extend({
 		picture.isSelected = !picture.isSelected;
 
 		if (!isSelected) {
+			picture.thumbnailEl.addClass('selected');
 			picture.fadedEl.show();
 			picture.checkedEl.show();
 			this.setSelectAllText(this.areAllSelected());
 			this.numSelected++;
 		} else {
+			picture.thumbnailEl.removeClass('selected');
 			picture.fadedEl.hide();
 			picture.checkedEl.hide();		
 			this.setSelectAllText(false);
@@ -154,6 +163,10 @@ var AddPictures = Class.extend({
 	 *   Some are unselected: "Select all".
 	 */
 	setSelectAllText: function(areAllSelected) {
+		if (!this.selectAllEl) {
+			return;
+		}
+
 		this.selectAllEl.text(
 				areAllSelected ? 'Select none' : 'Select all');
 	},
@@ -183,6 +196,41 @@ var AddPictures = Class.extend({
 		if (this.onSelectionChanged) {
 			this.onSelectionChanged(this.numSelected);
 		}
+	},
+
+	/**
+	 * Removes all the selected pictures.
+	 */
+	removeSelected: function() {
+		var selectedPicturesEl = this.picturesEl.find('.selected');
+    var alreadyRemoved = false;
+		selectedPicturesEl.animate({
+			opacity: 0
+		}, 500, 'swing', (function() {
+      // This gets called for each picture. Only need to remove the pictures
+      // once.
+      if (alreadyRemoved) {
+        return;
+      }
+      alreadyRemoved = true;
+
+			selectedPicturesEl.remove();
+			// Remove the selected pictures from the list of pictures.
+			for (var i = this.pictures.length - 1; i >= 0; i--) {
+        if (this.pictures[i].isSelected) {
+          this.pictures.splice(i, 1);
+        }
+			}
+      this.numSelected = 0;
+
+			// Update the remaining margins.
+			for (var i = 0, picture; picture = this.pictures[i]; i++) {
+			  picture.thumbnailEl.css('margin-left',
+						i % ADD_PICTURES_NUM_COLUMNS != 0 ?
+								ADD_PICTURES_SPACING + 'px' :
+								0);
+			}
+		}).bind(this));
 	},
 
 	/**

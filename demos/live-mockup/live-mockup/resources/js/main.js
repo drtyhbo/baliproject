@@ -1,13 +1,13 @@
 $(document).ready(function(){
   $(document.body).show();
 	setTimeout(function() {
-/*		if (!localStorage.getItem('registration-pictures')) {
+		PersonalLibrary.init();
+		if (!localStorage.getItem('personal-library')) {
 			RegistrationAddPicturesPage.show(false);
 		} else if (!localStorage.getItem('registration-name')) {
 			RegistrationCreateUserPage.show(false);		
 		} else {
 			FeedView.show(false);
-		}*/
-		RegistrationAddPicturesPage.show(false);
+		}
 	}, 400);
 });
