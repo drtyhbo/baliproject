@@ -226,14 +226,16 @@ RegistrationAddPicturesPage.touchEnd = function(picture) {
 RegistrationAddPicturesPage.touchFooterButton = function() {
 	// "Upload" those pictures which are selected.
 	var pictures = [];
+	var pictureNumbers = [];
 	for (var i = 0, picture; picture = RegistrationAddPicturesPage.pictures[i]; i++) {
 		if (!picture.isSelected) {
 			continue;
 		}
 		pictures.push(picture.asset);
+		pictureNumbers.push(picture.asset.num);
 	}
 	PersonalLibrary.add(pictures);
 
-	localStorage.setItem('initialized', 1);
+	localStorage.setItem('registration-pictures', pictureNumbers);
 	RegistrationCreateUserPage.show(true);
 };

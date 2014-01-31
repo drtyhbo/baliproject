@@ -7,7 +7,9 @@ var RegistrationCreateUserPage = {
 
 RegistrationCreateUserPage.show = function(animate) {
   $.mobile.pageContainer.on('pagecontainerbeforetransition',
-			RegistrationCreateUserPage.beforeTransition);
+			RegistrationCreateUserPage.onBeforeTransition);
+  $.mobile.pageContainer.on('pagecontainershow',
+			RegistrationCreateUserPage.onShow);
 	$.mobile.pageContainer.pagecontainer('change',
 			'#registration-create-user', {
     changeHash: false,
@@ -16,7 +18,7 @@ RegistrationCreateUserPage.show = function(animate) {
   });
 };
 
-RegistrationCreateUserPage.beforeTransition = function(event, ui) {
+RegistrationCreateUserPage.onBeforeTransition = function(event, ui) {
   if (ui.absUrl.indexOf('#registration-create-user') == -1) {
     $.mobile.pageContainer.off('pagecontainerbeforetransition',
 				arguments.callee);
@@ -34,12 +36,15 @@ RegistrationCreateUserPage.beforeTransition = function(event, ui) {
 			.blur(RegistrationCreateUserPage.blurInput);
 
 	RegistrationCreateUserPage.footerEl = ui.toPage.find('#create-user-footer')
-			.click(RegistrationCreateUserPage.clickFooterButton);
+			.on(TOUCHEND, RegistrationCreateUserPage.clickFooterButton);
+};
+
+RegistrationCreateUserPage.onShow = function(event, ui) {
+  $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
+	RegistrationCreateUserPage.nameEl.focus();
 };
 
 RegistrationCreateUserPage.clickFooterButton = function() {
-	FeedView.show(true);
-	return;
 	if (!RegistrationCreateUserPage.nameEl.val()) {
 		RegistrationCreateUserPage.nameEl.focus();
 	} else if (!RegistrationCreateUserPage.emailEl.val()) {
@@ -47,9 +52,13 @@ RegistrationCreateUserPage.clickFooterButton = function() {
 	} else if (!RegistrationCreateUserPage.passwordEl.val()) {
 		RegistrationCreateUserPage.passwordEl.focus();
 	} else {
-		localStorage.setItem('name', RegistrationCreateUserPage.nameEl.val());
-		localStorage.setItem('email', RegistrationCreateUserPage.emailEl.val());
-		localStorage.setItem('password', RegistrationCreateUserPage.passwordEl.val());
+		localStorage.setItem('registration-name',
+				RegistrationCreateUserPage.nameEl.val());
+		localStorage.setItem('registration-email',
+				RegistrationCreateUserPage.emailEl.val());
+		localStorage.setItem('registration-password',
+				RegistrationCreateUserPage.passwordEl.val());
+		FeedView.show(true);
 	}
 };
 
