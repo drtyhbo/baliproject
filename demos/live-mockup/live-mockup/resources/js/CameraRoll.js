@@ -23,8 +23,19 @@ var Asset = Class.extend({
 });
 
 var CameraRoll = {
-	cameraRoll: []
+	cameraRoll: [] // array of assets
 };
+
+
+CameraRoll.getAssets = function (moment) {
+    var  momentPictures = [];
+    for (var i = 0; i < CameraRoll.cameraRoll.length; i++)
+        if (CameraRoll.cameraRoll[i].moment == moment)
+            momentPictures.push(CameraRoll.cameraRoll[i]);
+
+    return momentPictures;
+}
+
 
 CameraRoll.getCameraRoll = function() {
   return CameraRoll.cameraRoll;

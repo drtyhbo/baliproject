@@ -31,6 +31,11 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
 			.find('#add-pictures-footer')
 			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
 
+	var viewProfileBtn = ui.toPage.find('#profile-btn')
+        .on(TOUCHSTART, function () {
+            LifeStreamView.show();
+        });
+
 	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(), true,
 			RegistrationAddPicturesPage.onSelectionChanged);
 	RegistrationAddPicturesPage.addPictures.getEl()
@@ -58,4 +63,7 @@ RegistrationAddPicturesPage.touchFooterButton = function(e) {
 	PersonalLibrary.add(
 			RegistrationAddPicturesPage.addPictures.getSelected());
 	RegistrationCreateUserPage.show(true);
+
+
+
 };

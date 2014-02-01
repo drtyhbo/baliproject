@@ -2,14 +2,14 @@
 
 <head>
     <link rel="stylesheet" href="jquery.mobile-1.4.0.min.css"></link>
-		<style type="text/css">
-			.ui-content {
-				padding: 0;
-			}
-		</style>
+    <style type="text/css">
+        .ui-content {
+            padding: 0;
+        }
+    </style>
     <script type="text/javascript">
         var isIOS =
-				navigator.userAgent.indexOf('iPhone; CPU iPhone OS') != -1;
+        navigator.userAgent.indexOf('iPhone; CPU iPhone OS') != -1;
         var TOUCHSTART = isIOS ? 'touchstart' : 'mousedown';
         var TOUCHMOVE = isIOS ? 'touchmove' : 'mousemove';
         var TOUCHEND = isIOS ? 'touchend' : 'mouseup';
@@ -20,15 +20,15 @@
     <script type="text/javascript" src="js/jquery-inheritance.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/CameraRoll.js"></script>
-		<script type="text/javascript" src="js/User.js"></script>
-		<script type="text/javascript" src="js/AddPictures.js"></script>
+    <script type="text/javascript" src="js/User.js"></script>
+    <script type="text/javascript" src="js/AddPictures.js"></script>
     <script type="text/javascript" src="js/RegistrationAddPicturesPage.js"></script>
     <script type="text/javascript" src="js/RegistrationCreateUserPage.js"></script>
     <script type="text/javascript" src="js/PersonalLibrary.js"></script>
-    <script type="text/javascript" src="js/LifeStreamLoadView.js"></script>
-		<script type="text/javascript" src="js/Feed.js"></script>
-		<script type="text/javascript" src="js/FeedView.js"></script>
-		<script type="text/javascript" src="js/AddPicturesView.js"></script>
+    <script type="text/javascript" src="js/LifeStreamView.js"></script>
+    <script type="text/javascript" src="js/Feed.js"></script>
+    <script type="text/javascript" src="js/FeedView.js"></script>
+    <script type="text/javascript" src="js/AddPicturesView.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -40,172 +40,173 @@
 
     <!-- Registration add pictures -->
     <div data-role="page" id="registration-add-pictures">
-      <style type="text/css">
-        .circle {
-            background: #ddd;
-            border: 1px solid #888;
-            border-radius: 50%;
-            display: inline-block;
-            height: 50px;
-            line-height: 50px;
-            text-align: center;
-            width: 50px;
-        }
-      </style>
-      <div data-role="content">
-        <div style="margin-top: 10px; text-align: center">
-          <div class="circle"
-              style="background: #bbb; margin-right: 10px">
-            1
-          </div>
-          <div class="circle"
-              style="background: #ddd">
-            2
-          </div>
-          <h3 style="margin: 5px 0">Add to your personal stream</h3>
-          <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
+        <style type="text/css">
+            .circle {
+                background: #ddd;
+                border: 1px solid #888;
+                border-radius: 50%;
+                display: inline-block;
+                height: 50px;
+                line-height: 50px;
+                text-align: center;
+                width: 50px;
+            }
+        </style>
+        <div data-role="content">
+            <div style="margin-top: 10px; text-align: center">
+                <div class="circle"
+                    style="background: #bbb; margin-right: 10px">
+                    1
+                </div>
+                <div class="circle"
+                    style="background: #ddd">
+                    2
+                </div>
+                <h3 style="margin: 5px 0">Add to your personal stream</h3>
+                <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
+            </div>
+            <div id="pictures" style="margin: 10px 5px"></div>
         </div>
-        <div id="pictures" style="margin: 10px 5px"></div>
-      </div>
-      <div data-role="footer" data-position="fixed" data-tap-toggle="false"
-           id="add-pictures-footer">
-        <h2>Skip</h2>
-      </div>
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="add-pictures-footer">
+            <h2>Skip</h2>
+        </div>
     </div>
 
     <!-- Registration create user -->
     <div data-role="page" id="registration-create-user">
-      <style type="text/css">
-        .circle {
-            background: #ddd;
-            border: 1px solid #888;
-            border-radius: 50%;
-            display: inline-block;
-            height: 50px;
-            line-height: 50px;
-            text-align: center;
-            width: 50px;
-        }
-      </style>
-      <div data-role="content">
-        <div style="margin-top: 10px; text-align: center"
-             id="create-user-header">
-          <div class="circle"
-              style="background: #ddd; margin-right: 10px">
-            1
-          </div>
-          <div class="circle"
-              style="background: #bbb">
-            2
-          </div>
-          <h3 style="margin: 5px 0">Create your account</h3>
-          <h3 style="margin: 5px 0 20px">(we're uploading in the background)</h3>
-        </div>
-        <div style="margin: 100px 10px 0 10px">
-          <input type="text" placeholder="Name" id="create-user-name">
-          <input type="email" placeholder="Email" id="create-user-email">
-          <input type="password" placeholder="Password"
-              id="create-user-password">
-        </div>
-      </div>
-      <div data-role="footer" data-position="fixed" data-tap-toggle="false"
-          id="create-user-footer">
-        <h2>Create</h2>
-      </div>
-    </div>
-
-    <!-- Life Stream: Main view -->
-    <div data-role="page" id="life-stream-load-view">
         <style type="text/css">
-            .thumb-span {
+            .circle {
+                background: #ddd;
+                border: 1px solid #888;
+                border-radius: 50%;
                 display: inline-block;
-                width: 45px;
-                height: 45px;
-                margin: 5px;
-                position: relative;
-            }
-
-            .thumb {
-                background-size: cover;
-                display: inline-block;
-                left: 0px;
-                top: 0px;
-                position: relative;
+                height: 50px;
+                line-height: 50px;
+                text-align: center;
+                width: 50px;
             }
         </style>
-        <div data-role="header" data-position="fixed" id="load-view-header">
-            <div style="float: left; position: relative;">
-                <span class="thumb-span">
-                    <span id="profile-thumbnail" class="thumb" style="height: 100%; width: 100%;"></span>
-                </span>
-            </div>
-            <div style="float: right; position: relative;">
-                <span class="thumb-span">
-                    <span id="share-moment-icon" class="thumb" style="height: 32px; width: 32px; float: right; margin-top: 7px"></span>
-                </span>
-            </div>
-        </div>
-
         <div data-role="content">
+            <div style="margin-top: 10px; text-align: center"
+                id="create-user-header">
+                <div class="circle"
+                    style="background: #ddd; margin-right: 10px">
+                    1
+                </div>
+                <div class="circle"
+                    style="background: #bbb">
+                    2
+                </div>
+                <h3 style="margin: 5px 0">Create your account</h3>
+                <h3 style="margin: 5px 0 20px">(we're uploading in the background)</h3>
+            </div>
+            <div style="margin: 100px 10px 0 10px">
+                <input type="text" placeholder="Name" id="create-user-name">
+                <input type="email" placeholder="Email" id="create-user-email">
+                <input type="password" placeholder="Password"
+                    id="create-user-password">
+            </div>
         </div>
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="create-user-footer">
+            <h2>Create</h2>
+        </div>
+    </div>
 
-        <div data-role="footer" class="ui-btn" data-position="fixed" data-tap-toggle="false" id="load-view-footer">
-            <div data-role="controlgroup" data-type="horizontal">
 
-                <a href="#" data-role="button" data-icon="home">Home</a>
-                <a href="#" data-role="button" data-icon="plus">Add</a>
-                <a href="#" data-role="button" data-icon="star">Life</a>
-
+    <!-- Feed view -->
+    <div data-role="page" id="feed-view">
+        <style type="text/css">
+            .header {
+                background: #eee;
+                border-top: 1px solid #ddd;
+                padding: 10px;
+            }
+        </style>
+        <div data-role="content">
+            <div id="shares"></div>
+            <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+                id="footer" data-id="main-footer">
+                <div data-role="navbar" id="navbar">
+                    <ul>
+                        <li><a href="#" class="ui-btn-active" data-icon="bars"></a></li>
+                        <li><a href="#" id="add-pictures-btn" data-icon="plus"></a></li>
+                        <li><a href="#" id="profile-btn" data-icon="user"></a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
-  <!-- Feed view -->
-  <div data-role="page" id="feed-view">
-		<style type="text/css">
-			.header {
-				background: #eee;
-				border-top: 1px solid #ddd;
-				padding: 10px;
-			}
-		</style>
-    <div data-role="content">
-			<div id="shares"></div>
-			<div data-role="footer" data-position="fixed" data-tap-toggle="false"
-			     id="footer" data-id="main-footer">
-				<div data-role="navbar" id="navbar">
-	        <ul>
-	          <li><a href="#" class="ui-btn-active" data-icon="bars"></a></li>
-	          <li><a href="#" id="add-pictures-btn" data-icon="plus"></a></li>
-	          <li><a href="#" data-icon="user"></a></li>
-	        </ul>
-	      </div>
-			</div>
-		</div>
-  </div>
+    <!-- Add pictures view -->
+    <div data-role="page" id="add-pictures-view">
+        <div data-role="content">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false"
+                id="header">
+                <h2>Camera roll</h2>
+                <button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
+                    id="add-button">
+                    Add</button>
+            </div>
+            <div id="pictures" style="margin: 5px"></div>
+            <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+                id="footer" data-id="main-footer">
+                <div data-role="navbar" id="navbar">
+                    <ul>
+                        <li><a href="#" id="home-btn" data-icon="bars"></a></li>
+                        <li><a href="#" class="ui-btn-active" data-icon="plus"></a></li>
+                        <li><a href="#" id="profile-btn" data-icon="user"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <!-- Add pictures view -->
-  <div data-role="page" id="add-pictures-view">
-    <div data-role="content">
-			<div data-role="header" data-position="fixed" data-tap-toggle="false"
-			     id="header">
-		    <h2>Camera roll</h2>
-				<button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
-				   id="add-button">Add</button>
-  		</div>
-			<div id="pictures" style="margin: 5px"></div>
-			<div data-role="footer" data-position="fixed" data-tap-toggle="false"
-			     id="footer" data-id="main-footer">
-				<div data-role="navbar" id="navbar">
-	        <ul>
-	          <li><a href="#" id="home-btn" data-icon="bars"></a></li>
-	          <li><a href="#" class="ui-btn-active" data-icon="plus"></a></li>
-	          <li><a href="#" id="profile-btn" data-icon="user"></a></li>
-	        </ul>
-	      </div>
-			</div>
-		</div>
-  </div>
+    <!-- Life stream view-->
+    <div data-role="page" id="life-stream-load-view">
+        <style type="text/css">
+            .thumb {
+                display: inline-block;
+                background-size: cover;
+                border-radius:100%;
+                width: 35px;
+                height: 35px;
+                left: 0px;
+                top: 0px;
+                float: left;
+                margin: 3px;
+            }
+            .stream-view-header {
+                background: #eee;
+                border-top: 1px solid #ddd;
+                padding: 10px;
+            }
+        </style>
+        <div data-role="header" data-position="fixed" data-tap-toggle="false"
+                id="header">
+            <span id="profile-thumbnail" class="thumb"></span>
+            <button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
+                    id="add-button">
+                    Share</button>
+        </div>
+
+        <div>
+            <div id="moments"></div>
+        </div>
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="footer" data-id="main-footer">
+            <div data-role="navbar" id="navbar">
+                <ul>
+                    <li><a href="#" id="home-btn" data-icon="bars"></a></li>
+                    <li><a href="#" id="add-pictures-btn" data-icon="plus"></a></li>
+                    <li><a href="#" id="profile-btn" class="ui-btn-active" data-icon="user"></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
