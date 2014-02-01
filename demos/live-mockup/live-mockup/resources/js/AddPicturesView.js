@@ -17,8 +17,6 @@ AddPicturesView.show = function() {
 	});
 };
 
-var once = false;
-
 /**
  * Event handler. Called before the add pictures registration page is made
  * visible.
