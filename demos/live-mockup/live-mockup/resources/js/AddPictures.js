@@ -2,7 +2,14 @@ var ADD_PICTURES_PAGE_SPACING = 10;
 var ADD_PICTURES_NUM_COLUMNS = 3;
 var ADD_PICTURES_SPACING = 5;
 
+/**
+ * Encapulates the logic for a picture selector based around the camera roll.
+ */
 var AddPictures = Class.extend({
+  /**
+   * showSelectAll - If true, displays the Select all/Select none link.
+   * onSelectionChanged - Called when the user selects/deselects pictures.
+   */
 	init: function(width, showSelectAll, onSelectionChanged) {
 		this.numSelected = 0;
 		this.onSelectionChanged = onSelectionChanged;
@@ -14,6 +21,10 @@ var AddPictures = Class.extend({
 		this.width = width;
 	},
 	
+  /**
+   * Creates and returns the picture selector element. Only adds pictures that
+   * are not currently added to the personal library.
+   */  
 	getEl: function() {
 		var pictureDimension = (this.width - ADD_PICTURES_PAGE_SPACING -
 				ADD_PICTURES_SPACING * (ADD_PICTURES_NUM_COLUMNS - 1)) /
@@ -112,10 +123,17 @@ var AddPictures = Class.extend({
 		return this.picturesEl;
 	},
   
-  getPictures: function() {
-    return this.pictures;
+  /**
+   * Returns the number of pictures being displayed.
+   */  
+  getNumPictures: function() {
+    return this.pictures.length;
   },
 
+  /**
+   * Returns an array containing all the pictures that are currently
+   * selected.
+   */  
 	getSelected: function() {
 		var pictures = [];
 		for (var i = 0, picture; picture = this.pictures[i]; i++) {
@@ -128,7 +146,7 @@ var AddPictures = Class.extend({
 	},
 
 	/**
-	 * Toggles the selected status of an individual image.
+	 * Toggles the selected status of an individual picture.
 	 */
 	toggleSelectedStatus: function(picture) {
 		var isSelected = picture.isSelected;

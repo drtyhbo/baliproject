@@ -62,9 +62,9 @@ AddPicturesView.beforeTransition = function(event, ui) {
 	AddPicturesView.addPictures.getEl()
 			.appendTo(picturesEl);
 
-  if (AddPicturesView.addPictures.getPictures().length) {
+  if (AddPicturesView.addPictures.getNumPictures()) {
   	AddPicturesView.addPictures.toggleSelectAll();
-    } else {
+  } else {
     AddPicturesView.showEmptyUi();
   }
 
@@ -117,7 +117,7 @@ AddPicturesView.onAddPictures = function(e) {
 
 	AddPicturesView.addPictures.removeSelected(function() {
     AddPicturesView.onSelectionChanged(0);
-    if (AddPicturesView.addPictures.getPictures().length == 0) {
+    if (!AddPicturesView.addPictures.getNumPictures()) {
       AddPicturesView.showEmptyUi();
     }
   });
