@@ -40,37 +40,78 @@
 
     <!-- Registration add pictures -->
     <div data-role="page" id="registration-add-pictures">
-        <div data-role="content">
-      			<div data-role="header" data-position="fixed" data-tap-toggle="false"
-      			     id="header">
-      		    <h2>Camera roll</h2>
-        		</div>
-            <div id="pictures" style="margin: 10px 5px"></div>
+      <style type="text/css">
+        .circle {
+            background: #ddd;
+            border: 1px solid #888;
+            border-radius: 50%;
+            display: inline-block;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            width: 50px;
+        }
+      </style>
+      <div data-role="content">
+        <div style="margin-top: 10px; text-align: center">
+          <div class="circle"
+              style="background: #bbb; margin-right: 10px">
+            1
+          </div>
+          <div class="circle"
+              style="background: #ddd">
+            2
+          </div>
+          <h3 style="margin: 5px 0">Add to your personal stream</h3>
+          <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
         </div>
-        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
-            id="add-pictures-footer">
-            <h2>Skip</h2>
-        </div>
+        <div id="pictures" style="margin: 10px 5px"></div>
+      </div>
+      <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+           id="add-pictures-footer">
+        <h2>Skip</h2>
+      </div>
     </div>
 
     <!-- Registration create user -->
     <div data-role="page" id="registration-create-user">
-        <div data-role="content">
-      			<div data-role="header" data-position="fixed" data-tap-toggle="false"
-      			     id="header">
-      		    <h2>Create account</h2>
-        		</div>
-            <div style="margin: 100px 10px 0 10px">
-                <input type="text" placeholder="Name" id="create-user-name">
-                <input type="email" placeholder="Email" id="create-user-email">
-                <input type="password" placeholder="Password"
-                    id="create-user-password">
-            </div>
+      <style type="text/css">
+        .circle {
+            background: #ddd;
+            border: 1px solid #888;
+            border-radius: 50%;
+            display: inline-block;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            width: 50px;
+        }
+      </style>
+      <div data-role="content">
+        <div style="margin-top: 10px; text-align: center"
+             id="create-user-header">
+          <div class="circle"
+              style="background: #ddd; margin-right: 10px">
+            1
+          </div>
+          <div class="circle"
+              style="background: #bbb">
+            2
+          </div>
+          <h3 style="margin: 5px 0">Create your account</h3>
+          <h3 style="margin: 5px 0 20px">(we're uploading in the background)</h3>
         </div>
-        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
-            id="create-user-footer">
-            <h2>Create</h2>
+        <div style="margin: 100px 10px 0 10px">
+          <input type="text" placeholder="Name" id="create-user-name">
+          <input type="email" placeholder="Email" id="create-user-email">
+          <input type="password" placeholder="Password"
+              id="create-user-password">
         </div>
+      </div>
+      <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+          id="create-user-footer">
+        <h2>Create</h2>
+      </div>
     </div>
 
     <!-- Life Stream: Main view -->

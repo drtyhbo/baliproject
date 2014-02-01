@@ -51,10 +51,11 @@ RegistrationAddPicturesPage.onSelectionChanged = function(numSelected) {
  * Event handler. Called when the user touches the footer button. Moves the
  * user to the second step of the registration flow.
  */
-RegistrationAddPicturesPage.touchFooterButton = function() {
+RegistrationAddPicturesPage.touchFooterButton = function(e) {
+  e.preventDefault();
+  
 	// "Upload" those pictures which are selected.
 	PersonalLibrary.add(
 			RegistrationAddPicturesPage.addPictures.getSelected());
-//	RegistrationCreateUserPage.show(true);
-  FeedView.show(true);
+	RegistrationCreateUserPage.show(true);
 };

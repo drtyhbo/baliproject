@@ -44,7 +44,9 @@ RegistrationCreateUserPage.onShow = function(event, ui) {
 	RegistrationCreateUserPage.nameEl.focus();
 };
 
-RegistrationCreateUserPage.clickFooterButton = function() {
+RegistrationCreateUserPage.clickFooterButton = function(e) {
+  e.preventDefault();
+
 	if (!RegistrationCreateUserPage.nameEl.val()) {
 		RegistrationCreateUserPage.nameEl.focus();
 	} else if (!RegistrationCreateUserPage.emailEl.val()) {

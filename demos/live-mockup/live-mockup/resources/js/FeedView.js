@@ -1,5 +1,8 @@
 var SHOW_THUMBNAIL_IN_COMMENTS = false;
 
+/**
+ * Encapsulates all the logic behind an item in the feed.
+ */
 var FeedItem = Class.extend({
 	init: function(share) {
 		this.share = share;
@@ -8,7 +11,11 @@ var FeedItem = Class.extend({
 		this.newCommentEl = null;
 		this.isCommenting = false;
 	},
-	
+
+  /**
+   * Returns this feed item as a jQuery object that can be inserted into the
+   * dom.
+   */	
 	getEl: function() {
 		this.el = $('<div></div>')
 				.css({
@@ -67,7 +74,7 @@ var FeedItem = Class.extend({
 					lineHeight: '11px',
 					position: 'absolute'
 				})
-				.text(this.getElapsedTime())
+				.text(this.getElapsedTimeString())
 				.appendTo(nameContainerEl);
 
 		this.createPicturesEl();
@@ -86,7 +93,7 @@ var FeedItem = Class.extend({
 			this.getCommentEl(comment.user, comment.comment)
 					.appendTo(this.commentsEl);
 		}
-		this.addNewCommentEl();
+		this.createNewCommentEl();
 
 		var buttonsEl = $('<div></div>')
 				.css({
@@ -100,7 +107,7 @@ var FeedItem = Class.extend({
 					fontSize: '11px',
 				})
 				.text('Comment')
-				.on(TOUCHEND, this.onCommentButton.bind(this))
+				.on(TOUCHEND, this.onTouchCommentButton.bind(this))
 				.appendTo(buttonsEl);
 		this.shareButtonEl = $('<button></button>')
 				.addClass('ui-btn ui-btn-inline')
@@ -109,12 +116,15 @@ var FeedItem = Class.extend({
 					marginRight: 0
 				})
 				.text('Share')
-				.on(TOUCHEND, this.onShareButton.bind(this))
+				.on(TOUCHEND, this.onTouchShareButton.bind(this))
 				.appendTo(buttonsEl);
 
 		return this.el;
 	},
 
+  /**
+   * Creates the main picture element and inserts it into the dom.
+   */	
 	createPicturesEl: function() {
 		var picturesContainerEl = $(
 				'<div>' +
@@ -139,10 +149,13 @@ var FeedItem = Class.extend({
 				.on(TOUCHEND, function(e) {
 					e.preventDefault();
 				})
-				.on(TOUCHEND, this.onTouchEndPicture.bind(this))
+				.on(TOUCHEND, this.onTouchPicture.bind(this))
 				.appendTo(picturesContainerEl);
 	},
 	
+  /**
+   * Creates and returns the element containing the comments.
+   */	
 	getCommentEl: function(user, comment) {
 		var commentEl = $('<div></div>')
 				.css({
@@ -198,18 +211,21 @@ var FeedItem = Class.extend({
 					})
 					.attr('placeholder', 'Your comment...')
 					.text(comment)
-					.blur(this.hideAddComment.bind(this))
+					.blur(this.hideNewCommentEl.bind(this))
 					.appendTo(commentContainerEl);			
 		}
 		
 		return commentEl;
 	},
-	
-	addNewCommentEl: function() {
+
+  /**
+   * Creates the new comment element and inserts it into the dom.
+   */	
+	createNewCommentEl: function() {
 		this.newCommentEl = $('<form></form>')
 				.css('display', 'none')
 				.on('submit', (function(e) {
-						this.postComment();
+						this.postNewComment();
 						e.preventDefault();
 				}).bind(this))
 				.appendTo(this.commentsEl);
@@ -217,8 +233,12 @@ var FeedItem = Class.extend({
 		this.getCommentEl(Users.getUser('andreas'), null)
 				.appendTo(this.newCommentEl);
 	},
-	
-	getElapsedTime: function() {
+
+  /**
+   * Returns a string which contains the time that's elapsed since this feed
+   * item was created.
+   */
+	getElapsedTimeString: function() {
 		var elapsedMs = new Date().getTime() - this.share.timestampMs;
 
 		// seconds...
@@ -232,8 +252,53 @@ var FeedItem = Class.extend({
 			return Math.floor(elapsedMs / (60 * 60) / 1000) + 'h';
 		}
 	},
+
+  /**
+   * Shows the new comment element.
+   */
+	showNewCommentEl: function() {
+		this.isCommenting = true;
+
+		this.newCommentEl.css('display', 'block');
+
+		setTimeout((function() {
+			this.newCommentEl.find('input').focus();
+		}).bind(this), 0);
 	
-	onTouchEndPicture: function(e) {
+		this.commentButtonEl.text('Save');
+		this.shareButtonEl.text('Cancel');		
+	},
+	
+  /**
+   * Hides the new comment element.
+   */
+	hideNewCommentEl: function() {
+		this.isCommenting = false;
+
+		this.newCommentEl.remove();
+		this.createNewCommentEl();
+		this.commentButtonEl.text('Comment');
+		this.shareButtonEl.text('Share');				
+	},
+	
+  /**
+   * Adds the new comment to the comment stream.
+   */
+	postNewComment: function() {
+		this.getCommentEl(Users.getUser('andreas'),
+											this.newCommentEl.find('input').val())
+				.css('opacity', 0)
+				.appendTo(this.commentsEl)
+				.animate({
+					opacity: 1
+				}, 200);
+		this.hideNewCommentEl();
+	},
+
+  /**
+   * Event handler. Called when the user touches the picture.
+   */
+	onTouchPicture: function(e) {
 		var pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
 		
 		// Next picture...
@@ -252,51 +317,24 @@ var FeedItem = Class.extend({
 						'url(' + this.share.pictures[this.currentPicture].getSrc() + ')'
 			  });
 	},
-	
-	showAddComment: function() {
-		this.isCommenting = true;
 
-		this.newCommentEl.css('display', 'block');
-
-		setTimeout((function() {
-			this.newCommentEl.find('input').focus();
-		}).bind(this), 0);
-	
-		this.commentButtonEl.text('Save');
-		this.shareButtonEl.text('Cancel');		
-	},
-	
-	hideAddComment: function() {
-		this.isCommenting = false;
-
-		this.newCommentEl.remove();
-		this.addNewCommentEl();
-		this.commentButtonEl.text('Comment');
-		this.shareButtonEl.text('Share');				
-	},
-	
-	postComment: function() {
-		this.getCommentEl(Users.getUser('andreas'),
-											this.newCommentEl.find('input').val())
-				.css('opacity', 0)
-				.appendTo(this.commentsEl)
-				.animate({
-					opacity: 1
-				}, 200);
-		this.hideAddComment();
-	},
-	
-	onCommentButton: function(e) {
+  /**
+   * Event handler. Called when the user touches the comment button.
+   */
+	onTouchCommentButton: function(e) {
 		if (!this.isCommenting) {
-			this.showAddComment();
+			this.showNewCommentEl();
 		} else {
-			this.postComment();
+			this.postNewComment();
 		}
 	},
 	
-	onShareButton: function(e) {
+  /**
+   * Event handler. Called when the user touches the share button.
+   */
+	onTouchShareButton: function(e) {
 		if (this.isCommenting) {
-			this.hideAddComment();
+			this.hideNewCommentEl();
 		}
 	}
 })
