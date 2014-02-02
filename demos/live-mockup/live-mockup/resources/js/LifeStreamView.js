@@ -7,13 +7,18 @@ var LifeStreamItem = Class.extend({
     * Returns this feed item as a jQuery object that can be inserted into the
     * dom.
     */
-    getEl: function () {
+    getEl: function (isEven) {
 
         //top level element
         this.el = $('<div></div>')
 				.css({
-				    marginBottom: '10px',
+				    paddingBottom: '10px'
 				});
+        if (!isEven)
+            this.el.css({
+                background: '#eee'
+            });
+
 
         var headerEl = $('<div></div>')
 				.addClass('stream-view-header')
@@ -36,7 +41,7 @@ var LifeStreamItem = Class.extend({
 				.appendTo(locationTimeContainerEl);
         var timeEl = $('<div></div>')
 				.css({
-                    paddingRight: '3px',
+                    paddingRight: '4px',
 				    fontSize: '11px',
 				    lineHeight: '11px',
 				    position: 'relative',
@@ -52,7 +57,7 @@ var LifeStreamItem = Class.extend({
                .css({
                    padding: '4px 0px 0px 4px',
                    height: '32px',
-                   background: '#eee',
+                   //background: '#eee',
                    position: 'relative',
                    clear: 'left'
                })
@@ -82,10 +87,28 @@ var LifeStreamItem = Class.extend({
                 position: 'relative',
                 clear: 'left'
             })
-            .appendTo(headerEl);
+            .appendTo(this.el);
         var addPictures = new AddPictures(LifeStreamView.ui.toPage.width(), false, false, null, this.moment.widgets);
         addPictures.getEl()
               .appendTo(pictureContainerEl);
+
+        //add comment
+        var commentsLinkContainerEl = $('<div></div>')
+					.css({
+					    marginBottom: '10px',
+					    textAlign: 'right'
+					})
+					.appendTo(this.el);
+        this.commentLinkEl = $('<span></span>')
+                .css({
+                    color: 'blue',
+                    fontSize: '12px',
+                    lineHeight: '12px',
+                    cursor: 'pointer',
+                    paddingRight: '6px'
+                })
+                .text('5 comments in 6 shares')
+                .appendTo(commentsLinkContainerEl);
 
         /*
         this.createPicturesEl();
@@ -209,7 +232,7 @@ LifeStreamView.beforeTransition = function (event, ui) {
     var momentsEl = ui.toPage.find('#moments');
     momentsEl.empty();
     for (var idx = 0, moment; moment = lifeStream.moments[idx]; idx++)
-        new LifeStreamItem(moment).getEl().appendTo(momentsEl);
+        new LifeStreamItem(moment).getEl((idx % 2 == 0)).appendTo(momentsEl);
 
     //save current view
     localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);

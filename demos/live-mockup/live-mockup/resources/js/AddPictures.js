@@ -73,7 +73,7 @@ var AddPictures = Class.extend({
 
             var imageEl = $('<span></span>')
 		      .css({
-		          backgroundImage: 'url(' + picture.thumbnailPictureSrc + ')',
+		          backgroundImage: 'url(' + picture.pictureSrc + ')',
 		          backgroundSize: 'cover',
 		          display: 'inline-block',
 		          height: '100%',
