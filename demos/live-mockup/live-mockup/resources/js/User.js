@@ -1,5 +1,6 @@
 var User = Class.extend({
-    init: function (name, username, thumbnailSrc) {
+    init: function (id, name, username, thumbnailSrc) {
+        this.id = id || null;
         this.name = name || null;
         this.username = username || null;
         this.thumbnailSrc = thumbnailSrc || null;
@@ -11,9 +12,9 @@ var User = Class.extend({
 
 var Widget = Class.extend({
     init: function (createdBy, createdOn) {
-        this.createdBy = createdBy || null;    //created by user: User
+        this.createdBy = createdBy || null;    //created by user: User ID
         this.createdOn = createdOn || null;    //created on date: date
-        this.shared = 0;                       //how many times this widget has been shared
+        this.shared = [];                       //array of all shares (IDs)
     }
 });
 
@@ -47,63 +48,100 @@ var Moment = Class.extend({
         this.widgets.push(new PictureWidget(pictureSrc, thumbnailPictureSrc, comments, createdBy, createdOn));
     },
 
-    addMomentComments: function (comments, createdBy, createdOn) {
-        for (var idx = 0; idx< comments.length; idx++)
-            this.momentComments.push(new CommentWidget(comments[idx], createdBy, createdOn));
+    addMomentComment: function (comment, createdBy, createdOn) {
+        this.momentComments.push(new CommentWidget(comment, createdBy, createdOn));
     },
 
     getElapsedTime: function () {
-        return '7m';
+        var elapsedMs = new Date().getTime() - this.timeStamp;
+
+        // seconds...
+        if (elapsedMs < 60 * 1000) {
+            return Math.floor(elapsedMs / 1000) + 's';
+            // minutes...
+        } else if (elapsedMs < 60 * 60 * 1000) {
+            return Math.floor(elapsedMs / 60 / 1000) + 'm';
+            // hours...
+        } else if (elapsedMs < 24 * 60 * 60 * 1000) {
+            return Math.floor(elapsedMs / (60 * 60) / 1000) + 'h';
+        }
+    },
+
+    getWidgetOwners: function() {
+        if (!this.widgets)
+            return null;
+
+        var users = {};
+        for (var idx = 0, widget; widget = this.widgets[idx]; idx++){
+            user = Users.getUserByID(widget.createdBy)
+            if (user && !(user.username in users))
+                users[user.username] = user;
+        }
+        return users;
     }
-
-
 });
 
-//user profile class
-var UserProfile = Class.extend({
-    init: function (name, email) {
-        this.user = new User(name, email);              //user info: User
-        this.profilePicture = null;                     //user profile picture: PictureWidget
-    }
-});
 
 //life stream class: top level class used to represent the life stream
 var LifeStream = Class.extend({
     init: function () {
-        this.userProfile = null;  //logged in user profile: UserProfile
+        this.userProfile = null;       //logged in user profile: User
         this.moments = [];      //all moments= Moment[]
     },
 
     getUserProfileThumbnailPath: function () {
-        if (!this.userProfile ||
-            !this.userProfile.profilePicture)
+        if (!this.userProfile)
             return null;
 
-        return this.userProfile.profilePicture.thumbnailPictureSrc;
+        return this.userProfile.thumbnailSrc;
     },
 
-    loadSampleData: function(name, email, profilePicturePath, thumbnailPicturePath) {
+    loadSampleData: function(username) {
         
         //create user profile
-        var userProfile = new UserProfile(name, email);
-        if (profilePicturePath) {
-            userProfile.profilePicture = new PictureWidget(profilePicturePath, thumbnailPicturePath);
-        }
-        this.userProfile = userProfile;
+        this.userProfile = Users.getUser(username);
 
         //add moments
-        var moment = new Moment('Phuket, Thailand', '12/12/2013');
+        var moment = new Moment('Phuket, Thailand', new Date().getTime() - 6 * 60 * 1000);
         var assets = CameraRoll.getAssets(100);
         for(var i = 0; i < assets.length; i++)
             moment.addPictureWidget(
                 assets[i].getSrc(),
                 assets[i].getThumbSrc(),
                 null,
-                'amine zejli',
-                '12/12/2013 1:00pm');
-        moment.addMomentComments(['Awesome Picture Nigga'], 'John Vaghn', '12/12/2013 1:10pm');
-        moment.addMomentComments(['Good Picture Nigga'], 'Andreas B', '12/12/2013 1:12pm');
+                i % 2 == 0? 1: 4, //user ID
+                 new Date().getTime() - 6 * 60 * 1000);
+        moment.addMomentComment('Awesome Picture Nigga', 2, new Date().getTime() - 3 * 60 * 1000);
+        moment.addMomentComment('Good Picture Nigga', 4, new Date().getTime() - 2 * 60 * 1000);
         this.moments.push(moment);
+
+        var moment = new Moment('Koh Lanta, Thailand', new Date().getTime() - 60 * 60 * 1000);
+        var assets = CameraRoll.getAssets(102);
+        for (var i = 0; i < assets.length; i++)
+            moment.addPictureWidget(
+                assets[i].getSrc(),
+                assets[i].getThumbSrc(),
+                null,
+                i % 4 == 0? 1 : ((i % 5) == 0? 3: 2),
+                 new Date().getTime() - 60 * 60 * 1000);
+        moment.addMomentComment('Koh Lanta is tits', 3, new Date().getTime() - 53 * 60 * 1000);
+        moment.addMomentComment('I know at least one idiot that ate shit there', 2, new Date().getTime() - 51 * 60 * 1000);
+        this.moments.push(moment);
+
+        var moment = new Moment('Jakarta, Indonesia', new Date().getTime() - 120 * 60 * 1000);
+        var assets = CameraRoll.getAssets(102);
+        for (var i = 0; i < assets.length; i++)
+            moment.addPictureWidget(
+                assets[i].getSrc(),
+                assets[i].getThumbSrc(),
+                null,
+                1,
+                 new Date().getTime() - 121 * 60 * 1000);
+        moment.addMomentComment('Holy shit it\'s the nasty gurang', 4, new Date().getTime() - 112 * 60 * 1000);
+        moment.addMomentComment('NASTY!', 2, new Date().getTime() - 113 * 1000 + 10);
+        this.moments.push(moment);
+
+
     }
 
 });
@@ -113,15 +151,23 @@ var Users = {
     users: {}
 };
 
-Users.users['amine'] = new User('Amine Zejli', 'amine',
+Users.users['amine'] = new User(1, 'Amine Zejli', 'amine',
 		Images.getPath('users/') + 'amine.jpg');
-Users.users['marcello'] = new User('Marcello Chermak', 'marcello',
+Users.users['marcello'] = new User(2, 'Marcello Chermak', 'marcello',
  		Images.getPath('users/') + 'marcello.jpg');
-Users.users['veronica'] = new User('Veronica Marian', 'veronica',
+Users.users['veronica'] = new User(3, 'Veronica Marian', 'veronica',
 		Images.getPath('users/') + 'veronica.jpg');
-Users.users['andreas'] = new User('Andreas Binnewies', 'andreas',
+Users.users['andreas'] = new User(4, 'Andreas Binnewies', 'andreas',
  		Images.getPath('users/') + 'andreas.jpg');
 
 Users.getUser = function (username) {
     return Users.users[username];
+};
+
+Users.getUserByID = function (userId) {
+    for (username in Users.users)
+        if (Users.users[username].id == userId)
+            return Users.users[username];
+
+    return null;
 };

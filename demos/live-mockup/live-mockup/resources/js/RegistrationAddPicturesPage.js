@@ -36,8 +36,14 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
             LifeStreamView.show();
         });
 
-	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(), true,
-			RegistrationAddPicturesPage.onSelectionChanged);
+    //get picture widgets & remove the ones already in the library
+	var pictureWidgets = CameraRoll.getPictureWidgets();
+	pictureWidgets  = pictureWidgets.filter(function(pictureWidget) {
+	    return !PersonalLibrary.hasPictureWidget(pictureWidget);
+	});
+
+	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(), true, true,
+			RegistrationAddPicturesPage.onSelectionChanged, pictureWidgets);
 	RegistrationAddPicturesPage.addPictures.getEl()
 			.appendTo(ui.toPage.find('#pictures'));
 };

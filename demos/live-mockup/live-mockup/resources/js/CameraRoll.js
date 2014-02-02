@@ -41,6 +41,14 @@ CameraRoll.getCameraRoll = function() {
   return CameraRoll.cameraRoll;
 };
 
+CameraRoll.getPictureWidgets = function () {
+    var pictureWidgets = [];
+    for (var i = 0, asset; asset = CameraRoll.cameraRoll[i]; i++) {
+        pictureWidgets.push(new PictureWidget(asset.getSrc(), asset.getThumbSrc()));
+    }
+    return pictureWidgets;
+}
+
 CameraRoll.addAssetsToCameraRoll = function(moment, assetNumbers) {
 	for (var i = 0; i < assetNumbers.length; i++) {
 		CameraRoll.cameraRoll.push(new Asset(assetNumbers[i], moment));

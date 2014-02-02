@@ -9,11 +9,7 @@ var LifeStreamItem = Class.extend({
     */
     getEl: function () {
 
-        var time = '7m';
-        var thumbnailSrc1 = 'img/camera/IMG_0183_thumb.jpg';
-        var thumbnailSrc2 = 'img/camera/IMG_0155_thumb.jpg';
-
-
+        //top level element
         this.el = $('<div></div>')
 				.css({
 				    marginBottom: '10px',
@@ -40,6 +36,7 @@ var LifeStreamItem = Class.extend({
 				.appendTo(locationTimeContainerEl);
         var timeEl = $('<div></div>')
 				.css({
+                    paddingRight: '3px',
 				    fontSize: '11px',
 				    lineHeight: '11px',
 				    position: 'relative',
@@ -48,48 +45,47 @@ var LifeStreamItem = Class.extend({
 				.text(this.moment.getElapsedTime())
 				.appendTo(locationTimeContainerEl);
 
-        //generate thumbnails
-        var tumbnailContainerEl = $('<div></div>')
-           .css({
-               padding:'3px',
-               height: '42px',
-               position: 'relative',
-               clear: 'left',
-               background: '#eee'
-           })
-           .appendTo(headerEl);
+        //generate user thumbnails
+        var users = this.moment.getWidgetOwners();
+        if (users && Object.keys(users).length > 1) {
+            var tumbnailContainerEl = $('<div></div>')
+               .css({
+                   padding: '4px 0px 0px 4px',
+                   height: '32px',
+                   background: '#eee',
+                   position: 'relative',
+                   clear: 'left'
+               })
+               .appendTo(headerEl);
 
-        var thumbnailEl1 = $('<span></span>')
-            .css({
-                backgroundImage: 'url(' + thumbnailSrc1 + ')',
-                backgroundSize: 'cover',
-                borderRadius: '100%',
-                height: '32px',
-                width: '32px',
-                display: 'inline-block',
-                position:'relative',
-                float: 'left',
-                marginRight: '3px'
-            })
-            .appendTo(tumbnailContainerEl);
-
-        var thumbnailEl2 = $('<span></span>')
-            .css({
-                backgroundImage: 'url(' + thumbnailSrc2 + ')',
-                backgroundSize: 'cover',
-                borderRadius: '100%',
-                height: '32px',
-                width: '32px',
-                display: 'inline-block',
-                position: 'relative',
-                float: 'left',
-                marginRight: '3px'
-            })
-            .appendTo(tumbnailContainerEl);
+            for (username in users) {
+                var thumbnailEl1 = $('<span></span>')
+                    .css({
+                        backgroundImage: 'url(' + users[username].thumbnailSrc + ')',
+                        backgroundSize: 'cover',
+                        borderRadius: '100%',
+                        height: '32px',
+                        width: '32px',
+                        display: 'inline-block',
+                        position: 'relative',
+                        float: 'left',
+                        marginRight: '3px'
+                    })
+                    .appendTo(tumbnailContainerEl);
+            }
+        }
 
         //generate pictures
-            
-
+        var pictureContainerEl = $('<div></div>')
+            .css({
+                padding: '6px 0px 8px 0px',
+                position: 'relative',
+                clear: 'left'
+            })
+            .appendTo(headerEl);
+        var addPictures = new AddPictures(LifeStreamView.ui.toPage.width(), false, false, null, this.moment.widgets);
+        addPictures.getEl()
+              .appendTo(pictureContainerEl);
 
         /*
         this.createPicturesEl();
@@ -138,12 +134,6 @@ var LifeStreamItem = Class.extend({
         return this.el;
     }
 });
-
-
-
-
-
-
 
 var LifeStreamView = {
     headerEl: null,
@@ -206,11 +196,7 @@ LifeStreamView.beforeTransition = function (event, ui) {
     //load sample life stream
     var assets = CameraRoll.getCameraRoll();
     var lifeStream = new LifeStream();
-    lifeStream.loadSampleData(
-        'amine zejli',
-        'zejli.amine@gmail.com',
-        assets[0].getSrc(),
-        assets[0].getThumbSrc());
+    lifeStream.loadSampleData('amine');
 
     //display user profile thumbnail
     var thumbnailPath = lifeStream.getUserProfileThumbnailPath();
@@ -222,8 +208,8 @@ LifeStreamView.beforeTransition = function (event, ui) {
     //load all moments
     var momentsEl = ui.toPage.find('#moments');
     momentsEl.empty();
-    for (var idx = 0; idx < lifeStream.moments.length; idx++)
-        new LifeStreamItem(lifeStream.moments[idx]).getEl().appendTo(momentsEl);
+    for (var idx = 0, moment; moment = lifeStream.moments[idx]; idx++)
+        new LifeStreamItem(moment).getEl().appendTo(momentsEl);
 
     //save current view
     localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);

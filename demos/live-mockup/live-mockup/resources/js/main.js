@@ -13,7 +13,8 @@ $(document).ready(function () {
 		} else {
 		    if (localStorage.getItem('current-view') == ADD_PICTURES_VIEW_PAGE_IDX)
 		        AddPicturesView.show(false);
-		    else if (localStorage.getItem('current-view') == LIFE_STREAM_VIEW_PAGE_IDX)
+		    else if (localStorage.getItem('current-view') == 2)
+		        //RegistrationAddPicturesPage.show(false);
 		        LifeStreamView.show(false);
             else
 			    FeedView.show(false);

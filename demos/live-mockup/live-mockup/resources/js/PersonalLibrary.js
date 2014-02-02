@@ -102,6 +102,17 @@ PersonalLibrary.hasPicture = function (picture) {
 };
 
 /**
+ * Returns true if the specified picture widget (by checking the path)
+ */
+PersonalLibrary.hasPictureWidget = function (pictureWidget) {
+    for (var i = 0, picture; picture = PersonalLibrary.pictures[i]; i++)
+        if (pictureWidget.pictureSrc == picture.picture.getSrc())
+            return true;
+
+    return false;
+};
+
+/**
  * Determines what needs to be uploaded and kicks off that process.
  */
 PersonalLibrary.startUpload = function () {
