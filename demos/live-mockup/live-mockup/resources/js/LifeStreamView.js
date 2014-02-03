@@ -57,7 +57,6 @@ var LifeStreamItem = Class.extend({
                .css({
                    padding: '4px 0px 0px 4px',
                    height: '32px',
-                   //background: '#eee',
                    position: 'relative',
                    clear: 'left'
                })
@@ -109,50 +108,6 @@ var LifeStreamItem = Class.extend({
                 })
                 .text('5 comments in 6 shares')
                 .appendTo(commentsLinkContainerEl);
-
-        /*
-        this.createPicturesEl();
-
-        this.commentsEl = $('<div></div>')
-				.css({
-				    margin: '10px 10px 0 10px'
-				})
-				.appendTo(this.el);
-        if (this.share.description) {
-            this.getCommentEl(this.share.user, this.share.description)
-					.appendTo(this.commentsEl);
-        }
-
-        for (var i = 0, comment; comment = this.share.comments[i]; i++) {
-            this.getCommentEl(comment.user, comment.comment)
-					.appendTo(this.commentsEl);
-        }
-        this.createNewCommentEl();
-
-        var buttonsEl = $('<div></div>')
-				.css({
-				    margin: '10px 10px 0 0',
-				    textAlign: 'right'
-				})
-				.appendTo(this.el)
-        this.commentButtonEl = $('<button></button>')
-				.addClass('ui-btn ui-btn-inline')
-				.css({
-				    fontSize: '11px',
-				})
-				.text('Comment')
-				.on(TOUCHEND, this.onTouchCommentButton.bind(this))
-				.appendTo(buttonsEl);
-        this.shareButtonEl = $('<button></button>')
-				.addClass('ui-btn ui-btn-inline')
-				.css({
-				    fontSize: '11px',
-				    marginRight: 0
-				})
-				.text('Share')
-				.on(TOUCHEND, this.onTouchShareButton.bind(this))
-				.appendTo(buttonsEl);
-        */
 
         return this.el;
     }

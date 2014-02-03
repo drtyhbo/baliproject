@@ -26,20 +26,19 @@ var CameraRoll = {
 	cameraRoll: [] // array of assets
 };
 
+CameraRoll.getCameraRoll = function() {
+  return CameraRoll.cameraRoll;
+};
 
-CameraRoll.getAssets = function (moment) {
-    var  momentPictures = [];
+CameraRoll.getAssetByMomentId = function (momentId) {
+    var momentPictures = [];
     for (var i = 0; i < CameraRoll.cameraRoll.length; i++)
-        if (CameraRoll.cameraRoll[i].moment == moment)
+        if (CameraRoll.cameraRoll[i].moment == momentId)
             momentPictures.push(CameraRoll.cameraRoll[i]);
 
     return momentPictures;
 }
 
-
-CameraRoll.getCameraRoll = function() {
-  return CameraRoll.cameraRoll;
-};
 
 CameraRoll.getPictureWidgets = function () {
     var pictureWidgets = [];

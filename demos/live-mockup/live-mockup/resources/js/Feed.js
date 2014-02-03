@@ -1,5 +1,9 @@
 var Feed = {
-  feed: [{
+    feed: null
+}
+
+Feed.init = function(){
+    Feed.feed = [{
 		user: Users.getUser('amine'),
 		location: 'Kuala Lumpur, Malaysia',
 		description: 'me in kuala lumpur <3',
