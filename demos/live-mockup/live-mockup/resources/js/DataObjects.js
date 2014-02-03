@@ -110,6 +110,7 @@ Shares.init = function () {
 
 Shares.getWidgetShares = function(widgetId){
     var shares = [];
+
     for (var j = 0, share; share = Shares.shareDB[j]; j++)
         for (var i = 0, currentWidgetId; currentWidgetId = share.sharedWidgetsIds[i]; i++)
             if (currentWidgetId == widgetId){
