@@ -94,10 +94,31 @@ var Shares = {
 }
 
 Shares.init = function () {
-    Shares.shareDB.push(new Share(Shares.currentId++, 1, [2, 3], Util.getPastDate(2), [151, 155, 161]));
-    Shares.shareDB.push(new Share(Shares.currentId++, 1, [3, 4], Util.getPastDate(2), [151, 155, 183, 184]));
+    
+    var comments1 = [];
+    comments1.push(new CommentWidget(1, 'Awesome Picture Nigga', 2, new Util.getPastDate(3)));
+    comments1.push(new CommentWidget(2, 'Good Picture Nigga', 4, new Util.getPastDate(2)));
+
+    var comments2 = [];
+    comments2.push(new CommentWidget(3,'Holy shit it\'s the nasty gurang', 4, new Util.getPastDate(110)));
+    comments2.push(new CommentWidget(4,'NASTY!', 2, new Util.getPastDate(105)));
+
+    Shares.shareDB.push(new Share(Shares.currentId++, 1, [2, 3], Util.getPastDate(2), [151, 155, 161], comments1));
+    Shares.shareDB.push(new Share(Shares.currentId++, 1, [3, 4], Util.getPastDate(2), [151, 155, 183, 184], comments2));
     Shares.shareDB.push(new Share(Shares.currentId++, 1, [1, 2, 3], Util.getPastDate(2), [267, 268, 269, 271, 272, 275, 277, 281]));
 }
+
+Shares.getWidgetShares = function(widgetId){
+    var shares = [];
+    for (var j = 0, share; share = Shares.shareDB[j]; j++)
+        for (var i = 0, currentWidgetId; currentWidgetId = share.sharedWidgetsIds[i]; i++)
+            if (currentWidgetId == widgetId){
+                shares.push(share);
+                continue;
+            }
+    return shares;
+}
+
 
 
 /*******************************************
@@ -124,19 +145,13 @@ Moments.init = function () {
 
     var moment = new Moment(100, 'Phuket, Thailand', new Util.getPastDate(6), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
-    moment.addMomentComment('Awesome Picture Nigga', 2, new Util.getPastDate(3));
-    moment.addMomentComment('Good Picture Nigga', 4, new Util.getPastDate(2));
     Moments.momentDB.push(moment);
 
     var moment = new Moment(101, 'Koh Lanta, Thailand', new Util.getPastDate(60), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
-    moment.addMomentComment('Koh Lanta is tits', 3, new Util.getPastDate(58));
-    moment.addMomentComment('I know at least one idiot that ate shit there', 2, new Util.getPastDate(55));
     Moments.momentDB.push(moment);
 
     var moment = new Moment(102, 'Jakarta, Indonesia', new Util.getPastDate(120), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
-    moment.addMomentComment('Holy shit it\'s the nasty gurang', 4, new Util.getPastDate(110));
-    moment.addMomentComment('NASTY!', 2, new Util.getPastDate(105));
     Moments.momentDB.push(moment);
 }

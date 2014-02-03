@@ -91,6 +91,19 @@ var LifeStreamItem = Class.extend({
         addPictures.getEl()
               .appendTo(pictureContainerEl);
 
+        //contruct comment link
+        var numComments = this.moment.getCommentCount();
+        var numShares = this.moment.getShareCount();
+        var linkTxt = '';
+        if (numComments > 1)
+            linkTxt = numComments + ' comments ';
+        else if (numComments > 0)
+            linkTxt = numComments + ' comment ';
+        if (numShares > 1)
+            linkTxt += 'in ' + numShares + ' shares';
+        else if (numShares > 0)
+            linkTxt += 'in ' + numShares + ' share';
+
         //add comment
         var commentsLinkContainerEl = $('<div></div>')
 					.css({
@@ -106,7 +119,7 @@ var LifeStreamItem = Class.extend({
                     cursor: 'pointer',
                     paddingRight: '6px'
                 })
-                .text('5 comments in 6 shares')
+                .text(linkTxt)
                 .appendTo(commentsLinkContainerEl);
 
         return this.el;

@@ -8,6 +8,7 @@ $(document).ready(function () {
         Db.init();
         Feed.init();
         PersonalLibrary.init();
+        //localStorage.removeItem('personal-library')
         if (localStorage.getItem('personal-library') === null) {
             RegistrationAddPicturesPage.show(false);
         } else if (!localStorage.getItem('registration-name')) {

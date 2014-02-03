@@ -70,9 +70,6 @@ AddPicturesView.beforeTransition = function (event, ui) {
         AddPicturesView.showEmptyUi();
     }
 
-
-
-
     localStorage.setItem('current-view', ADD_PICTURES_VIEW_PAGE_IDX);
 
 };
