@@ -31,6 +31,7 @@
     <script type="text/javascript" src="js/Feed.js"></script>
     <script type="text/javascript" src="js/FeedView.js"></script>
     <script type="text/javascript" src="js/AddPicturesView.js"></script>
+    <script type="text/javascript" src="js/ShareView.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -188,12 +189,57 @@
                 id="header">
             <span id="profile-thumbnail" class="thumb"></span>
             <button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
-                    id="add-button">
+                    id="share-button">
                     Share</button>
         </div>
 
         <div>
             <div id="moments"></div>
+        </div>
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="footer" data-id="main-footer">
+            <div data-role="navbar" id="navbar">
+                <ul>
+                    <li><a href="#" id="home-btn" data-icon="bars"></a></li>
+                    <li><a href="#" id="add-pictures-btn" data-icon="plus"></a></li>
+                    <li><a href="#" id="profile-btn" class="ui-btn-active" data-icon="user"></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Life stream view-->
+    <div data-role="page" id="share-view">
+        <style type="text/css">
+            .thumb {
+                display: inline-block;
+                background-size: cover;
+                border-radius:100%;
+                width: 35px;
+                height: 35px;
+                left: 0px;
+                top: 0px;
+                float: left;
+                margin: 3px;
+            }
+            .stream-view-header {
+                border-top: 1px solid #ddd;
+                padding: 10px;
+            }
+        </style>
+        <div data-role="header" data-position="fixed" data-tap-toggle="false"
+                id="header">
+            <button class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
+                    id="back-button">
+                    Back</button>
+            <button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
+                    id="share-button">
+                    Share</button>
+        </div>
+
+        <div>
+            <div id="shares"></div>
         </div>
 
         <div data-role="footer" data-position="fixed" data-tap-toggle="false"

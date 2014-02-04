@@ -35,13 +35,13 @@ var LifeStreamItem = Class.extend({
 				    fontSize: '11px',
 				    lineHeight: '11px',
 				    position: 'relative',
-                    float:'left'
+				    float: 'left'
 				})
 				.text(this.moment.location)
 				.appendTo(locationTimeContainerEl);
         var timeEl = $('<div></div>')
 				.css({
-                    paddingRight: '4px',
+				    paddingRight: '4px',
 				    fontSize: '11px',
 				    lineHeight: '11px',
 				    position: 'relative',
@@ -99,9 +99,9 @@ var LifeStreamItem = Class.extend({
             linkTxt = numComments + ' comments ';
         else if (numComments > 0)
             linkTxt = numComments + ' comment ';
-        if (numShares > 1)
+        if (numComments > 0 && numShares > 1)
             linkTxt += 'in ' + numShares + ' shares';
-        else if (numShares > 0)
+        else if (numComments > 0 && numShares > 0)
             linkTxt += 'in ' + numShares + ' share';
 
         //add comment
@@ -121,10 +121,38 @@ var LifeStreamItem = Class.extend({
                 })
                 .text(linkTxt)
                 .appendTo(commentsLinkContainerEl);
+        
+        
+        if (isIOS) {
+            this.commentLinkEl.on(TOUCHSTART, this.touchStart.bind(this));
+            this.commentLinkEl.on('touchmove', this.touchMove.bind(this));
+            this.commentLinkEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));
+        }
+        else {
+            this.commentLinkEl.on('click', this.touchEnd.bind(this, this.moment.getMomentShares())); 
+        }
+
 
         return this.el;
+    },
+
+    touchStart: function (e) {
+        this.touchStartY = this.touchEndY = e.originalEvent.pageY;
+    },
+
+    touchMove: function (e) {
+        this.touchEndY = e.originalEvent.pageY;
+    },
+
+    touchEnd: function (shares) {
+        if (Math.abs((this.touchEndY || 0) - (this.touchStartY || 0) < 5)) {
+                ShareView.show(false);
+        }
     }
+
 });
+
+
 
 var LifeStreamView = {
     headerEl: null,
@@ -132,12 +160,6 @@ var LifeStreamView = {
     footerEl: null,
     ui: null,
 };
-
-
-LifeStreamView.DisplayLifeStream = function (lifeStream) {
-    if (!lifeStream)
-        throw "lifeStream not initalized";
-}
 
 /**
  * Makes the life stream view the current view.
@@ -171,7 +193,7 @@ LifeStreamView.beforeTransition = function (event, ui) {
 
     var addPictureBtn = ui.toPage.find('#add-pictures-btn')
 		.on(TOUCHSTART, function () {
-			AddPicturesView.show();
+		    AddPicturesView.show();
 		});
 
     //save pointer to UI elements

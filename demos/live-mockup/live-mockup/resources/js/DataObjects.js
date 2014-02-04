@@ -78,9 +78,13 @@ PictureWidgets.getPictureWidgetsByMomentId= function (momentId) {
         return $.inArray(momentId, picture.momentIds);
         
     });
-
 };
 
+PictureWidgets.getPictureWidgets = function (sharedWidgetsIds) {
+    PictureWidgets.pictureWidgetDB.filter(function (picture) {
+        return (picture.id in sharedWidgetsIds);
+    });
+}
 
 /*******************************************
  *
