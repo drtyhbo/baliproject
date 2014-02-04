@@ -21,7 +21,6 @@
 		DD24AA90189066E700A5DF34 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD24AA72189066E700A5DF34 /* UIKit.framework */; };
 		DD24AA98189066E700A5DF34 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DD24AA96189066E700A5DF34 /* InfoPlist.strings */; };
 		DD24AA9A189066E700A5DF34 /* momentsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DD24AA99189066E700A5DF34 /* momentsTests.m */; };
-		DD24AAA51890685700A5DF34 /* Moments.m in Sources */ = {isa = PBXBuildFile; fileRef = DD24AAA41890685700A5DF34 /* Moments.m */; };
 		DD24AAA81890687800A5DF34 /* Moment.m in Sources */ = {isa = PBXBuildFile; fileRef = DD24AAA71890687800A5DF34 /* Moment.m */; };
 		DD24AAAB1890834900A5DF34 /* AssetCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD24AAAA1890834900A5DF34 /* AssetCell.m */; };
 /* End PBXBuildFile section */
@@ -56,8 +55,6 @@
 		DD24AA95189066E700A5DF34 /* momentsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "momentsTests-Info.plist"; sourceTree = "<group>"; };
 		DD24AA97189066E700A5DF34 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DD24AA99189066E700A5DF34 /* momentsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = momentsTests.m; sourceTree = "<group>"; };
-		DD24AAA31890685700A5DF34 /* Moments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Moments.h; sourceTree = "<group>"; };
-		DD24AAA41890685700A5DF34 /* Moments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Moments.m; sourceTree = "<group>"; };
 		DD24AAA61890687800A5DF34 /* Moment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Moment.h; sourceTree = "<group>"; };
 		DD24AAA71890687800A5DF34 /* Moment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Moment.m; sourceTree = "<group>"; };
 		DD24AAA91890834900A5DF34 /* AssetCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssetCell.h; sourceTree = "<group>"; };
@@ -124,8 +121,6 @@
 				DD24AA7D189066E700A5DF34 /* AppDelegate.h */,
 				DD24AA7E189066E700A5DF34 /* AppDelegate.m */,
 				DD24AA80189066E700A5DF34 /* Main.storyboard */,
-				DD24AAA31890685700A5DF34 /* Moments.h */,
-				DD24AAA41890685700A5DF34 /* Moments.m */,
 				DD24AAA91890834900A5DF34 /* AssetCell.h */,
 				DD24AAAA1890834900A5DF34 /* AssetCell.m */,
 				DD24AA83189066E700A5DF34 /* ViewController.h */,
@@ -268,7 +263,6 @@
 				DD24AA85189066E700A5DF34 /* ViewController.m in Sources */,
 				DD24AA7F189066E700A5DF34 /* AppDelegate.m in Sources */,
 				DD24AA7B189066E700A5DF34 /* main.m in Sources */,
-				DD24AAA51890685700A5DF34 /* Moments.m in Sources */,
 				DD24AAA81890687800A5DF34 /* Moment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -478,6 +472,7 @@
 				DD24AA9F189066E700A5DF34 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DD24AAA0189066E700A5DF34 /* Build configuration list for PBXNativeTarget "momentsTests" */ = {
 			isa = XCConfigurationList;
@@ -486,6 +481,7 @@
 				DD24AAA2189066E700A5DF34 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -7,12 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
-#import "Moments.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface ViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout> {
-  Moments *_moments;
+  ALAssetsLibrary *_assetsLibrary;
   UICollectionView *_collectionView;
+  NSArray *_assets;
 }
 
 @end

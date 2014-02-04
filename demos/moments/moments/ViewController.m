@@ -8,9 +8,7 @@
 
 #import "ViewController.h"
 
-#import <AssetsLibrary/AssetsLibrary.h>
 #import "AssetCell.h"
-#import "Moment.h"
 
 @interface ViewController ()
 
@@ -28,10 +26,28 @@
   [_collectionView registerClass:[AssetCell class] forCellWithReuseIdentifier:@"Asset"];
   [self.view addSubview:_collectionView];
   
-  _moments = [[Moments alloc] init];
-  [_moments loadMoments:^void (Moments *moments) {
-    [_collectionView reloadData];
-  }];
+  [self loadAssets];
+}
+
+- (void)loadAssets {
+  NSMutableArray *mutableAssets = [[NSMutableArray alloc] init];
+  
+  _assetsLibrary = [[ALAssetsLibrary alloc] init];
+  [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll
+                                usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+                                  if (group == nil) {
+                                    _assets = mutableAssets;
+                                    [_collectionView reloadData];
+                                  }
+                                  [group enumerateAssetsUsingBlock:^(ALAsset *asset, NSUInteger index, BOOL *stop) {
+                                    if (!asset) {
+                                      return;
+                                    }
+                                    UIImage *image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:UIImageOrientationUp];
+                                    [mutableAssets addObject:image];
+                                  }];
+                                } failureBlock:^(NSError *error) {
+                                }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -40,19 +56,17 @@
 }
 
 - (UIImage*)getImageForIndexPath:(NSIndexPath *)indexPath {
-  Moment *moment = (Moment*)[_moments.moments objectAtIndex:indexPath.section];
-  return (UIImage*)[moment.assets objectAtIndex:indexPath.row];
+  return (UIImage*)[_assets objectAtIndex:indexPath.row];
 }
 
 #pragma mark - UICollectionView Datasource
 
 - (NSInteger)collectionView:(UICollectionView *)view numberOfItemsInSection:(NSInteger)section {
-  Moment *moment = (Moment*)[_moments.moments objectAtIndex:section];
-  return [moment.assets count];
+  return [_assets count];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-  return [_moments.moments count];
+  return 1;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -73,12 +87,12 @@
 #pragma mark – UICollectionViewDelegateFlowLayout
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-  UIImage *image = [self getImageForIndexPath:indexPath];
-  return image.size;
+  double viewWidth = self.view.bounds.size.width;
+  return CGSizeMake(viewWidth / 3 - 10, viewWidth / 3 - 10);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-  return UIEdgeInsetsMake(50, 20, 50, 20);
+  return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
 @end
