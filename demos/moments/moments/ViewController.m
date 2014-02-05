@@ -13,8 +13,10 @@
 
 #import "AssetCell.h"
 #import "AssetInfo.h"
+#import "CoreData.h"
 #import "FinishedUploadingView.h"
 #import "MomentFlowLayout.h"
+#import "UploadedAsset.h"
 
 @interface ViewController ()
 
@@ -39,7 +41,9 @@
                                     [self startNextUpload];
                                   }
                                   [group enumerateAssetsUsingBlock:^(ALAsset *asset, NSUInteger index, BOOL *stop) {
-                                    if (!asset || [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo]) {
+                                    if (!asset ||
+                                        [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo] ||
+                                        [self hasAssetBeenUploaded:asset]) {
                                       return;
                                     }
                                     [mutableAssets addObject:[self createAssetInfoForAsset:asset]];
@@ -48,8 +52,21 @@
                                 }];
 }
 
+- (BOOL)hasAssetBeenUploaded:(ALAsset *)asset {
+  NSString *filename = [asset defaultRepresentation].filename;
+
+  NSManagedObjectContext *context = [CoreData context];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"UploadedAsset" inManagedObjectContext:context];
+  
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  [fetchRequest setEntity:entity];
+  [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(filename == %@)", filename]];
+  
+  return [[context executeFetchRequest:fetchRequest error:nil] lastObject];
+}
+
 // Creates an AssetInfo object given an ALAsset object.
-- (AssetInfo*)createAssetInfoForAsset:(ALAsset *)asset {
+- (AssetInfo *)createAssetInfoForAsset:(ALAsset *)asset {
   AssetInfo *assetInfo = [[AssetInfo alloc] init];
   assetInfo.asset = asset;
   assetInfo.image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:UIImageOrientationUp];
@@ -68,6 +85,14 @@
 // Finishes the upload off by hiding the progress bar and displaying the finished view.
 - (void)finishUploadWithSuccess:(BOOL)isSuccess {
   AssetInfo *currentUpload = [_assets objectAtIndex:_currentUploadIdx];
+
+  // Store in CoreData so we don't show this asset anymore.
+  if (isSuccess) {
+     UploadedAsset *uploadedAsset = [NSEntityDescription insertNewObjectForEntityForName:@"UploadedAsset"inManagedObjectContext:[CoreData context]];
+    uploadedAsset.filename = [currentUpload.asset defaultRepresentation].filename;
+    [CoreData save];
+  }
+
   currentUpload.finishedView.hidden = NO;
   currentUpload.finishedView.alpha = 0;
   currentUpload.finishedView.isSuccess = isSuccess;
