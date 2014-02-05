@@ -60,7 +60,7 @@ AddPicturesView.beforeTransition = function (event, ui) {
     var picturesEl = ui.toPage.find('#pictures')
 			.empty();
     AddPicturesView.addPictures = new AddPictures(ui.toPage.width(),
-			false, AddPicturesView.onSelectionChanged);
+			false, true, AddPicturesView.onSelectionChanged, PictureWidgets.getAll());
     AddPicturesView.addPictures.getEl()
 			.appendTo(picturesEl);
 

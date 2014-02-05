@@ -8,6 +8,8 @@
 
 #import "WebViewController.h"
 
+#import <AdSupport/ASIdentifierManager.h>
+
 @interface WebViewController ()
 
 @end
@@ -23,8 +25,11 @@
   _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, statusHeight, bounds.size.width, bounds.size.height - statusHeight)];
   [self.view addSubview:_webView];
   
-  NSURL *htmlURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"iphone-main" ofType:@"html"]];
-  NSURLRequest *htmlRequest = [NSURLRequest requestWithURL:htmlURL];
+  NSString *pathToHtml = [[NSBundle mainBundle] pathForResource:@"iphone-main" ofType:@"html"];
+  NSString *queryString = [NSString stringWithFormat:@"?uid=%@", [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString]];
+  NSString *pathWithQuery = [pathToHtml stringByAppendingString:queryString];
+  
+  NSURLRequest *htmlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:pathWithQuery]];
   [_webView loadRequest:htmlRequest];
 }
 

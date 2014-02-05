@@ -1,5 +1,3 @@
-﻿
-
 var Db = {
 }
 
@@ -78,6 +76,13 @@ PictureWidgets.init = function () {
                 Util.getPastDate(6),
                 [asset.moment]));
 }
+
+/*
+ * Returns all picture widgets.
+ */
+PictureWidgets.getAll = function() {
+    return PictureWidgets.pictureWidgetDB;
+};
 
 /*
  * Returns all widgets belonging to moment identified by momentId
