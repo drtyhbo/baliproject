@@ -51,8 +51,8 @@
 				.appendTo(locationTimeContainerEl);
 
         //generate user thumbnails
-        var users = this.moment.getWidgetOwners();
-        if (users && Object.keys(users).length > 1) {
+        var users = this.share.getSharedWithUsers();
+        if (users && users.length > 1) {
             var tumbnailContainerEl = $('<div></div>')
                .css({
                    padding: '4px 0px 0px 4px',
@@ -87,7 +87,7 @@
                 clear: 'left'
             })
             .appendTo(this.el);
-        var addPictures = new AddPictures(LifeStreamView.ui.toPage.width(), false, false, null, this.share.readWidgets());
+        var addPictures = new AddPictures(ShareView.ui.toPage.width(), false, false, null, this.share.getWidgets());
         addPictures.getEl()
               .appendTo(pictureContainerEl);
 
@@ -124,9 +124,9 @@
 
         commentsLinkContainerEl.on(TOUCHSTART, this.touchStart.bind(this));
         commentsLinkContainerEl.on('touchmove', this.touchMove.bind(this));
-        commentsLinkContainerEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));
+        commentsLinkContainerEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));*/
 
-        return this.el;*/
+        return this.el;
     },
 
     touchStart: function (e) {
@@ -153,6 +153,7 @@ var ShareView = {
     headerEl: null,
     footerEl: null,
     ui: null,
+    shares: null
 };
 
 ShareView.show = function (shares, animate) {
@@ -185,9 +186,9 @@ ShareView.beforeTransition = function (event, ui) {
 		});
 
     //save pointer to UI elements
-    LifeStreamView.ui = ui;
-    LifeStreamView.headerEl = ui.toPage.find('#load-view-header');
-    LifeStreamView.footerEl = ui.toPage.find('#load-view-footer');
+    ShareView.ui = ui;
+    ShareView.headerEl = ui.toPage.find('#load-view-header');
+    ShareView.footerEl = ui.toPage.find('#load-view-footer');
 
 
     //load all moments
@@ -197,6 +198,6 @@ ShareView.beforeTransition = function (event, ui) {
         new ShareViewItem(share).getEl((idx % 2 == 0)).appendTo(sharesEl);
 
     //save current view
-    localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
-
+    localStorage.setItem('current-view', SHARE_VIEW_PAGE_IDX);
+    localStorage.setItem('loaded-share-ids', Shares.getIds(ShareView.shares))
 };

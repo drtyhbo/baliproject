@@ -48,6 +48,13 @@ Users.getUserByID = function (userId) {
     return null;
 };
 
+Users.getUsers = function (userIds) {
+    var users = Users.userDB.filter(function (user) {
+            return ($.inArray(user.id, userIds) != -1);
+    });
+    return users;
+}
+
 
 /*******************************************
  *
@@ -57,7 +64,6 @@ Users.getUserByID = function (userId) {
 
 var PictureWidgets = {
     pictureWidgetDB: [],      //private data store
-    currentId: 0
 };
 
 PictureWidgets.init = function () {
@@ -68,21 +74,27 @@ PictureWidgets.init = function () {
                 asset.getSrc(),
                 asset.getThumbSrc(),
                 null,
-                (asset.num == 101)? 1: ((i % 2 == 0)? 3: 4), //createdBy (moment 101 is shared by only one user)
-                new Util.getPastDate(6),
+                (asset.num == 101)? 1: ((asset.num % 2 == 0)? 3: 4), //createdBy (moment 101 is shared by only one user)
+                Util.getPastDate(6),
                 [asset.moment]));
 }
 
+/*
+ * Returns all widgets belonging to moment identified by momentId
+ */
 PictureWidgets.getPictureWidgetsByMomentId= function (momentId) {
     return PictureWidgets.pictureWidgetDB.filter(function (picture) {
-        return $.inArray(momentId, picture.momentIds);
+        return ($.inArray(momentId, picture.momentIds) != -1);
         
     });
 };
 
+/*
+ * Returns all widgets identified by the array of ids sharedWidgetsIds
+ */
 PictureWidgets.getPictureWidgets = function (sharedWidgetsIds) {
-    PictureWidgets.pictureWidgetDB.filter(function (picture) {
-        return (picture.id in sharedWidgetsIds);
+    return PictureWidgets.pictureWidgetDB.filter(function (picture) {
+        return ($.inArray(picture.id, sharedWidgetsIds) != -1); 
     });
 }
 
@@ -94,24 +106,33 @@ PictureWidgets.getPictureWidgets = function (sharedWidgetsIds) {
 
 var Shares = {
     shareDB: [],
-    currentId: 0
+    currentId: 1
 }
 
 Shares.init = function () {
     
     var comments1 = [];
-    comments1.push(new CommentWidget(1, 'Awesome Picture Nigga', 2, new Util.getPastDate(3)));
-    comments1.push(new CommentWidget(2, 'Good Picture Nigga', 4, new Util.getPastDate(2)));
+    comments1.push(new CommentWidget(1, 'Awesome Picture Nigga', 2, Util.getPastDate(3)));
+    comments1.push(new CommentWidget(2, 'Good Picture Nigga', 4, Util.getPastDate(2)));
 
     var comments2 = [];
-    comments2.push(new CommentWidget(3,'Holy shit it\'s the nasty gurang', 4, new Util.getPastDate(110)));
-    comments2.push(new CommentWidget(4,'NASTY!', 2, new Util.getPastDate(105)));
+    comments2.push(new CommentWidget(3,'Holy shit it\'s the nasty gurang', 4, Util.getPastDate(110)));
+    comments2.push(new CommentWidget(4,'NASTY!', 2, Util.getPastDate(105)));
 
     Shares.shareDB.push(new Share(Shares.currentId++, 1, [2, 3], Util.getPastDate(2), [151, 155, 161], comments1));
     Shares.shareDB.push(new Share(Shares.currentId++, 1, [3, 4], Util.getPastDate(2), [151, 155, 183, 184], comments2));
     Shares.shareDB.push(new Share(Shares.currentId++, 1, [1, 2, 3], Util.getPastDate(2), [267, 268, 269, 271, 272, 275, 277, 281]));
 }
 
+Share.getShares = function (shareIds) {
+    return Shares.shareDB.filter(function (share) {
+        return ($.inArray(share.id, shareIds) != -1);
+    });
+}
+
+/*
+ * Returns all shares that contain the widget identified by widgetId
+ */
 Shares.getWidgetShares = function(widgetId){
     var shares = [];
 
@@ -124,6 +145,18 @@ Shares.getWidgetShares = function(widgetId){
     return shares;
 }
 
+/*
+ * Returns all share ids of shares
+ */
+Shares.getIds = function (shares) {
+    return $.map(shares, function (share) {
+        return share.id;
+    });
+}
+
+
+
+
 
 
 /*******************************************
@@ -133,7 +166,6 @@ Shares.getWidgetShares = function(widgetId){
  *******************************************/
 var Moments = {
     momentDB: [],
-    currentId: 0
 }
 
 Moments.getAllMoments = function () {
@@ -148,15 +180,15 @@ Moments.getMomentsByOwnderId = function (userId) {
 
 Moments.init = function () {
 
-    var moment = new Moment(100, 'Phuket, Thailand', new Util.getPastDate(6), 1);
+    var moment = new Moment(100, 'Kuala, Lumpur', Util.getPastDate(6), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
     Moments.momentDB.push(moment);
 
-    var moment = new Moment(101, 'Koh Lanta, Thailand', new Util.getPastDate(60), 1);
+    var moment = new Moment(101, 'Koh Lanta, Thailand', Util.getPastDate(60), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
     Moments.momentDB.push(moment);
 
-    var moment = new Moment(102, 'Jakarta, Indonesia', new Util.getPastDate(120), 1);
+    var moment = new Moment(103, 'Phucket, Thailand', Util.getPastDate(120), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
     Moments.momentDB.push(moment);
 }

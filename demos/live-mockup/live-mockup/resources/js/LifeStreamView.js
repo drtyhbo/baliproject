@@ -52,7 +52,7 @@ var LifeStreamItem = Class.extend({
 
         //generate user thumbnails
         var users = this.moment.getWidgetOwners();
-        if (users && Object.keys(users).length > 1) {
+        if (users && users.length > 1) {
             var tumbnailContainerEl = $('<div></div>')
                .css({
                    padding: '4px 0px 0px 4px',
@@ -146,7 +146,7 @@ var LifeStreamItem = Class.extend({
 
     touchEnd: function (shares) {
         if (Math.abs((this.touchEndY || 0) - (this.touchStartY || 0) < 5)) {
-                ShareView.show(false);
+                ShareView.show(shares,false);
         }
     }
 
