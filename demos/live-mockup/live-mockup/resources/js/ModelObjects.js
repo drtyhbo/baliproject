@@ -17,7 +17,26 @@ var Share = Class.extend({
         this.sharedOn = sharedOn || null;
         this.sharedWidgetsIds = sharedWidgetIds || [];
         this.comments = comments || [];
+    },
+
+    getElapsedTime: function () {
+        Util.getElapsedTime(this.sharedOn);
+    },
+
+    /*
+     * Return all widgets that belong to this share
+     */ 
+    getWidgets: function () {
+        return PictureWidgets.getPictureWidgets(this.sharedWidgetsIds);
+    },
+
+    /*
+     * Return all users that received this share
+     */ 
+    getSharedWithUsers: function () {
+        return Users.getUsers(this.sharedWith);
     }
+
 });
 
 var Widget = Class.extend({
@@ -65,35 +84,53 @@ var Moment = Class.extend({
     },
 
     getShareCount: function () {
-        var shareCount = 0;
-        for (var i = 0, picture; picture = this.widgets[i]; i++) {
-            var shares = Shares.getWidgetShares(picture.id);
-            shareCount += shares ? shares.length : 0;
-        }
-        return shareCount;
+        return this.getMomentShares().length;
     },
 
     getCommentCount: function () {
         var commentCount = 0;
-        for (var i = 0, picture; picture = this.widgets[i]; i++) {
-            var shares = Shares.getWidgetShares(picture.id);
-            for (var j = 0, share; share = shares[j]; j++)
-                commentCount += share.comments.length;
-        }
+        var shares = this.getMomentShares();
+        for (var j = 0, share; share = shares[j]; j++)
+            commentCount += share.comments.length;
+        
         return commentCount;
     },
 
+    /*
+     * Returns all shares associated with this moment (shares that contain pictures that are part of this moment)
+     */
+    getMomentShares: function () {
+        var shareDict = {};
+        for (var i = 0, picture; picture = this.widgets[i]; i++) {
+            var shares = Shares.getWidgetShares(picture.id);
+
+            //use dictionary to keep only uniques
+            for (var j = 0, share; share = shares[j]; j++)
+                shareDict[share.id] = share;
+        }
+        var uniqueShares = [];
+        for (var shareid in shareDict)
+            uniqueShares.push(shareDict[shareid]);
+        return uniqueShares;
+    },
+
+    /*
+     * Returns all users that created the widgets contained in this moment
+     */
     getWidgetOwners: function () {
         if (!this.widgets)
             return null;
 
-        var users = {};
+        var usersDic = {};
         for (var idx = 0, widget; widget = this.widgets[idx]; idx++) {
             user = Users.getUserByID(widget.createdBy)
-            if (user && !(user.username in users))
-                users[user.username] = user;
+            if (user && !(user.id in usersDic))
+                usersDic[user.id] = user;
         }
-        return users;
+        var uniqueUsers = [];
+        for (var userid in usersDic)
+            uniqueUsers.push(usersDic[userid]);
+        return uniqueUsers;
     }
 });
 

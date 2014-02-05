@@ -9,7 +9,7 @@ Util.getPastDate = function (minutes, hours, days) {
     minutes = minutes || 0;
     hours = hours || 0;
     days = days || 0;
-    new Date().getTime() - minutes * 60 * 1000 - hours * 60 * 60 * 1000 - days * 24 * 60 * 60 * 1000;
+    return new Date().getTime() - minutes * 60 * 1000 - hours * 60 * 60 * 1000 - days * 24 * 60 * 60 * 1000;
 }
 
 /*
