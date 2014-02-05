@@ -69,6 +69,8 @@
 - (AssetInfo *)createAssetInfoForAsset:(ALAsset *)asset {
   AssetInfo *assetInfo = [[AssetInfo alloc] init];
   assetInfo.asset = asset;
+
+  ALAssetRepresentation *rep = [asset defaultRepresentation];
   assetInfo.image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:UIImageOrientationUp];
   
   UIProgressView *progressView = [[UIProgressView alloc] init];
@@ -120,9 +122,16 @@
   
   // Note that this only uploads thumbnails.
   ALAssetRepresentation *rep = [currentUpload.asset defaultRepresentation];
-  Byte *buffer = (Byte*)malloc(rep.size);
-  NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:rep.size error:nil];
-  NSData *fileData = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
+  UIImage *resizedImage = [UIImage imageWithCGImage:[rep fullResolutionImage] scale:128 orientation:UIImageOrientationUp];
+
+  UIImage *fullSizeImage = [UIImage imageWithCGImage:[rep fullResolutionImage]];
+
+  CGSize newImageSize = CGSizeMake(fullSizeImage.size.width / 8, fullSizeImage.size.height / 8);
+  UIGraphicsBeginImageContext(newImageSize);
+  [fullSizeImage drawInRect:CGRectMake(0, 0, newImageSize.width, newImageSize.height)];
+  NSData *fileData = UIImageJPEGRepresentation(UIGraphicsGetImageFromCurrentImageContext(), 0.5);
+  UIGraphicsEndImageContext();
+  
   
   NSDate *date = [currentUpload.asset valueForProperty:ALAssetPropertyDate];
   CLLocation *location = [currentUpload.asset valueForProperty:ALAssetPropertyLocation];
