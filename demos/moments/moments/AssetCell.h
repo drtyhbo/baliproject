@@ -9,11 +9,12 @@
 #import <UIKit/UIKit.h>
 
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "AssetInfo.h"
 
 @interface AssetCell : UICollectionViewCell {
   UIImageView *_imageView;
 }
 
-@property (nonatomic, strong) UIImage *image;
+@property (nonatomic, strong) AssetInfo *assetInfo;
 
 @end

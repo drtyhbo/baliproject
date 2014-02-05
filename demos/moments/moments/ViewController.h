@@ -6,13 +6,18 @@
 //  Copyright (c) 2014 baliproject. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout> {
+#import "AssetInfo.h"
+#import "Request.h"
+
+@interface ViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, RequestDelegate> {
   ALAssetsLibrary *_assetsLibrary;
   UICollectionView *_collectionView;
-  NSArray *_assets;
+  NSMutableArray *_assets;
+  int _currentUploadIdx;
+  Request *_currentRequest;
 }
 
 @end

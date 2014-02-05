@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9639C1F818A15A2F00C19477 /* MomentFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 9639C1F718A15A2F00C19477 /* MomentFlowLayout.m */; };
+		9639C1FE18A15ED800C19477 /* Request.m in Sources */ = {isa = PBXBuildFile; fileRef = 9639C1FD18A15ED800C19477 /* Request.m */; };
+		9639C20118A16C3500C19477 /* AssetInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9639C20018A16C3500C19477 /* AssetInfo.m */; };
+		9653354F18A2AF1B00826E38 /* check-grey-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 9653354E18A2AF1B00826E38 /* check-grey-128.png */; };
+		9653355218A2B41000826E38 /* FinishedUploadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9653355118A2B41000826E38 /* FinishedUploadingView.m */; };
+		9653355618A2BFEE00826E38 /* error-red-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 9653355518A2BFEE00826E38 /* error-red-128.png */; };
 		DD24AA6F189066E700A5DF34 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD24AA6E189066E700A5DF34 /* Foundation.framework */; };
 		DD24AA71189066E700A5DF34 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD24AA70189066E700A5DF34 /* CoreGraphics.framework */; };
 		DD24AA73189066E700A5DF34 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD24AA72189066E700A5DF34 /* UIKit.framework */; };
@@ -36,6 +42,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9639C1F618A15A2F00C19477 /* MomentFlowLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MomentFlowLayout.h; sourceTree = "<group>"; };
+		9639C1F718A15A2F00C19477 /* MomentFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MomentFlowLayout.m; sourceTree = "<group>"; };
+		9639C1FC18A15ED800C19477 /* Request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Request.h; sourceTree = "<group>"; };
+		9639C1FD18A15ED800C19477 /* Request.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Request.m; sourceTree = "<group>"; };
+		9639C1FF18A16C3500C19477 /* AssetInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssetInfo.h; sourceTree = "<group>"; };
+		9639C20018A16C3500C19477 /* AssetInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetInfo.m; sourceTree = "<group>"; };
+		9653354E18A2AF1B00826E38 /* check-grey-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "check-grey-128.png"; path = "resources/check-grey-128.png"; sourceTree = "<group>"; };
+		9653355018A2B41000826E38 /* FinishedUploadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FinishedUploadingView.h; path = ../FinishedUploadingView.h; sourceTree = "<group>"; };
+		9653355118A2B41000826E38 /* FinishedUploadingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FinishedUploadingView.m; path = ../FinishedUploadingView.m; sourceTree = "<group>"; };
+		9653355518A2BFEE00826E38 /* error-red-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "error-red-128.png"; path = "resources/error-red-128.png"; sourceTree = "<group>"; };
 		DD24AA6B189066E700A5DF34 /* moments.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = moments.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD24AA6E189066E700A5DF34 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		DD24AA70189066E700A5DF34 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -118,6 +134,10 @@
 		DD24AA74189066E700A5DF34 /* moments */ = {
 			isa = PBXGroup;
 			children = (
+				9653355018A2B41000826E38 /* FinishedUploadingView.h */,
+				9653355118A2B41000826E38 /* FinishedUploadingView.m */,
+				9639C1FC18A15ED800C19477 /* Request.h */,
+				9639C1FD18A15ED800C19477 /* Request.m */,
 				DD24AA7D189066E700A5DF34 /* AppDelegate.h */,
 				DD24AA7E189066E700A5DF34 /* AppDelegate.m */,
 				DD24AA80189066E700A5DF34 /* Main.storyboard */,
@@ -125,6 +145,10 @@
 				DD24AAAA1890834900A5DF34 /* AssetCell.m */,
 				DD24AA83189066E700A5DF34 /* ViewController.h */,
 				DD24AA84189066E700A5DF34 /* ViewController.m */,
+				9639C1FF18A16C3500C19477 /* AssetInfo.h */,
+				9639C20018A16C3500C19477 /* AssetInfo.m */,
+				9639C1F618A15A2F00C19477 /* MomentFlowLayout.h */,
+				9639C1F718A15A2F00C19477 /* MomentFlowLayout.m */,
 				DD24AA86189066E700A5DF34 /* Images.xcassets */,
 				DD24AA75189066E700A5DF34 /* Supporting Files */,
 				DD24AAA61890687800A5DF34 /* Moment.h */,
@@ -136,6 +160,8 @@
 		DD24AA75189066E700A5DF34 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				9653355518A2BFEE00826E38 /* error-red-128.png */,
+				9653354E18A2AF1B00826E38 /* check-grey-128.png */,
 				DD24AA76189066E700A5DF34 /* moments-Info.plist */,
 				DD24AA77189066E700A5DF34 /* InfoPlist.strings */,
 				DD24AA7A189066E700A5DF34 /* main.m */,
@@ -240,7 +266,9 @@
 			files = (
 				DD24AA87189066E700A5DF34 /* Images.xcassets in Resources */,
 				DD24AA79189066E700A5DF34 /* InfoPlist.strings in Resources */,
+				9653355618A2BFEE00826E38 /* error-red-128.png in Resources */,
 				DD24AA82189066E700A5DF34 /* Main.storyboard in Resources */,
+				9653354F18A2AF1B00826E38 /* check-grey-128.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,9 +289,13 @@
 			files = (
 				DD24AAAB1890834900A5DF34 /* AssetCell.m in Sources */,
 				DD24AA85189066E700A5DF34 /* ViewController.m in Sources */,
+				9639C20118A16C3500C19477 /* AssetInfo.m in Sources */,
 				DD24AA7F189066E700A5DF34 /* AppDelegate.m in Sources */,
+				9653355218A2B41000826E38 /* FinishedUploadingView.m in Sources */,
 				DD24AA7B189066E700A5DF34 /* main.m in Sources */,
 				DD24AAA81890687800A5DF34 /* Moment.m in Sources */,
+				9639C1F818A15A2F00C19477 /* MomentFlowLayout.m in Sources */,
+				9639C1FE18A15ED800C19477 /* Request.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
