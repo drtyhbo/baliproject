@@ -15,7 +15,7 @@
 @interface ViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, RequestDelegate> {
   ALAssetsLibrary *_assetsLibrary;
   UICollectionView *_collectionView;
-  NSMutableArray *_assets;
+  NSArray *_assets;
   int _currentUploadIdx;
   Request *_currentRequest;
 }

@@ -1,5 +1,17 @@
 var Util = {
+  GET: {}
 }
+
+/*
+ * Initializes the utilities.
+ */
+Util.init = function() {
+  var keyValuePairs = window.location.search.substr(1).split('&');
+  for (var i = 0, pair; pair = keyValuePairs[i]; i++) {
+    var keyValue = pair.split('=');
+    Util.GET[keyValue[0]] = decodeURIComponent(keyValue[1]);
+  }  
+};
 
 /*
  *  get date in the past 
@@ -28,3 +40,9 @@ Util.getElapsedTime = function (timeStamp) {
         return Math.floor(elapsedMs / (60 * 60) / 1000) + 'h';
     }
 }
+
+var Images = {};
+
+Images.getPath = function(subpath) {
+  return isIOS ? '' : ('img/' + (subpath || ''));
+};

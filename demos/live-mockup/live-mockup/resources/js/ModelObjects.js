@@ -58,9 +58,13 @@ var CommentWidget = Widget.extend({
 var PictureWidget = Widget.extend({
     init: function (id, pictureSrc, thumbnailPictureSrc, comments, createdBy, createdOn, momentIds) {
         this._super(id, createdBy, createdOn, momentIds);
-        this.pictureSrc = pictureSrc || null;                           //main picture: string
-        this.thumbnailPictureSrc = thumbnailPictureSrc || null;          //thumbnail picture: string
-        this.comments = comments || [];                                 //picture comments: CommentWidget[]
+        this.pictureSrc = pictureSrc || null;
+        this.thumbnailPictureSrc = thumbnailPictureSrc || null;
+        this.comments = comments || [];
+    },
+    
+    getSrc: function() {
+        return this.pictureSrc;
     }
 });
 

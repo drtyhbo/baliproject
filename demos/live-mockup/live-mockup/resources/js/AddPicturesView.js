@@ -59,8 +59,13 @@ AddPicturesView.beforeTransition = function (event, ui) {
 
     var picturesEl = ui.toPage.find('#pictures')
 			.empty();
+
+    var assets = CameraRoll.getCameraRoll().filter(function(item) {
+      return !PersonalLibrary.hasAsset(item);
+    });
+
     AddPicturesView.addPictures = new AddPictures(ui.toPage.width(),
-			false, true, AddPicturesView.onSelectionChanged, PictureWidgets.getAll());
+			false, true, AddPicturesView.onSelectionChanged, assets);
     AddPicturesView.addPictures.getEl()
 			.appendTo(picturesEl);
 
@@ -71,7 +76,6 @@ AddPicturesView.beforeTransition = function (event, ui) {
     }
 
     localStorage.setItem('current-view', ADD_PICTURES_VIEW_PAGE_IDX);
-
 };
 
 /**

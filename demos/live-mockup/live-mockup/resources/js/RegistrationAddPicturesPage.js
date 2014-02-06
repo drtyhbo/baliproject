@@ -27,6 +27,8 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
     return;
   }
 
+  debugger;
+
 	RegistrationAddPicturesPage.footerEl = ui.toPage
 			.find('#add-pictures-footer')
 			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
@@ -36,14 +38,10 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
             LifeStreamView.show();
         });
 
-    //get picture widgets & remove the ones already in the library
-	var pictureWidgets = CameraRoll.getPictureWidgets();
-	pictureWidgets  = pictureWidgets.filter(function(pictureWidget) {
-	    return !PersonalLibrary.hasPictureWidget(pictureWidget);
-	});
-
-	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(), true, true,
-			RegistrationAddPicturesPage.onSelectionChanged, pictureWidgets);
+	var cameraRoll = CameraRoll.getCameraRoll();
+	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(),
+            true, true, RegistrationAddPicturesPage.onSelectionChanged,
+            cameraRoll);
 	RegistrationAddPicturesPage.addPictures.getEl()
 			.appendTo(ui.toPage.find('#pictures'));
 };

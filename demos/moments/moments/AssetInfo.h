@@ -13,6 +13,7 @@
 
 @interface AssetInfo : NSObject
 
+@property (nonatomic) BOOL hasBeenUploaded;
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) ALAsset *asset;
 @property (nonatomic, strong) UIProgressView *progressView;

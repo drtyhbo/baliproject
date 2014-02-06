@@ -68,13 +68,13 @@ PictureWidgets.init = function () {
     var assets = CameraRoll.getCameraRoll();
     for (var i = 0, asset; asset = assets[i]; i++)
         PictureWidgets.pictureWidgetDB.push(new PictureWidget(
-                asset.num,      //use asset number as Id so it would be easy to reference
-                asset.getSrc(),
-                asset.getThumbSrc(),
+                asset.id,      //use asset number as Id so it would be easy to reference
+                asset.url,
+                asset.url,
                 null,
                 (asset.num == 101)? 1: ((asset.num % 2 == 0)? 3: 4), //createdBy (moment 101 is shared by only one user)
                 Util.getPastDate(6),
-                [asset.moment]));
+                [0]));
 }
 
 /*
@@ -88,9 +88,11 @@ PictureWidgets.getAll = function() {
  * Returns all widgets belonging to moment identified by momentId
  */
 PictureWidgets.getPictureWidgetsByMomentId= function (momentId) {
+//    return PictureWidgets.pictureWidgetDB.filter(function (picture) {
+//        return ($.inArray(momentId, picture.momentIds) != -1);
     return PictureWidgets.pictureWidgetDB.filter(function (picture) {
-        return ($.inArray(momentId, picture.momentIds) != -1);
-        
+      return true;
+//        return ($.inArray(momentId, picture.momentIds) != -1);        
     });
 };
 
@@ -184,7 +186,6 @@ Moments.getMomentsByOwnderId = function (userId) {
 }
 
 Moments.init = function () {
-
     var moment = new Moment(100, 'Kuala, Lumpur', Util.getPastDate(6), 1);
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
     Moments.momentDB.push(moment);

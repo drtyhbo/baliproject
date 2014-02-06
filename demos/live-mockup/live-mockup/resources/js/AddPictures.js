@@ -10,10 +10,11 @@ var AddPictures = Class.extend({
      * showSelectAll - If true, displays the Select all/Select none link.
      * onSelectionChanged - Called when the user selects/deselects pictures (only called if isSelectable is set to true)
      * isSelectable - If true, user can select the images
-     * pictureWidgets - list of picture to be displayed (of type pictureWidget[]
+     * assets - List of assets to be displayed.
      */
-    init: function (width, showSelectAll, isSelectable, onSelectionChanged, pictureWidgets) {
+    init: function (width, showSelectAll, isSelectable, onSelectionChanged, assets) {
         this.numSelected = 0;
+        this.assets = assets;
         this.pictures = [];
         this.selectAllEl = null;
         this.showSelectAll = showSelectAll;
@@ -22,7 +23,6 @@ var AddPictures = Class.extend({
         this.isSelectable = isSelectable;
         this.onSelectionChanged = this.isSelectable ? onSelectionChanged : null;
         this.width = width;
-        this.pictureWidgets = pictureWidgets;
     },
 
     /**
@@ -56,7 +56,7 @@ var AddPictures = Class.extend({
 
         //generate pictures
         var numPictures = 0;
-        for (var i = 0, picture; picture = this.pictureWidgets[i]; i++) {
+        for (var i = 0, asset; asset = this.assets[i]; i++) {
             var thumbnailEl = $('<span></span>')
 		      .css({
 		          display: 'inline-block',
@@ -73,7 +73,7 @@ var AddPictures = Class.extend({
 
             var imageEl = $('<span></span>')
 		      .css({
-		          backgroundImage: 'url(' + picture.pictureSrc + ')',
+		          backgroundImage: 'url(' + asset.getSrc() + ')',
 		          backgroundSize: 'cover',
 		          display: 'inline-block',
 		          height: '100%',
@@ -131,7 +131,7 @@ var AddPictures = Class.extend({
      * Returns the number of pictures being displayed.
      */
     getNumPictures: function () {
-        return this.pictureWidgets.length;
+        return this.pictures.length;
     },
 
     /**

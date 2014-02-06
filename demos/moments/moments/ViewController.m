@@ -36,14 +36,17 @@
   [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
                                 usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
                                   if (group == nil) {
-                                    _assets = mutableAssets;
+                                    _assets = [mutableAssets sortedArrayUsingComparator:^NSComparisonResult(AssetInfo *first, AssetInfo *second) {
+                                      return first.hasBeenUploaded ?
+                                          NSOrderedDescending :
+                                          (second.hasBeenUploaded ? NSOrderedAscending : NSOrderedSame);
+                                    }];
                                     [_collectionView reloadData];
                                     [self startNextUpload];
                                   }
                                   [group enumerateAssetsUsingBlock:^(ALAsset *asset, NSUInteger index, BOOL *stop) {
                                     if (!asset ||
-                                        [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo] ||
-                                        [self hasAssetBeenUploaded:asset]) {
+                                        [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo]) {
                                       return;
                                     }
                                     [mutableAssets addObject:[self createAssetInfoForAsset:asset]];
@@ -70,6 +73,8 @@
   AssetInfo *assetInfo = [[AssetInfo alloc] init];
   assetInfo.asset = asset;
 
+  assetInfo.hasBeenUploaded = [self hasAssetBeenUploaded:asset];
+  
   ALAssetRepresentation *rep = [asset defaultRepresentation];
   assetInfo.image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:UIImageOrientationUp];
   
@@ -78,7 +83,7 @@
   assetInfo.progressView = progressView;
   
   UIView *finishedView = [[FinishedUploadingView alloc] init];
-  finishedView.hidden = YES;
+  finishedView.hidden = !assetInfo.hasBeenUploaded;
   assetInfo.finishedView = finishedView;
   
   return assetInfo;
@@ -87,9 +92,10 @@
 // Finishes the upload off by hiding the progress bar and displaying the finished view.
 - (void)finishUploadWithSuccess:(BOOL)isSuccess {
   AssetInfo *currentUpload = [_assets objectAtIndex:_currentUploadIdx];
-
+  
   // Store in CoreData so we don't show this asset anymore.
   if (isSuccess) {
+    currentUpload.hasBeenUploaded = YES;
      UploadedAsset *uploadedAsset = [NSEntityDescription insertNewObjectForEntityForName:@"UploadedAsset"inManagedObjectContext:[CoreData context]];
     uploadedAsset.filename = [currentUpload.asset defaultRepresentation].filename;
     [CoreData save];
@@ -113,11 +119,18 @@
 
 // Starts the next upload. Doesn't do anything if the uploads have all been completed.
 - (void)startNextUpload {
-  if (++_currentUploadIdx == [_assets count]) {
+  int i;
+  AssetInfo *currentUpload;
+  for (i = ++_currentUploadIdx; i < [_assets count]; i++) {
+    currentUpload = [_assets objectAtIndex:_currentUploadIdx];
+    if (!currentUpload.hasBeenUploaded) {
+      break;
+    }
+  }
+  if (i == [_assets count]) {
     return;
   }
   
-  AssetInfo *currentUpload = [_assets objectAtIndex:_currentUploadIdx];
   currentUpload.progressView.hidden = NO;
   
   // Note that this only uploads thumbnails.

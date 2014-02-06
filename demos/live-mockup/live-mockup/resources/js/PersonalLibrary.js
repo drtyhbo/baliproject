@@ -20,6 +20,7 @@
  */
 
 var PersonalLibrary = {
+    assets: {},
     pictures: {},
     uploadTimerId: 0,
     toUpload: [],
@@ -95,10 +96,16 @@ PersonalLibrary.add = function (pictures) {
 };
 
 /**
- * Returns true if the specified picture is already in the library.
+ * Returns true if the specified asset is already in the library.
  */
-PersonalLibrary.hasPicture = function (picture) {
-    return picture.num in PersonalLibrary.pictures;
+PersonalLibrary.hasAsset = function (asset) {
+    for (var i = 0, picture; picture = PersonalLibrary.pictures[i]; i++) {
+        if (picture.num == asset.num) {
+            return true;
+        }
+    }
+
+    return false;
 };
 
 /**

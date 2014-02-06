@@ -10,6 +10,6 @@
 
 @implementation AssetInfo
 
-@synthesize image, asset, progressView, finishedView;
+@synthesize hasBeenUploaded, image, asset, progressView, finishedView;
 
 @end
