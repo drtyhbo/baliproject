@@ -21,13 +21,11 @@ RegistrationAddPicturesPage.show = function(animate) {
  * visible.
  */
 RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
-  if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
-    $.mobile.pageContainer.off('pagecontainerbeforetransition',
-				arguments.callee);
-    return;
-  }
-
-  debugger;
+    if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
+        $.mobile.pageContainer.off('pagecontainerbeforetransition',
+		        arguments.callee);
+        return;
+    }
 
 	RegistrationAddPicturesPage.footerEl = ui.toPage
 			.find('#add-pictures-footer')
@@ -61,13 +59,17 @@ RegistrationAddPicturesPage.onSelectionChanged = function(numSelected) {
  * user to the second step of the registration flow.
  */
 RegistrationAddPicturesPage.touchFooterButton = function(e) {
-  e.preventDefault();
+    e.preventDefault();
   
+    var assets = RegistrationAddPicturesPage.addPictures.getSelected();
+
 	// "Upload" those pictures which are selected.
-	PersonalLibrary.add(
-			RegistrationAddPicturesPage.addPictures.getSelected());
-	RegistrationCreateUserPage.show(true);
-
-
-
+	PersonalLibrary.add(assets);
+    PictureWidgets.ajaxAdd(assets, function() {
+        if (!Users.getCurrentUser()) {
+            RegistrationCreateUserPage.show(true);
+        } else {
+            FeedView.show(true);
+        }
+    });
 };

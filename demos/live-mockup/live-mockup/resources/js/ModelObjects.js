@@ -55,11 +55,11 @@ var CommentWidget = Widget.extend({
 });
 
 var PictureWidget = Widget.extend({
-    init: function (id, pictureSrc, thumbnailPictureSrc, comments, createdBy, createdOn, momentIds) {
-        this._super(id, createdBy, createdOn, momentIds);
-        this.pictureSrc = pictureSrc || null;
-        this.thumbnailPictureSrc = thumbnailPictureSrc || null;
-        this.comments = comments || [];
+    init: function (props) {
+        this._super(props.id, props.createdBy, props.createdOn, props.momentIds);
+        this.pictureSrc = props.pictureSrc || null;
+        this.thumbnailPictureSrc = props.thumbnailPictureSrc || null;
+        this.comments = props.comments || [];
     },
     
     getSrc: function() {

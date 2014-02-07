@@ -90,7 +90,7 @@ PersonalLibrary.add = function (pictures) {
             personalLibrary.push(picture.num);
         }
     }
-    localStorage.setItem('personal-library', personalLibrary);
+    
 
     PersonalLibrary.startUpload();
 };

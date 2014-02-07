@@ -111,7 +111,7 @@ var AddPictures = Class.extend({
 
                 var picture = {
                     isSelected: false,
-                    picture: picture,
+                    asset: asset,
                     fadedEl: fadedEl,
                     checkedEl: checkedEl,
                     thumbnailEl: thumbnailEl
@@ -139,14 +139,14 @@ var AddPictures = Class.extend({
      * selected.
      */
     getSelected: function () {
-        var pictures = [];
+        var assets = [];
         for (var i = 0, picture; picture = this.pictures[i]; i++) {
             if (!picture.isSelected) {
                 continue;
             }
-            pictures.push(picture.picture);
+            assets.push(picture.asset);
         }
-        return pictures;
+        return assets;
     },
 
     /**

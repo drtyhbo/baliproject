@@ -60,8 +60,8 @@ AddPicturesView.beforeTransition = function (event, ui) {
     var picturesEl = ui.toPage.find('#pictures')
 			.empty();
 
-    var assets = CameraRoll.getCameraRoll().filter(function(item) {
-      return !PersonalLibrary.hasAsset(item);
+    var assets = CameraRoll.getCameraRoll().filter(function(asset) {
+        return !PictureWidgets.getPictureByAssetId(asset.id);
     });
 
     AddPicturesView.addPictures = new AddPictures(ui.toPage.width(),

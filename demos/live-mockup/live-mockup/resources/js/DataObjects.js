@@ -2,12 +2,19 @@ var Db = {
 }
 
 Db.init = function(callback) {
-    Users.init(function() {
-        PictureWidgets.init();
-        Shares.init();
-        Moments.init();
-        callback();
-    });
+    // We expect two calls to return before we continue on.
+    var numExpected = 2;
+    function onInit() {
+        if (!--numExpected) {
+            Shares.init();
+            Moments.init();
+
+            callback();
+        }
+    }
+    
+    Users.init(onInit);
+    PictureWidgets.init(onInit);
 }
 
 /*******************************************
@@ -114,19 +121,24 @@ Users.ajaxCallback = function(callback, data) {
 
 var PictureWidgets = {
     pictureWidgetDB: [],      //private data store
+    pictures: [],
+    picturesByAssetId: {}
 };
 
-PictureWidgets.init = function () {
+PictureWidgets.init = function (callback) {
     var assets = CameraRoll.getCameraRoll();
     for (var i = 0, asset; asset = assets[i]; i++)
-        PictureWidgets.pictureWidgetDB.push(new PictureWidget(
-                asset.id,      //use asset number as Id so it would be easy to reference
-                asset.url,
-                asset.url,
-                null,
-                (asset.num == 101)? 1: ((asset.num % 2 == 0)? 3: 4), //createdBy (moment 101 is shared by only one user)
-                Util.getPastDate(6),
-                [0]));
+        PictureWidgets.pictureWidgetDB.push(
+            new PictureWidget({
+                id: asset.id,
+                pictureSrc: asset.url,
+                thumbnailPictureSrc: asset.url,
+                comments: null,
+                createdBy: (asset.num == 101)? 1: ((asset.num % 2 == 0)? 3: 4),
+                createdOn: Util.getPastDate(6),
+                momentIds: [0]
+            }));
+    PictureWidgets.ajaxGetAll(callback);
 }
 
 /*
@@ -156,6 +168,58 @@ PictureWidgets.getPictureWidgets = function (sharedWidgetsIds) {
         return ($.inArray(picture.id, sharedWidgetsIds) != -1); 
     });
 }
+
+/**
+ * Returns the picture widget with the specified asset id or null.
+ */
+PictureWidgets.getPictureByAssetId = function(id) {
+    return PictureWidgets.picturesByAssetId[id] || null;
+};
+
+/**
+ * Returns the list of pictures.
+ */
+PictureWidgets.getPictures = function() {
+    return PictureWidgets.pictures;
+};
+
+/**
+ * Grabs all uploaded pictures from the server.
+ */
+PictureWidgets.ajaxAdd = function(assets, callback) {
+    var assetIds = [];
+    for (var i = 0, asset; asset = assets[i]; i++) {
+        assetIds.push(asset.id);
+    }
+    Util.makeRequest('api/picture/add/', {
+        uid: Util.GET['uid'],
+        id: assetIds
+    }, PictureWidgets.ajaxCallback.bind(this, callback));
+};
+
+/**
+ * Grabs all uploaded pictures from the server.
+ */
+PictureWidgets.ajaxGetAll = function(callback) {
+    Util.makeRequest('api/picture/get/all/', {
+        uid: Util.GET['uid'],
+    }, PictureWidgets.ajaxCallback.bind(this, callback));
+};
+
+/**
+ * This callback function handles the return data from a picture related ajax
+ * call.
+ */
+PictureWidgets.ajaxCallback = function(callback, data) {
+    if (data) {
+        for (var i = 0, props; props = data[i]; i++) {
+            var widget = new PictureWidget(props);
+            PictureWidgets.pictures.push(widget);
+            PictureWidgets.picturesByAssetId[props.assetId] = widget;
+        }
+    }
+    callback();
+};
 
 /*******************************************
  *

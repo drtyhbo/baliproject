@@ -15,7 +15,7 @@ function initApp() {
     Db.init(function() {
         Feed.init();
         PersonalLibrary.init();
-        if (localStorage.getItem('personal-library') === null) {
+        if (!PictureWidgets.getPictures().length) {
             RegistrationAddPicturesPage.show(false);
         } else if (!Users.getCurrentUser()) {
             RegistrationCreateUserPage.show(false);
