@@ -33,7 +33,7 @@
   
   _assetsLibrary = [[ALAssetsLibrary alloc] init];
   // ALAssetsGroupSavedPhotos = Camera Roll
-  [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
+  [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos | ALAssetsGroupAlbum
                                 usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
                                   if (group == nil) {
                                     _assets = [mutableAssets sortedArrayUsingComparator:^NSComparisonResult(AssetInfo *first, AssetInfo *second) {
