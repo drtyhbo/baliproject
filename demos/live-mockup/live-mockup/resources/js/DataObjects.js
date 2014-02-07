@@ -1,11 +1,13 @@
 var Db = {
 }
 
-Db.init = function () {
-    Users.init();
-    PictureWidgets.init();
-    Shares.init();
-    Moments.init();
+Db.init = function(callback) {
+    Users.init(function() {
+        PictureWidgets.init();
+        Shares.init();
+        Moments.init();
+        callback();
+    });
 }
 
 /*******************************************
@@ -15,30 +17,46 @@ Db.init = function () {
  *******************************************/
 var Users = {
     userDB: [],      //private data store
-    currentId : 1
+    currentId : 1,
+    currentUser: null
 };
 
-Users.init = function () {
+Users.init = function (callback) {
+    Users.ajaxGetCurrentUser(callback);
 
-    Users.userDB.push(new User(Users.currentId++, 'Amine Zejli', 'amine',
-            Images.getPath('users/') + 'amine.jpg'));
-    Users.userDB.push(new User(Users.currentId++, 'Marcello Chermak', 'marcello',
-            Images.getPath('users/') + 'marcello.jpg'));
-    Users.userDB.push(new User(Users.currentId++, 'Veronica Marian', 'veronica',
-            Images.getPath('users/') + 'veronica.jpg'));
-    Users.userDB.push(new User(Users.currentId++, 'Andreas Binnewies', 'andreas',
-            Images.getPath('users/') + 'andreas.jpg'));
+    // Leave these in for now so the app can continue to function, but delete
+    // once everything is coming from the server.
+    Users.userDB.push(
+        new User({
+            id: Users.currentId++,
+            name: 'Amine Zejli',
+            thumbnailSrc: Images.getPath('users/') + 'amine.jpg'
+        }));
+    Users.userDB.push(
+        new User({
+            id: Users.currentId++,
+            name: 'Marcello Chermak',
+            thumbnailSrc: Images.getPath('users/') + 'marcello.jpg'
+        }));
+    Users.userDB.push(
+        new User({
+            id: Users.currentId++,
+            name: 'Veronica Marian',
+            thumbnailSrc: Images.getPath('users/') + 'veronica.jpg'
+        }));
+    Users.userDB.push(
+        new User({
+            id: Users.currentId++,
+            name: 'Andreas Binnewies',
+            thumbnailSrc: Images.getPath('users/') + 'andreas.jpg'
+        }));
 }
 
-Users.getUser = function (username) {
-    for (var i = 0, user; user = Users.userDB[i]; i++)
-        if (user.username == username)
-            return user;
-
-    return null;
+Users.getCurrentUser = function() {
+    return Users.currentUser;
 };
 
-Users.getUserByID = function (userId) {
+Users.getUserById = function (userId) {
     for (var i = 0, user; user = Users.userDB[i]; i++)
         if (user.id == userId)
             return user;
@@ -51,8 +69,42 @@ Users.getUsers = function (userIds) {
             return ($.inArray(user.id, userIds) != -1);
     });
     return users;
-}
+};
 
+/**
+ * Returns the current user.
+ */
+Users.ajaxGetCurrentUser = function(callback) {
+  Util.makeRequest('api/user/get/', {
+      uid: Util.GET['uid'],
+  }, Users.ajaxCallback.bind(this, callback));
+};
+
+/**
+ * Makes a request to the server to create a user. Returns the response to
+ * callback. Password is ignored.
+ */
+Users.ajaxCreateUser = function(name, email, password, callback) {
+  Util.makeRequest('api/user/add/', {
+      uid: Util.GET['uid'],
+      name: name,
+      email: email
+  }, Users.ajaxCallback.bind(this, callback));
+};
+
+/**
+ * This callback function handles the return data from a user related ajax
+ * call.
+ */
+Users.ajaxCallback = function(callback, data) {
+    if (data) {
+        // For now hardcode this. Take this out once all users have
+        // thumbnails.
+        data.thumbnailSrc = Images.getPath('users/') + 'amine.jpg';
+        Users.currentUser = new User(data);
+    }
+    callback();
+};
 
 /*******************************************
  *

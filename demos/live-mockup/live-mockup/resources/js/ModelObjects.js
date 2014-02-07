@@ -1,11 +1,10 @@
 var User = Class.extend({
-    init: function (id, name, username, thumbnailSrc) {
-        this.id = id || null;
-        this.name = name || null;
-        this.username = username || null;
-        this.thumbnailSrc = thumbnailSrc || null;
-        this.firstName = name.split(' ')[0];
-        this.lastName = name.split(' ')[1];
+    init: function (props) {
+        this.id = props.id || '';
+        this.name = props.name || '';
+        this.thumbnailSrc = props.thumbnailSrc || '';
+        this.firstName = this.name.split(' ')[0];
+        this.lastName = this.name.split(' ')[1];
     }
 });
 
@@ -127,7 +126,7 @@ var Moment = Class.extend({
 
         var usersDic = {};
         for (var idx = 0, widget; widget = this.widgets[idx]; idx++) {
-            user = Users.getUserByID(widget.createdBy)
+            user = Users.getUserById(widget.createdBy)
             if (user && !(user.id in usersDic))
                 usersDic[user.id] = user;
         }

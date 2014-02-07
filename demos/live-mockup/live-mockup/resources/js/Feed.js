@@ -4,7 +4,7 @@ var Feed = {
 
 Feed.init = function(){
     Feed.feed = [{
-		user: Users.getUser('amine'),
+        user: Users.getUserById(1),
 		location: 'Kuala Lumpur, Malaysia',
 		description: 'me in kuala lumpur <3',
 		pictures: [
@@ -15,25 +15,25 @@ Feed.init = function(){
 		],
 		comments: [{
 				comment: 'are you grabbing the shaft?',
-				user: Users.getUser('marcello')
+				user: Users.getUserById(4)
 			}, {
 				comment: 'it looked cooler in my mind...',
-				user: Users.getUser('amine')
+				user: Users.getUserById(1)
 			}, {
 				comment: 'dont forget to play with the... mall?',
-				user: Users.getUser('marcello')
+				user: Users.getUserById(2)
 			}
 		],
 		// 6 minutes ago
 		timestampMs: new Date().getTime() - 6 * 60 * 1000,
 		visibleTo: [
-			Users.getUser('amine'),
-			Users.getUser('andreas'),
-			Users.getUser('marcello'),
-			Users.getUser('veronica')
+			Users.getUserById(4),
+			Users.getUserById(1),
+			Users.getUserById(2),
+			Users.getUserById(3)
 		]
 	}, {
-		user: Users.getUser('andreas'),
+        user: Users.getUserById(4),
 		location: 'Kuala Lumpur, Malaysia',
 		description: 'Kuala lumpur, standing in front of a big ass building.',
 		pictures: [
@@ -46,10 +46,10 @@ Feed.init = function(){
 		// 2 hours ago
 		timestampMs: new Date().getTime() - 120 * 60 * 1000,
 		visibleTo: [
-			Users.getUser('amine')
+			Users.getUserById(1)
 		]
 	}, {
-		user: Users.getUser('andreas'),
+		user: Users.getUserById(4),
 		location: 'Phuket, Thailand',
 		description: 'Beach, bay, babes and bikes :)',
 		pictures: [
@@ -64,22 +64,22 @@ Feed.init = function(){
 		],
 		comments: [{
 				comment: 'Be safe on those things!',
-				user: Users.getUser('veronica')
-			}, {
+                user: Users.getUserById(1),
+            }, {
 				comment: 'Lol, what a fruity pink bike ;)',
-				user: Users.getUser('amine')
-			}, {
+                user: Users.getUserById(2),
+            }, {
 				comment: 'At least it stays upright...',
-				user: Users.getUser('andreas')
+                user: Users.getUserById(3),
 			} 
 		],
 		// 5 hours ago
 		timestampMs: new Date().getTime() - 300 * 60 * 1000,
 		visibleTo: [
-			Users.getUser('amine'),
-			Users.getUser('andreas'),
-			Users.getUser('marcello'),
-			Users.getUser('veronica')
+    		Users.getUserById(4),
+    		Users.getUserById(1),
+    		Users.getUserById(2),
+    		Users.getUserById(3)
 		]
 	}]
 };

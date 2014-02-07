@@ -26,9 +26,9 @@ var CameraRoll = {
  * once they've been loaded.
  */
 CameraRoll.init = function(callback) {
-    $.ajax('http://drtyhbo.net/api/asset/get/?uid=' + Util.GET['uid'], {
-        success: CameraRoll.load.bind(CameraRoll, callback)
-    });
+    Util.makeRequest('api/asset/get/', {
+        uid: Util.GET['uid']
+    }, CameraRoll.load.bind(CameraRoll, callback));
 };
 
 /*

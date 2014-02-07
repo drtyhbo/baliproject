@@ -230,7 +230,7 @@ var FeedItem = Class.extend({
 				}).bind(this))
 				.appendTo(this.commentsEl);
 
-        this.getCommentEl(Users.getUser('andreas'), null)
+        this.getCommentEl(Users.getCurrentUser(), null)
 				.appendTo(this.newCommentEl);
     },
 

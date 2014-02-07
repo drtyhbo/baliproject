@@ -41,6 +41,18 @@ Util.getElapsedTime = function (timeStamp) {
     }
 }
 
+/*
+ * Issues an AJAX request to the specified path. Automatically prefixes the
+ * path with the server url (currently http://drtyhbo.net/).
+ */
+Util.makeRequest = function(path, data, success) {
+  $.ajax('http://drtyhbo.net/' + path, {
+      data: data,
+      success: success,
+      type: 'POST'
+  });  
+};
+
 var Images = {};
 
 Images.getPath = function(subpath) {

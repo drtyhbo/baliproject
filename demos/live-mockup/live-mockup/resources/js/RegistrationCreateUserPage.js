@@ -54,14 +54,16 @@ RegistrationCreateUserPage.clickFooterButton = function(e) {
 	} else if (!RegistrationCreateUserPage.passwordEl.val()) {
 		RegistrationCreateUserPage.passwordEl.focus();
 	} else {
-		localStorage.setItem('registration-name',
-				RegistrationCreateUserPage.nameEl.val());
-		localStorage.setItem('registration-email',
-				RegistrationCreateUserPage.emailEl.val());
-		localStorage.setItem('registration-password',
-				RegistrationCreateUserPage.passwordEl.val());
-		FeedView.show(true);
+        var name = RegistrationCreateUserPage.nameEl.val();
+        var email = RegistrationCreateUserPage.emailEl.val();
+        var password = RegistrationCreateUserPage.passwordEl.val();
+        Users.ajaxCreateUser(name, email, password,
+                RegistrationCreateUserPage.onCreateUser);
 	}
+};
+
+RegistrationCreateUserPage.onCreateUser = function(data) {
+    FeedView.show(true);
 };
 
 RegistrationCreateUserPage.focusInput = function() {
