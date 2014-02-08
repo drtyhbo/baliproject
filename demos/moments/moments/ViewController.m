@@ -76,7 +76,7 @@
   assetInfo.hasBeenUploaded = [self hasAssetBeenUploaded:asset];
   
   ALAssetRepresentation *rep = [asset defaultRepresentation];
-  assetInfo.image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:UIImageOrientationUp];
+  assetInfo.image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:0];
   
   UIProgressView *progressView = [[UIProgressView alloc] init];
   progressView.hidden = YES;
@@ -137,7 +137,7 @@
   ALAssetRepresentation *rep = [currentUpload.asset defaultRepresentation];
   UIImage *resizedImage = [UIImage imageWithCGImage:[rep fullResolutionImage] scale:128 orientation:UIImageOrientationUp];
 
-  UIImage *fullSizeImage = [UIImage imageWithCGImage:[rep fullResolutionImage]];
+  UIImage *fullSizeImage = [UIImage imageWithCGImage:[rep fullResolutionImage] scale:1 orientation:[rep orientation]];
 
   CGSize newImageSize = CGSizeMake(fullSizeImage.size.width / 8, fullSizeImage.size.height / 8);
   UIGraphicsBeginImageContext(newImageSize);
