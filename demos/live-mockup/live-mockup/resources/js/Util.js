@@ -46,11 +46,12 @@ Util.getElapsedTime = function (timeStamp) {
  * path with the server url (currently http://drtyhbo.net/).
  */
 Util.makeRequest = function(path, data, success) {
-  $.ajax('http://drtyhbo.net/' + path, {
-      data: data,
-      success: success,
-      type: 'POST'
-  });  
+    var host = Util.GET['host'] || 'http://drtyhbo.net/';
+    $.ajax(host + path, {
+        data: data,
+        success: success,
+        type: 'POST'
+    });  
 };
 
 var Images = {};
