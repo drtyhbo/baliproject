@@ -114,9 +114,17 @@ AddPicturesView.showEmptyUi = function (e) {
  * Event handler. Called when the user clicks the 'Add' button.
  */
 AddPicturesView.onAddPictures = function (e) {
+    var assets = AddPicturesView.addPictures.getSelected();
+
     // "Upload" those pictures which are selected.
-    PersonalLibrary.add(
-			AddPicturesView.addPictures.getSelected());
+    PersonalLibrary.add(assets);
+    PictureWidgets.ajaxAdd(assets, function() {
+        if (!Users.getCurrentUser()) {
+            RegistrationCreateUserPage.show(true);
+        } else {
+            FeedView.show(true);
+        }
+    });
 
     AddPicturesView.addPictures.removeSelected(function () {
         AddPicturesView.onSelectionChanged(0);
