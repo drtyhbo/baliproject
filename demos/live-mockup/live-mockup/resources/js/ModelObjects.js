@@ -70,12 +70,18 @@ var PictureWidget = Widget.extend({
 //moment class: top level class used to represent a moment
 var Moment = Class.extend({
 
-    init: function (id, location, timeStamp, ownedBy) {
-        this.id = id || null;                           //moment ID
-        this.location = location || null;               //location of the moment: string
-        this.timeStamp = timeStamp || null;             //when the moment occured: date
+    init: function (props) {
+        this.id = props.id || null;                           //moment ID
+        this.location = props.location || null;               //location of the moment: string
+        this.timeStamp = props.timeStamp || null;             //when the moment occured: date
         this.widgets = [];                              //all widgets in a moment (pictures, videos, checkins...): Widget[]
-        this.ownedBy = ownedBy || ownedBy               //owner of the moment
+        this.ownedBy = props.ownedBy || null;
+        
+        if (props.pictures) {
+            for (var j = 0, pictureProps; pictureProps = props.pictures[j]; j++) {
+                this.widgets.push(new PictureWidget(pictureProps));
+            }
+        }
     },
 
     addPictureWidget: function (pictureSrc, thumbnailPictureSrc, comments, createdBy, createdOn) {
@@ -153,11 +159,11 @@ var LifeStream = Class.extend({
         return this.userProfile.thumbnailSrc;
     },
 
-    loadSampleData: function (username) {
-
-        //create user profile
-        this.userProfile = Users.getUser(username);
-        this.moments = Moments.getMomentsByOwnderId(this.userProfile.id);
+    loadData: function (callback) {
+        this.userProfile = Users.getCurrentUser();
+        Moments.ajaxGetAll(function(moments) {
+            this.moments = moments;
+            callback(moments);
+        }.bind(this));
     }
-
 });

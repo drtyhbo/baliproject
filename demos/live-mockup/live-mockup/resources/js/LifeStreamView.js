@@ -209,22 +209,21 @@ LifeStreamView.beforeTransition = function (event, ui) {
     //load sample life stream
     var assets = CameraRoll.getCameraRoll();
     var lifeStream = new LifeStream();
-    lifeStream.loadSampleData('amine');
+    lifeStream.loadData(function(moments) {
+        //display user profile thumbnail
+        var thumbnailPath = lifeStream.getUserProfileThumbnailPath();
+        if (!thumbnailPath)
+            throw "user profile thumbnail picture is not initalized";
+        ui.toPage.find('#profile-thumbnail')
+            .css('background-image', 'url(' + thumbnailPath + ')');
 
-    //display user profile thumbnail
-    var thumbnailPath = lifeStream.getUserProfileThumbnailPath();
-    if (!thumbnailPath)
-        throw "user profile thumbnail picture is not initalized";
-    ui.toPage.find('#profile-thumbnail')
-        .css('background-image', 'url(' + thumbnailPath + ')');
+        //load all moments
+        var momentsEl = ui.toPage.find('#moments');
+        momentsEl.empty();
+        for (var idx = 0, moment; moment = lifeStream.moments[idx]; idx++)
+            new LifeStreamItem(moment).getEl((idx % 2 == 0)).appendTo(momentsEl);
 
-    //load all moments
-    var momentsEl = ui.toPage.find('#moments');
-    momentsEl.empty();
-    for (var idx = 0, moment; moment = lifeStream.moments[idx]; idx++)
-        new LifeStreamItem(moment).getEl((idx % 2 == 0)).appendTo(momentsEl);
-
-    //save current view
-    localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
-
+        //save current view
+        localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
+    });
 };

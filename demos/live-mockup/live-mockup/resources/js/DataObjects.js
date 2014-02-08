@@ -314,3 +314,21 @@ Moments.init = function () {
     moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
     Moments.momentDB.push(moment);
 }
+
+/**
+ * Grabs all moments.
+ */
+Moments.ajaxGetAll = function(callback) {
+    Util.makeRequest('api/moment/get/all/', {
+        uid: Util.GET['uid'],
+    }, function(data) {
+        var moments = [];
+        if (data) {
+            for (var i = 0, momentProps; momentProps = data[i]; i++) {
+                var moment = new Moment(momentProps)
+                moments.push(moment)
+            }
+        }
+        callback(moments);
+    });
+};
