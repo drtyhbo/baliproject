@@ -73,7 +73,7 @@ var Moment = Class.extend({
     init: function (props) {
         this.id = props.id || null;                           //moment ID
         this.location = props.location || null;               //location of the moment: string
-        this.timeStamp = props.timeStamp || null;             //when the moment occured: date
+        this.timeStamp = props.timestamp * 1000 || null;             //when the moment occured: date
         this.widgets = [];                              //all widgets in a moment (pictures, videos, checkins...): Widget[]
         this.ownedBy = props.ownedBy || null;
         

@@ -1,18 +1,22 @@
-var ADD_PICTURES_PAGE_SPACING = 10;
 var ADD_PICTURES_NUM_COLUMNS = 3;
 var ADD_PICTURES_SPACING = 5;
+var USE_VARIOUS_SPACING_UI = true;
 
 /**
  * Encapulates the logic for a picture selector based around the camera roll.
  */
 var AddPictures = Class.extend({
     /**
+     * width - The width of the parent.
      * showSelectAll - If true, displays the Select all/Select none link.
      * onSelectionChanged - Called when the user selects/deselects pictures (only called if isSelectable is set to true)
      * isSelectable - If true, user can select the images
      * assets - List of assets to be displayed.
+     * baseSpacing - The amount of spacing between pictures.
+     * numColumns - The number of columns per row.
      */
-    init: function (width, showSelectAll, isSelectable, onSelectionChanged, assets) {
+    init: function (width, showSelectAll, isSelectable, onSelectionChanged,
+            assets, baseSpacing, numColumns) {
         this.numSelected = 0;
         this.assets = assets;
         this.pictures = [];
@@ -23,6 +27,10 @@ var AddPictures = Class.extend({
         this.isSelectable = isSelectable;
         this.onSelectionChanged = this.isSelectable ? onSelectionChanged : null;
         this.width = width;
+        this.baseSpacing = baseSpacing !== undefined ?
+                baseSpacing : ADD_PICTURES_SPACING;
+        this.numColumns = numColumns !== undefined ?
+                numColumns : ADD_PICTURES_NUM_COLUMNS;
     },
 
     /**
@@ -30,11 +38,12 @@ var AddPictures = Class.extend({
      * are not currently added to the personal library.
      */
     getEl: function () {
-        var pictureDimension = (this.width - ADD_PICTURES_PAGE_SPACING -
-				ADD_PICTURES_SPACING * (ADD_PICTURES_NUM_COLUMNS - 1)) /
-				ADD_PICTURES_NUM_COLUMNS;
+        var pictureDimension = (this.width - (this.baseSpacing * 2) -
+				this.baseSpacing * (this.numColumns - 1)) /
+				this.numColumns;
 
-        this.picturesEl = $('<div></div>');
+        this.picturesEl = $('<div></div>')
+                .css('padding', '0 ' + this.baseSpacing + 'px');
 
         //add show all link 
         if (this.showSelectAll) {
@@ -53,19 +62,149 @@ var AddPictures = Class.extend({
 					.on(TOUCHEND, this.toggleSelectAll.bind(this))
 					.appendTo(selectAllContainerEl);
         }
+        
+        if (USE_VARIOUS_SPACING_UI) {
+            this.renderVariousSpacingUi(pictureDimension);
+        } else {
+            this.renderStandardUi(pictureDimension);
+        }
 
-        //generate pictures
-        var numPictures = 0;
+        return this.picturesEl;
+    },
+
+    renderVariousSpacingUi: function(pictureDimension) {
+        var currentRow = null;
+        var left = 0;
+        var top = 0;
         for (var i = 0, asset; asset = this.assets[i]; i++) {
+            var row = Math.floor(i / this.numColumns);
+            var isLastRow = row == Math.floor(this.assets.length / this.numColumns);
+            var isBigRow = row % 2 == 0 && !isLastRow;
+            var isRightAlignedRow = isBigRow && row % 4 == 2;
+            var isBigColumn = i % this.numColumns == 0 && !isRightAlignedRow ||
+                    i % this.numColumns == this.numColumns - 1 && isRightAlignedRow;
+            
+            // Start of the row.
+            if (i % this.numColumns == 0) {
+                currentRow = $('<div></div>')
+                        .css({
+                            height:
+                                isBigRow ?
+                                        pictureDimension * 2 + this.baseSpacing + 'px':
+                                        pictureDimension + 'px',
+                            marginBottom: isLastRow ? 0 : this.baseSpacing + 'px',
+                            position: 'relative'
+                        })
+                        .appendTo(this.picturesEl);
+            }
+
+            var thumbnailEl = $('<span></span>')
+                .css({
+                    display: 'inline-block',
+                    position: 'absolute'
+    		    })
+                .appendTo(currentRow);
+
+            if (isBigRow && isBigColumn) {
+                thumbnailEl
+                    .css({
+                        height: (pictureDimension * 2 + this.baseSpacing) + 'px',
+                        top: 0,
+        		        width: (pictureDimension * 2 + this.baseSpacing) + 'px'
+        		    });
+                thumbnailEl.css('left',
+                        isRightAlignedRow ?
+                                pictureDimension + this.baseSpacing + 'px' :
+                                0);
+            } else if (isBigRow) {
+                var top = isRightAlignedRow ?
+                        i % this.numColumns * (pictureDimension + this.baseSpacing) :
+                        (i % this.numColumns - 1) * (pictureDimension + this.baseSpacing);
+                thumbnailEl
+                    .css({
+                        left: isRightAlignedRow ? 0 :
+                                (pictureDimension * 2 + this.baseSpacing * 2) + 'px',
+                        top: top + 'px',
+                        height: pictureDimension + 'px',
+        		        width: pictureDimension + 'px'
+        		    });
+            } else {
+                thumbnailEl
+                    .css({
+                        left: (i % this.numColumns) * (pictureDimension + this.baseSpacing) + 'px',
+                        height: pictureDimension + 'px',
+                        top: 0,
+        		        width: pictureDimension + 'px'
+        		    });                
+            }
+
+            var imageEl = $('<span></span>')
+		      .css({
+		          backgroundImage: 'url(' + asset.getSrc() + ')',
+		          backgroundSize: 'cover',
+		          display: 'inline-block',
+		          height: '100%',
+		          left: 0,
+		          position: 'absolute',
+		          top: 0,
+		          width: '100%'
+		      })
+			  .appendTo(thumbnailEl);
+
+            //if picture is selectable, add selection UI elements and event handlers
+            if (this.isSelectable) {
+                var fadedEl = $('<span></span>')
+					    .css({
+					        background: '#ffffff',
+					        display: 'none',
+					        height: '100%',
+					        left: 0,
+					        opacity: 0.35,
+					        position: 'absolute',
+					        top: 0,
+					        width: '100%'
+					    })
+					    .appendTo(thumbnailEl);
+
+                var checkedEl = $('<img></img>')
+					    .css({
+					        bottom: 5,
+					        display: 'none',
+					        position: 'absolute',
+					        right: 5
+					    })
+					    .attr('src', Images.getPath() + 'check.png')
+					    .appendTo(thumbnailEl);
+
+                var picture = {
+                    isSelected: false,
+                    asset: asset,
+                    fadedEl: fadedEl,
+                    checkedEl: checkedEl,
+                    thumbnailEl: thumbnailEl
+                };
+                this.pictures.push(picture);
+
+                thumbnailEl.on(TOUCHSTART, this.touchStart.bind(this));
+                thumbnailEl.on('touchmove', this.touchMove.bind(this));
+                thumbnailEl.on(TOUCHEND, this.touchEnd.bind(this, picture));
+            }
+        }
+    },
+    
+    renderStandardUi: function(pictureDimensiono) {
+        for (var i = 0, asset; asset = this.assets[i]; i++) {
+            var numRows = Math.ceil(this.assets.length / this.numColumns);
+            var isLastRow = i >= numRows * this.numColumns - this.numColumns;
+
             var thumbnailEl = $('<span></span>')
 		      .css({
 		          display: 'inline-block',
 		          height: pictureDimension + 'px',
-		          marginBottom: '5px',
-		          marginLeft:
-                          numPictures++ % ADD_PICTURES_NUM_COLUMNS != 0 ?
-                                  ADD_PICTURES_SPACING + 'px' :
-                                  0,
+		          marginBottom: isLastRow ? 0 : this.baseSpacing,
+		          marginLeft: i % this.numColumns != 0 ?
+                          this.baseSpacing + 'px' :
+                          0,
 		          position: 'relative',
 		          width: pictureDimension + 'px'
 		      })
@@ -123,8 +262,6 @@ var AddPictures = Class.extend({
                 thumbnailEl.on(TOUCHEND, this.touchEnd.bind(this, picture));
             }
         }
-
-        return this.picturesEl;
     },
 
     /**
@@ -252,9 +389,8 @@ var AddPictures = Class.extend({
             // Update the remaining margins.
             for (var i = 0, picture; picture = this.pictures[i]; i++) {
                 picture.thumbnailEl.css('margin-left',
-                          i % ADD_PICTURES_NUM_COLUMNS != 0 ?
-                                  ADD_PICTURES_SPACING + 'px' :
-                                  0);
+                          i % this.numColumns != 0 ?
+                                  this.baseSpacing + 'px' : 0);
             }
 
             onRemoved();

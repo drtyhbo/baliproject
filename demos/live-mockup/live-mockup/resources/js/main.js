@@ -17,7 +17,7 @@ function initApp() {
         PersonalLibrary.init();
         if (!PictureWidgets.getPictures().length) {
             RegistrationAddPicturesPage.show(false);
-        } else if (!Users.getCurrentUser()) {
+        } else if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
             RegistrationCreateUserPage.show(false);
         } else {
             if (localStorage.getItem('current-view') == ADD_PICTURES_VIEW_PAGE_IDX)
