@@ -118,13 +118,7 @@ AddPicturesView.onAddPictures = function (e) {
 
     // "Upload" those pictures which are selected.
     PersonalLibrary.add(assets);
-    PictureWidgets.ajaxAdd(assets, function() {
-        if (!Users.getCurrentUser()) {
-            RegistrationCreateUserPage.show(true);
-        } else {
-            FeedView.show(true);
-        }
-    });
+    PictureWidgets.ajaxAdd(assets);
 
     AddPicturesView.addPictures.removeSelected(function () {
         AddPicturesView.onSelectionChanged(0);

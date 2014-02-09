@@ -207,29 +207,9 @@
 
     <!-- Life stream view-->
     <div data-role="page" id="life-stream-load-view">
-        <style type="text/css">
-            .thumb
-            {
-                display: inline-block;
-                background-size: cover;
-                border-radius: 100%;
-                width: 35px;
-                height: 35px;
-                left: 0px;
-                top: 0px;
-                float: left;
-                margin: 3px;
-            }
-
-            .stream-view-header
-            {
-                border-top: 1px solid #ddd;
-                padding: 10px;
-            }
-        </style>
         <div data-role="header" data-position="fixed" data-tap-toggle="false"
             id="header">
-            <span id="profile-thumbnail" class="thumb"></span>
+            <h2 id="lifestream-user-name"></h2>
             <button class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right"
                 id="share-button">
                 Share</button>

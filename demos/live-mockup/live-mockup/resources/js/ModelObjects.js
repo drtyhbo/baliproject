@@ -39,24 +39,24 @@ var Share = Class.extend({
 });
 
 var Widget = Class.extend({
-    init: function (id, createdBy, createdOn, momentIds) {
+    init: function (id, createdBy, timestamp, momentIds) {
         this.id = id || null;
         this.createdBy = createdBy || null;    //created by user: User ID
-        this.createdOn = createdOn || null;    //created on date: date
+        this.timestamp = timestamp || null;    //created on date: date
         this.momentIds = momentIds || [];      //list of all moment IDs that this widget belons to: int[]
     }
 });
 
 var CommentWidget = Widget.extend({
-    init: function (id, commentText, createdBy, createdOn) {
-        this._super(id, createdBy, createdOn, null);
+    init: function (id, commentText, createdBy, timestamp) {
+        this._super(id, createdBy, timestamp, null);
         commentText = commentText || null;          //comment text: string
     }
 });
 
 var PictureWidget = Widget.extend({
     init: function (props) {
-        this._super(props.id, props.createdBy, props.createdOn, props.momentIds);
+        this._super(props.id, props.createdBy, props.timestamp, props.momentIds);
         this.pictureSrc = props.pictureSrc || null;
         this.thumbnailPictureSrc = props.thumbnailPictureSrc || null;
         this.comments = props.comments || [];
@@ -73,7 +73,7 @@ var Moment = Class.extend({
     init: function (props) {
         this.id = props.id || null;                           //moment ID
         this.location = props.location || null;               //location of the moment: string
-        this.timeStamp = props.timeStamp || null;             //when the moment occured: date
+        this.timestamp = props.timestamp * 1000 || null;             //when the moment occured: date
         this.widgets = [];                              //all widgets in a moment (pictures, videos, checkins...): Widget[]
         this.ownedBy = props.ownedBy || null;
         
@@ -89,7 +89,7 @@ var Moment = Class.extend({
     },
 
     getElapsedTime: function () {
-        return Util.getElapsedTime(this.timeStamp);
+        return Util.getElapsedTime(this.timestamp);
     },
 
     getShareCount: function () {

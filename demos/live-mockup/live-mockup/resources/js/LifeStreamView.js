@@ -8,47 +8,40 @@ var LifeStreamItem = Class.extend({
     * dom.
     */
     getEl: function (isEven) {
-
         //top level element
         this.el = $('<div></div>')
-				.css({
-				    paddingBottom: '10px'
-				});
-        if (!isEven)
-            this.el.css({
-                background: '#eee'
-            });
-
+                .css({
+                    clear: 'both',
+                    paddingBottom: '5px'
+                });
 
         var headerEl = $('<div></div>')
-				.addClass('stream-view-header')
+                .css({
+                    margin: '10px 5px',
+                    position: 'relative',
+                    textShadow: 'none'
+                })
 				.appendTo(this.el);
-
-        //generate location & time
-        var locationTimeContainerEl = $('<div></div>')
-				.css({
-				    position: 'relative'
-				})
-				.appendTo(headerEl);
+        this.moment.location = 'Berkeley, California'
         var locationEl = $('<div></div>')
 				.css({
 				    fontSize: '11px',
+                    left: 0,
 				    lineHeight: '11px',
-				    position: 'relative',
-				    float: 'left'
 				})
-				.text(this.moment.location)
-				.appendTo(locationTimeContainerEl);
-        var timeEl = $('<div></div>')
+				.text((this.moment.location ?
+                            (this.moment.location + ' \u00B7 ') : '') +
+                            this.moment.getElapsedTime())
+				.appendTo(headerEl);
+/*        var timeEl = $('<div></div>')
 				.css({
-				    paddingRight: '4px',
 				    fontSize: '11px',
 				    lineHeight: '11px',
-				    position: 'relative',
-				    float: 'right'
+//				    position: 'absolute',
+                    right: 0
 				})
 				.text(this.moment.getElapsedTime())
-				.appendTo(locationTimeContainerEl);
+				.appendTo(headerEl);*/
 
         //generate user thumbnails
         var users = this.moment.getWidgetOwners();
@@ -57,8 +50,7 @@ var LifeStreamItem = Class.extend({
                .css({
                    padding: '4px 0px 0px 4px',
                    height: '32px',
-                   position: 'relative',
-                   clear: 'left'
+                   position: 'relative'
                })
                .appendTo(headerEl);
 
@@ -82,12 +74,13 @@ var LifeStreamItem = Class.extend({
         //generate pictures
         var pictureContainerEl = $('<div></div>')
             .css({
-                padding: '6px 0px 8px 0px',
-                position: 'relative',
-                clear: 'left'
+                position: 'relative'
             })
             .appendTo(this.el);
-        var addPictures = new AddPictures(LifeStreamView.ui.toPage.width(), false, false, null, this.moment.widgets);
+
+        var addPictures = new AddPictures(
+                LifeStreamView.ui.toPage.width(), false, false, null,
+                this.moment.widgets, 1, 3);
         addPictures.getEl()
               .appendTo(pictureContainerEl);
 
@@ -105,7 +98,7 @@ var LifeStreamItem = Class.extend({
             linkTxt += 'in ' + numShares + ' share';
 
         //add comment
-        var commentsLinkContainerEl = $('<div></div>')
+/*        var commentsLinkContainerEl = $('<div></div>')
 					.css({
 					    marginBottom: '10px',
 					    textAlign: 'right'
@@ -120,17 +113,17 @@ var LifeStreamItem = Class.extend({
                     paddingRight: '6px'
                 })
                 .text(linkTxt)
-                .appendTo(commentsLinkContainerEl);
+                .appendTo(commentsLinkContainerEl);*/
         
         
-        if (isIOS) {
+/*        if (isIOS) {
             this.commentLinkEl.on(TOUCHSTART, this.touchStart.bind(this));
             this.commentLinkEl.on('touchmove', this.touchMove.bind(this));
             this.commentLinkEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));
         }
         else {
             this.commentLinkEl.on('click', this.touchEnd.bind(this, this.moment.getMomentShares())); 
-        }
+        }*/
 
 
         return this.el;
@@ -206,17 +199,12 @@ LifeStreamView.beforeTransition = function (event, ui) {
     ui.toPage.find('#share-moment-icon')
         .css('background-image', 'url(' + Images.getPath() + 'check32.png)')
 
+    ui.toPage.find('#lifestream-user-name').text(Users.getCurrentUser().firstName);
+
     //load sample life stream
     var assets = CameraRoll.getCameraRoll();
     var lifeStream = new LifeStream();
     lifeStream.loadData(function(moments) {
-        //display user profile thumbnail
-        var thumbnailPath = lifeStream.getUserProfileThumbnailPath();
-        if (!thumbnailPath)
-            throw "user profile thumbnail picture is not initalized";
-        ui.toPage.find('#profile-thumbnail')
-            .css('background-image', 'url(' + thumbnailPath + ')');
-
         //load all moments
         var momentsEl = ui.toPage.find('#moments');
         momentsEl.empty();

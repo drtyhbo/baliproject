@@ -66,7 +66,7 @@ RegistrationAddPicturesPage.touchFooterButton = function(e) {
 	// "Upload" those pictures which are selected.
 	PersonalLibrary.add(assets);
     PictureWidgets.ajaxAdd(assets, function() {
-        if (!Users.getCurrentUser()) {
+        if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
             RegistrationCreateUserPage.show(true);
         } else {
             FeedView.show(true);

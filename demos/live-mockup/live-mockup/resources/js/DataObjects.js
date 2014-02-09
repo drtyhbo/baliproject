@@ -218,7 +218,9 @@ PictureWidgets.ajaxCallback = function(callback, data) {
             PictureWidgets.picturesByAssetId[props.assetId] = widget;
         }
     }
-    callback();
+    if (callback) {
+        callback();
+    }
 };
 
 /*******************************************
