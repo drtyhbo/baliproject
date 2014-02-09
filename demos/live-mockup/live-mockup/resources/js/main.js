@@ -7,6 +7,7 @@ $(document).ready(function () {
     $(document.body).show();
     setTimeout(function () {
         Util.init();
+        ServerSettings.init(ServerSettings.CENTRALDEV_SERVER_IDX);
         CameraRoll.init(initApp);
     }, 400);
 });

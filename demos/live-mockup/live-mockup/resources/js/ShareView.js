@@ -1,4 +1,4 @@
-var ShareViewItem = Class.extend({
+﻿var ShareViewItem = Class.extend({
     init: function (share) {
         this.share= share;
     },
@@ -92,7 +92,7 @@ var ShareViewItem = Class.extend({
               .appendTo(pictureContainerEl);
 
         //contruct comment link
-        /*var numComments = this.moment.getCommentCount();
+        var numComments = this.share.getCommentCount();
         var numShares = this.moment.getShareCount();
         var linkTxt = '';
         if (numComments > 1)
@@ -124,7 +124,7 @@ var ShareViewItem = Class.extend({
 
         commentsLinkContainerEl.on(TOUCHSTART, this.touchStart.bind(this));
         commentsLinkContainerEl.on('touchmove', this.touchMove.bind(this));
-        commentsLinkContainerEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));*/
+        commentsLinkContainerEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));
 
         return this.el;
     },
