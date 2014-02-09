@@ -2,6 +2,106 @@ var ADD_PICTURES_NUM_COLUMNS = 3;
 var ADD_PICTURES_SPACING = 5;
 var USE_VARIOUS_SPACING_UI = true;
 
+var AssetElement = Class.extend({
+    init: function(asset) {
+        this.assets = [];
+        this.addAsset(asset);
+        
+        this.nextAsset = 1;
+        this.el = null;
+        this.imageEl = null;
+        this.nextImageEl = null;
+
+        this.offset = null;
+    },
+    
+    getOffset: function() {
+        if (!this.offset) {
+            this.offset = this.el.offset();
+        }
+        return this.offset;
+    },
+    
+    addAsset: function(asset) {
+        this.assets.push(asset);
+    },
+    
+    getNumFrames: function() {
+        return this.assets.length;
+    },
+    
+    stepAnimation: function() {
+        this.nextAsset = (this.nextAsset + 1) % this.assets.length;
+
+        this.nextImageEl.animate({
+            opacity: 1
+        }, 1000, function() {
+            this.imageEl.remove();
+            this.imageEl = this.nextImageEl;
+            this.nextImageEl = this.getImageEl(this.assets[this.nextAsset].getSrc())
+                .css('opacity', 0)
+                .appendTo(this.el);            
+        }.bind(this))
+    },
+    
+    getEl: function() {
+        this.el = $('<div></div>');
+
+        this.imageEl = this.getImageEl(this.assets[0].getSrc())
+              .appendTo(this.el);
+        if (this.assets.length > 1) {
+            this.nextImageEl = this.getImageEl(this.assets[1].getSrc())
+                .css('opacity', 0)
+                .appendTo(this.el);
+        }
+
+        //if picture is selectable, add selection UI elements and event handlers
+        if (this.isSelectable) {
+            var fadedEl = $('<span></span>')
+				    .css({
+				        background: '#ffffff',
+				        display: 'none',
+				        height: '100%',
+				        left: 0,
+				        opacity: 0.35,
+				        position: 'absolute',
+				        top: 0,
+				        width: '100%'
+				    })
+				    .appendTo(this.el);
+
+            var checkedEl = $('<img></img>')
+				    .css({
+				        bottom: 5,
+				        display: 'none',
+				        position: 'absolute',
+				        right: 5
+				    })
+				    .attr('src', Images.getPath() + 'check.png')
+				    .appendTo(this.el);
+
+            this.el.on(TOUCHSTART, this.touchStart.bind(this));
+            this.el.on('touchmove', this.touchMove.bind(this));
+            this.el.on(TOUCHEND, this.touchEnd.bind(this, picture));
+        }
+        return this.el;
+    },
+    
+    getImageEl: function(url) {
+        return $('<span></span>')
+	      .css({
+	          backgroundImage: 'url(' + url + ')',
+	          backgroundSize: 'cover',
+	          display: 'inline-block',
+	          height: '100%',
+	          left: 0,
+	          position: 'absolute',
+	          top: 0,
+	          width: '100%'
+	      });
+    }
+});
+
 /**
  * Encapulates the logic for a picture selector based around the camera roll.
  */
@@ -31,6 +131,7 @@ var AddPictures = Class.extend({
                 baseSpacing : ADD_PICTURES_SPACING;
         this.numColumns = numColumns !== undefined ?
                 numColumns : ADD_PICTURES_NUM_COLUMNS;
+        this.animateId = setInterval(this.onStepAnimation.bind(this), 2000);
     },
 
     /**
@@ -73,121 +174,119 @@ var AddPictures = Class.extend({
     },
 
     renderVariousSpacingUi: function(pictureDimension) {
-        var currentRow = null;
-        var left = 0;
-        var top = 0;
+        this.animatedAssetElements = [];
+
+        var lastAsset = null;
+        var assetElements = [];
         for (var i = 0, asset; asset = this.assets[i]; i++) {
-            var row = Math.floor(i / this.numColumns);
-            var isLastRow = row == Math.floor(this.assets.length / this.numColumns);
-            var isBigRow = row % 2 == 0 && !isLastRow;
-            var isRightAlignedRow = isBigRow && row % 4 == 2;
-            var isBigColumn = i % this.numColumns == 0 && !isRightAlignedRow ||
-                    i % this.numColumns == this.numColumns - 1 && isRightAlignedRow;
-            
-            // Start of the row.
-            if (i % this.numColumns == 0) {
-                currentRow = $('<div></div>')
-                        .css({
-                            height:
-                                isBigRow ?
-                                        pictureDimension * 2 + this.baseSpacing + 'px':
-                                        pictureDimension + 'px',
-                            marginBottom: isLastRow ? 0 : this.baseSpacing + 'px',
-                            position: 'relative'
-                        })
-                        .appendTo(this.picturesEl);
-            }
-
-            var thumbnailEl = $('<span></span>')
-                .css({
-                    display: 'inline-block',
-                    position: 'absolute'
-    		    })
-                .appendTo(currentRow);
-
-            if (isBigRow && isBigColumn) {
-                thumbnailEl
-                    .css({
-                        height: (pictureDimension * 2 + this.baseSpacing) + 'px',
-                        top: 0,
-        		        width: (pictureDimension * 2 + this.baseSpacing) + 'px'
-        		    });
-                thumbnailEl.css('left',
-                        isRightAlignedRow ?
-                                pictureDimension + this.baseSpacing + 'px' :
-                                0);
-            } else if (isBigRow) {
-                var top = isRightAlignedRow ?
-                        i % this.numColumns * (pictureDimension + this.baseSpacing) :
-                        (i % this.numColumns - 1) * (pictureDimension + this.baseSpacing);
-                thumbnailEl
-                    .css({
-                        left: isRightAlignedRow ? 0 :
-                                (pictureDimension * 2 + this.baseSpacing * 2) + 'px',
-                        top: top + 'px',
-                        height: pictureDimension + 'px',
-        		        width: pictureDimension + 'px'
-        		    });
+            if (lastAsset && asset.timestamp - lastAsset.timestamp < 15) {
+                assetElements[assetElements.length - 1].addAsset(asset);
             } else {
-                thumbnailEl
-                    .css({
-                        left: (i % this.numColumns) * (pictureDimension + this.baseSpacing) + 'px',
-                        height: pictureDimension + 'px',
-                        top: 0,
-        		        width: pictureDimension + 'px'
-        		    });                
+                // Keep track of all the animated elements so we can step
+                // through them later.
+                if (assetElements.length > 0 &&
+                        assetElements[assetElements.length - 1].getNumFrames() > 1) {
+                    this.animatedAssetElements.push(
+                            assetElements[assetElements.length - 1]);
+                }
+                assetElements.push(new AssetElement(asset));
             }
+            lastAsset = asset;
+        }
+        var bigImageCount = 0;
+        var numRows = Math.ceil(assetElements.length / 3);
+        for (var row = 0; row < numRows; row++) {
+            var start = row * 3;
+            var isLastRow = false;
 
-            var imageEl = $('<span></span>')
-		      .css({
-		          backgroundImage: 'url(' + asset.getSrc() + ')',
-		          backgroundSize: 'cover',
-		          display: 'inline-block',
-		          height: '100%',
-		          left: 0,
-		          position: 'absolute',
-		          top: 0,
-		          width: '100%'
-		      })
-			  .appendTo(thumbnailEl);
+            var numFrames = 0;
+            var bigImageIndex = -1;
+            // Only make an asset large if there are at least two items in a
+            // row.
+            if (assetElements.length - start > 1) {
+                // Determine if any of the assets are animated and thus should
+                // be displayed large.
+                for (var i = start, assetElement; i < start + 3; i++) {
+                    assetElement = assetElements[i];
+                    if (!assetElement) {
+                        break;
+                    }
+                    if (assetElement.getNumFrames() > 2) {
+                        if (assetElement.getNumFrames() > numFrames) {
+                            bigImageIndex = i;
+                            numFrames = assetElement.getNumFrames();
+                        }
+                    }
+                }
+            }
+            
+            var currentRow = $('<div></div>')
+                    .css({
+                        height:
+                            bigImageIndex != -1 ?
+                                    pictureDimension * 2 + this.baseSpacing + 'px':
+                                    pictureDimension + 'px',
+                        marginBottom: isLastRow ? 0 : this.baseSpacing + 'px',
+                        position: 'relative'
+                    })
+                    .appendTo(this.picturesEl);
+            
+            // Layout the row where one of the images is large.
+            if (bigImageIndex != -1) {
+                var isLeftAligned = bigImageCount++ % 2 == 0;
+                var bigImageDimension = pictureDimension * 2 + this.baseSpacing;
 
-            //if picture is selectable, add selection UI elements and event handlers
-            if (this.isSelectable) {
-                var fadedEl = $('<span></span>')
-					    .css({
-					        background: '#ffffff',
-					        display: 'none',
-					        height: '100%',
-					        left: 0,
-					        opacity: 0.35,
-					        position: 'absolute',
-					        top: 0,
-					        width: '100%'
-					    })
-					    .appendTo(thumbnailEl);
+                // Layout the big mama jama first.
+                assetElements[bigImageIndex].getEl()
+                    .css({
+                        height: bigImageDimension + 'px',
+                        left: isLeftAligned ?
+                                0 : pictureDimension + this.baseSpacing + 'px',
+                        position: 'absolute',
+                        top: 0,
+        		        width: bigImageDimension + 'px'
+        		    })
+                    .appendTo(currentRow);
 
-                var checkedEl = $('<img></img>')
-					    .css({
-					        bottom: 5,
-					        display: 'none',
-					        position: 'absolute',
-					        right: 5
-					    })
-					    .attr('src', Images.getPath() + 'check.png')
-					    .appendTo(thumbnailEl);
+                for (var i = start, top = 0, assetElement; i < start + 3; i++) {
+                    if (i == bigImageIndex) {
+                        continue;
+                    }
+                    assetElement = assetElements[i];
+                    if (!assetElement) {
+                        break;
+                    }
+                    assetElement.getEl()
+                        .css({
+                            height: pictureDimension + 'px',
+                            left: isLeftAligned ?
+                                    bigImageDimension + this.baseSpacing + 'px' :
+                                    0,
+                            position: 'absolute',
+                            top: top,
+            		        width: pictureDimension + 'px'
+            		    })
+                        .appendTo(currentRow);
+                    top += pictureDimension + this.baseSpacing;  
+                }
+            // Layout the row where all the images are small.
+            } else {
+                for (var i = start, assetElement; i < start + 3; i++) {
+                    assetElement = assetElements[i];
+                    if (!assetElement) {
+                        break;
+                    }
+                    var thumbnailEl = assetElement.getEl()
+                        .css({
+                            left: (i % this.numColumns) * (pictureDimension + this.baseSpacing) + 'px',
+                            height: pictureDimension + 'px',
+                            position: 'absolute',
+                            top: 0,
+            		        width: pictureDimension + 'px'
+            		    }) 
+                        .appendTo(currentRow);
 
-                var picture = {
-                    isSelected: false,
-                    asset: asset,
-                    fadedEl: fadedEl,
-                    checkedEl: checkedEl,
-                    thumbnailEl: thumbnailEl
-                };
-                this.pictures.push(picture);
-
-                thumbnailEl.on(TOUCHSTART, this.touchStart.bind(this));
-                thumbnailEl.on('touchmove', this.touchMove.bind(this));
-                thumbnailEl.on(TOUCHEND, this.touchEnd.bind(this, picture));
+                }
             }
         }
     },
@@ -421,6 +520,19 @@ var AddPictures = Class.extend({
             this.toggleSelectedStatus(picture);
             if (this.onSelectionChanged) {
                 this.onSelectionChanged(this.numSelected);
+            }
+        }
+    },
+    
+    onStepAnimation: function() {
+        var top = $(document).scrollTop();
+        var height = $(window).height();
+
+        for (var i = 0, assetElement;
+                    assetElement = this.animatedAssetElements[i]; i++) {
+            var offset = assetElement.getOffset();
+            if (offset.top + assetElement.el.height() > top && offset.top < top + height) {
+                assetElement.stepAnimation();
             }
         }
     }
