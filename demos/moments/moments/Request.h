@@ -8,12 +8,15 @@
 @end
 
 @interface Request : NSObject<NSURLConnectionDelegate> {
-    NSMutableData *_responseData;
-    int _expectedLength;
-    int _bytesReceieved;
-    id _delegate;
+  NSMutableData *_responseData;
+  int _expectedLength;
+  int _bytesReceieved;
+  id _delegate;
 }
 
+@property (nonatomic, strong) NSURLConnection *connection;
+
 + (Request*)sendRequest:(NSString*)path postData:(NSDictionary*)postData filename:(NSString*)filename fileData:(NSData*)fileData delegate:(id)delegate;
+- (void)stop;
 
 @end

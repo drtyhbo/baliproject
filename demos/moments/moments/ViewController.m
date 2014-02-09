@@ -65,7 +65,7 @@
   [fetchRequest setEntity:entity];
   [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(filename == %@)", filename]];
   
-  return [[context executeFetchRequest:fetchRequest error:nil] lastObject];
+  return [[context executeFetchRequest:fetchRequest error:nil] count] != 0;
 }
 
 // Creates an AssetInfo object given an ALAsset object.
@@ -75,14 +75,13 @@
 
   assetInfo.hasBeenUploaded = [self hasAssetBeenUploaded:asset];
   
-  ALAssetRepresentation *rep = [asset defaultRepresentation];
   assetInfo.image = [UIImage imageWithCGImage:[asset thumbnail] scale:1 orientation:0];
   
   UIProgressView *progressView = [[UIProgressView alloc] init];
   progressView.hidden = YES;
   assetInfo.progressView = progressView;
   
-  UIView *finishedView = [[FinishedUploadingView alloc] init];
+  FinishedUploadingView *finishedView = [[FinishedUploadingView alloc] init];
   finishedView.hidden = !assetInfo.hasBeenUploaded;
   assetInfo.finishedView = finishedView;
   
@@ -101,6 +100,8 @@
     [CoreData save];
   }
 
+  [[UIApplication sharedApplication] endBackgroundTask:_uploadId];
+  
   currentUpload.finishedView.hidden = NO;
   currentUpload.finishedView.alpha = 0;
   currentUpload.finishedView.isSuccess = isSuccess;
@@ -130,6 +131,10 @@
   if (i == [_assets count]) {
     return;
   }
+  
+  _uploadId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+    [_currentRequest stop];
+  }];
   
   currentUpload.progressView.hidden = NO;
   

@@ -201,9 +201,8 @@ var AddPictures = Class.extend({
 
             var numFrames = 0;
             var bigImageIndex = -1;
-            // Only make an asset large if there are at least two items in a
-            // row.
-            if (assetElements.length - start > 1) {
+            // Only make an asset large if the row is full.
+            if (assetElements.length - start > 2) {
                 // Determine if any of the assets are animated and thus should
                 // be displayed large.
                 for (var i = start, assetElement; i < start + 3; i++) {
