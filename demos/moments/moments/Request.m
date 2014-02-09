@@ -2,6 +2,8 @@
 
 @implementation Request
 
+@synthesize connection;
+
 const NSString *URL = @"http://drtyhbo.net/";
 const int REQUEST_TIMEOUT_SEC = 60;
 
@@ -32,12 +34,17 @@ const int REQUEST_TIMEOUT_SEC = 60;
   [urlRequest setHTTPMethod: @"POST"];
   [urlRequest setHTTPBody: requestData];
   
-  NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:urlRequest delegate:request];
-  if (!connection) {
+  request.connection = [[NSURLConnection alloc] initWithRequest:urlRequest delegate:request];
+  if (!request.connection) {
       return nil;
   }
   
   return request;
+}
+
+- (void)stop {
+  [self.connection cancel];
+  self.connection = nil;
 }
 
 - (NSString*)encodeUriComponent:(NSString*)component {

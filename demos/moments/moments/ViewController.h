@@ -18,6 +18,7 @@
   NSArray *_assets;
   int _currentUploadIdx;
   Request *_currentRequest;
+  UIBackgroundTaskIdentifier _uploadId;
 }
 
 @end
