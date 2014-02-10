@@ -1,6 +1,7 @@
 var LifeStreamItem = Class.extend({
-    init: function (moment) {
+    init: function (moment, pageWidth) {
         this.moment = moment;
+        this.pageWidth = pageWidth;
     },
 
     /**
@@ -37,7 +38,7 @@ var LifeStreamItem = Class.extend({
 				.css({
 				    fontSize: '11px',
 				    lineHeight: '11px',
-//				    position: 'absolute',
+				    position: 'absolute',
                     right: 0
 				})
 				.text(this.moment.getElapsedTime())
@@ -79,7 +80,7 @@ var LifeStreamItem = Class.extend({
             .appendTo(this.el);
 
         var addPictures = new AddPictures(
-                LifeStreamView.ui.toPage.width(), false, false, null,
+                this.pageWidth, false, false, null,
                 this.moment.widgets, 1, 3);
         addPictures.getEl()
               .appendTo(pictureContainerEl);
@@ -113,10 +114,9 @@ var LifeStreamItem = Class.extend({
                     paddingRight: '6px'
                 })
                 .text(linkTxt)
-                .appendTo(commentsLinkContainerEl);*/
-        
-        
-/*        if (isIOS) {
+                .appendTo(commentsLinkContainerEl);
+                
+        if (isIOS) {
             this.commentLinkEl.on(TOUCHSTART, this.touchStart.bind(this));
             this.commentLinkEl.on('touchmove', this.touchMove.bind(this));
             this.commentLinkEl.on(TOUCHEND, this.touchEnd.bind(this, this.moment.getMomentShares()));
@@ -157,7 +157,8 @@ var LifeStreamView = {
 /**
  * Makes the life stream view the current view.
  */
-LifeStreamView.show = function (animate) {
+LifeStreamView.show = function (lifeStream, animate) {
+    LifeStreamView.lifeStream = lifeStream;
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
                             LifeStreamView.beforeTransition);
     $.mobile.pageContainer.pagecontainer('change', '#life-stream-load-view', {
@@ -178,6 +179,11 @@ LifeStreamView.beforeTransition = function (event, ui) {
         return;
     }
 
+    if (LifeStreamView.shown) {
+        return;
+    }
+    LifeStreamView.shown = true;
+
     //wire footer buttons
     var homeBtn = ui.toPage.find('#home-btn')
         .on(TOUCHSTART, function () {
@@ -188,6 +194,7 @@ LifeStreamView.beforeTransition = function (event, ui) {
 		.on(TOUCHSTART, function () {
 		    AddPicturesView.show();
 		});
+
 
     //save pointer to UI elements
     LifeStreamView.ui = ui;
@@ -201,17 +208,30 @@ LifeStreamView.beforeTransition = function (event, ui) {
 
     ui.toPage.find('#lifestream-user-name').text(Users.getCurrentUser().firstName);
 
-    //load sample life stream
-    var assets = CameraRoll.getCameraRoll();
-    var lifeStream = new LifeStream();
-    lifeStream.loadData(function(moments) {
-        //load all moments
-        var momentsEl = ui.toPage.find('#moments');
-        momentsEl.empty();
-        for (var idx = 0, moment; moment = lifeStream.moments[idx]; idx++)
-            new LifeStreamItem(moment).getEl((idx % 2 == 0)).appendTo(momentsEl);
+    //reload 
+    if (!LifeStreamView.lifeStream) {
+        LifeStreamView.lifeStream = new LifeStream();
+        LifeStreamView.lifeStream.loadData(LifeStreamView.loadMoments);
+    }
+    else
+        LifeStreamView.loadMoments(LifeStreamView.lifeStream.moments);
 
-        //save current view
-        localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
-    });
 };
+
+
+LifeStreamView.loadMoments = function (moments) {
+    //load sample life stream
+    var momentsEl = LifeStreamView.ui.toPage.find('#moments');
+    momentsEl.empty();
+    for (var idx = 0, moment; moment = moments[idx]; idx++)
+        new LifeStreamItem(moment, LifeStreamView.ui.toPage.width()).getEl((idx % 2 == 0)).appendTo(momentsEl);
+
+    //save current view
+    localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
+
+    //wire share btn
+    var shareBtn = LifeStreamView.ui.toPage.find('#share-button')
+        .on(TOUCHSTART, function () {
+            LifeStreamShareView.show(LifeStreamView.lifeStream, false);
+        });
+}

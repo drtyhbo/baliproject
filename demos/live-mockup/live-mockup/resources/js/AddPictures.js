@@ -3,7 +3,7 @@ var ADD_PICTURES_SPACING = 5;
 var USE_VARIOUS_SPACING_UI = true;
 
 var AssetElement = Class.extend({
-    init: function(asset) {
+    init: function (asset, isSelectable, onSelectionChanged, onSelectionChangedArgs) {
         this.assets = [];
         this.addAsset(asset);
         
@@ -11,8 +11,16 @@ var AssetElement = Class.extend({
         this.el = null;
         this.imageEl = null;
         this.nextImageEl = null;
-
+        this.fadedEl = null;
+        this.checkedEl = null;
         this.offset = null;
+
+        this.isSelectable = isSelectable || false;
+        this.onSelectionChanged = onSelectionChanged || null;
+        this.onSelectionChangedArgs = onSelectionChangedArgs || null;
+        this.isSelected = false;
+
+        
     },
     
     getOffset: function() {
@@ -29,8 +37,15 @@ var AssetElement = Class.extend({
     getNumFrames: function() {
         return this.assets.length;
     },
+
+    setSelectable: function (isSelectable, onSelectionChanged) {
+        this.isSelectable = isSelectable;
+    },
     
     stepAnimation: function() {
+        if (this.assets.lenth < 2)
+            return;
+
         this.nextAsset = (this.nextAsset + 1) % this.assets.length;
 
         this.nextImageEl.animate({
@@ -43,8 +58,40 @@ var AssetElement = Class.extend({
                 .appendTo(this.el);            
         }.bind(this))
     },
-    
-    getEl: function() {
+
+    touchStart: function (e) {
+        this.touchStartY = this.touchEndY = e.originalEvent.pageY;
+    },
+
+    touchMove: function (e) {
+        this.touchEndY = e.originalEvent.pageY;
+    },
+
+    touchEnd: function (picture) {
+        if (Math.abs(this.touchEndY - this.touchStartY) < 5
+            && this.isSelectable) {
+            this.toggleSelectedStatus();
+            if (this.onSelectionChanged) {
+                this.onSelectionChanged(this.onSelectionChangedArgs);
+            }
+        }
+    },
+
+    toggleSelectedStatus: function () {
+        this.isSelected = !this.isSelected;
+
+        if (this.isSelected) {
+            //this.thumbnailEl.addClass('selected');
+            this.fadedEl.show();
+            this.checkedEl.show();
+        } else {
+            //picture.thumbnailEl.removeClass('selected');
+            this.fadedEl.hide();
+            this.checkedEl.hide();
+        }
+    },
+
+    getEl: function () {
         this.el = $('<div></div>');
 
         this.imageEl = this.getImageEl(this.assets[0].getSrc())
@@ -55,38 +102,39 @@ var AssetElement = Class.extend({
                 .appendTo(this.el);
         }
 
-        //if picture is selectable, add selection UI elements and event handlers
-        if (this.isSelectable) {
-            var fadedEl = $('<span></span>')
-				    .css({
-				        background: '#ffffff',
-				        display: 'none',
-				        height: '100%',
-				        left: 0,
-				        opacity: 0.35,
-				        position: 'absolute',
-				        top: 0,
-				        width: '100%'
-				    })
-				    .appendTo(this.el);
+        this.fadedEl = $('<span></span>')
+				.css({
+				    background: '#ffffff',
+				    display: 'none',
+				    height: '100%',
+				    left: 0,
+				    opacity: 0.35,
+				    position: 'absolute',
+				    top: 0,
+				    width: '100%',
+				    zIndex: 1
+				})
+				.appendTo(this.el);
 
-            var checkedEl = $('<img></img>')
-				    .css({
-				        bottom: 5,
-				        display: 'none',
-				        position: 'absolute',
-				        right: 5
-				    })
-				    .attr('src', Images.getPath() + 'check.png')
-				    .appendTo(this.el);
+        this.checkedEl = $('<img></img>')
+				.css({
+				    bottom: 5,
+				    display: 'none',
+				    position: 'absolute',
+				    right: 5,
+				    zIndex: 2
+				})
+				.attr('src', Images.getPath() + 'check.png')
+				.appendTo(this.el);
 
-            this.el.on(TOUCHSTART, this.touchStart.bind(this));
-            this.el.on('touchmove', this.touchMove.bind(this));
-            this.el.on(TOUCHEND, this.touchEnd.bind(this, picture));
-        }
+
+        this.el.on(TOUCHSTART, this.touchStart.bind(this));
+        this.el.on('touchmove', this.touchMove.bind(this));
+        this.el.on(TOUCHEND, this.touchEnd.bind(this));
+
         return this.el;
     },
-    
+
     getImageEl: function(url) {
         return $('<span></span>')
 	      .css({
@@ -115,17 +163,23 @@ var AddPictures = Class.extend({
      * baseSpacing - The amount of spacing between pictures.
      * numColumns - The number of columns per row.
      */
-    init: function (width, showSelectAll, isSelectable, onSelectionChanged,
+    init: function (width, showSelectAll, isSelectable, onSelectionChangedCallback,
             assets, baseSpacing, numColumns) {
-        this.numSelected = 0;
+        
+        
+        //asset data
         this.assets = assets;
-        this.pictures = [];
+        this.assetElements = [];
+
+        //is selectable
+        this.isSelectable = isSelectable;
+        this.onSelectionChangedCallback = onSelectionChangedCallback || null;
+
+        //select All
         this.selectAllEl = null;
         this.showSelectAll = showSelectAll;
-        this.touchStartY = 0;
-        this.touchEndY = 0;
-        this.isSelectable = isSelectable;
-        this.onSelectionChanged = this.isSelectable ? onSelectionChanged : null;
+        
+        
         this.width = width;
         this.baseSpacing = baseSpacing !== undefined ?
                 baseSpacing : ADD_PICTURES_SPACING;
@@ -135,6 +189,21 @@ var AddPictures = Class.extend({
     },
 
     /**
+     * Called when a picture selection changed to set the text on the 'select all' link
+     * and also calls onSelectionChangedCallback
+     */
+    selectionChanged: function (me) { //ATODO: is there a better way of doing this
+        //set select all text
+        me.setSelectAllText(me.areAllSelected());
+        
+        //callback
+        if (me.isSelectable && me.onSelectionChangedCallback) {
+            this.onSelectionChangedCallback(me.getSelected().length);
+        }
+    },
+
+    
+    /**
      * Creates and returns the picture selector element. Only adds pictures that
      * are not currently added to the personal library.
      */
@@ -143,6 +212,7 @@ var AddPictures = Class.extend({
 				this.baseSpacing * (this.numColumns - 1)) /
 				this.numColumns;
 
+        //top level div
         this.picturesEl = $('<div></div>')
                 .css('padding', '0 ' + this.baseSpacing + 'px');
 
@@ -164,6 +234,7 @@ var AddPictures = Class.extend({
 					.appendTo(selectAllContainerEl);
         }
         
+        //render pics
         if (USE_VARIOUS_SPACING_UI) {
             this.renderVariousSpacingUi(pictureDimension);
         } else {
@@ -173,28 +244,34 @@ var AddPictures = Class.extend({
         return this.picturesEl;
     },
 
+    /**
+     * Render pictures in an animated view
+     */
     renderVariousSpacingUi: function(pictureDimension) {
         this.animatedAssetElements = [];
 
         var lastAsset = null;
-        var assetElements = [];
+
+        //parse assets into assetelements with assets that are within 15
+        //of each other belonging to the same assetelement
         for (var i = 0, asset; asset = this.assets[i]; i++) {
             if (lastAsset && asset.timestamp - lastAsset.timestamp < 15) {
-                assetElements[assetElements.length - 1].addAsset(asset);
+                this.assetElements[this.assetElements.length - 1].addAsset(asset);
             } else {
                 // Keep track of all the animated elements so we can step
                 // through them later.
-                if (assetElements.length > 0 &&
-                        assetElements[assetElements.length - 1].getNumFrames() > 1) {
+                if (this.assetElements.length > 0 &&
+                        this.assetElements[this.assetElements.length - 1].getNumFrames() > 1) {
                     this.animatedAssetElements.push(
-                            assetElements[assetElements.length - 1]);
+                            this.assetElements[this.assetElements.length - 1]);
                 }
-                assetElements.push(new AssetElement(asset));
+                this.assetElements.push(new AssetElement(asset, this.isSelectable, this.selectionChanged, this));
             }
             lastAsset = asset;
         }
+
         var bigImageCount = 0;
-        var numRows = Math.ceil(assetElements.length / 3);
+        var numRows = Math.ceil(this.assetElements.length / 3);
         for (var row = 0; row < numRows; row++) {
             var start = row * 3;
             var isLastRow = false;
@@ -202,14 +279,15 @@ var AddPictures = Class.extend({
             var numFrames = 0;
             var bigImageIndex = -1;
             // Only make an asset large if the row is full.
-            if (assetElements.length - start > 2) {
+            if (this.assetElements.length - start > 2) {
                 // Determine if any of the assets are animated and thus should
                 // be displayed large.
                 for (var i = start, assetElement; i < start + 3; i++) {
-                    assetElement = assetElements[i];
+                    assetElement = this.assetElements[i];
                     if (!assetElement) {
                         break;
                     }
+                    //select asset with biggest number of frames to be large image
                     if (assetElement.getNumFrames() > 2) {
                         if (assetElement.getNumFrames() > numFrames) {
                             bigImageIndex = i;
@@ -236,7 +314,7 @@ var AddPictures = Class.extend({
                 var bigImageDimension = pictureDimension * 2 + this.baseSpacing;
 
                 // Layout the big mama jama first.
-                assetElements[bigImageIndex].getEl()
+                this.assetElements[bigImageIndex].getEl()
                     .css({
                         height: bigImageDimension + 'px',
                         left: isLeftAligned ?
@@ -251,7 +329,7 @@ var AddPictures = Class.extend({
                     if (i == bigImageIndex) {
                         continue;
                     }
-                    assetElement = assetElements[i];
+                    assetElement = this.assetElements[i];
                     if (!assetElement) {
                         break;
                     }
@@ -271,7 +349,7 @@ var AddPictures = Class.extend({
             // Layout the row where all the images are small.
             } else {
                 for (var i = start, assetElement; i < start + 3; i++) {
-                    assetElement = assetElements[i];
+                    assetElement = this.assetElements[i];
                     if (!assetElement) {
                         break;
                     }
@@ -290,6 +368,9 @@ var AddPictures = Class.extend({
         }
     },
     
+    /**
+     * Render pictures in a regular grid
+     */
     renderStandardUi: function(pictureDimensiono) {
         for (var i = 0, asset; asset = this.assets[i]; i++) {
             var numRows = Math.ceil(this.assets.length / this.numColumns);
@@ -308,57 +389,10 @@ var AddPictures = Class.extend({
 		      })
 		      .appendTo(this.picturesEl);
 
-            var imageEl = $('<span></span>')
-		      .css({
-		          backgroundImage: 'url(' + asset.getSrc() + ')',
-		          backgroundSize: 'cover',
-		          display: 'inline-block',
-		          height: '100%',
-		          left: 0,
-		          position: 'absolute',
-		          top: 0,
-		          width: '100%'
-		      })
-			  .appendTo(thumbnailEl);
-
-            //if picture is selectable, add selection UI elements and event handlers
-            if (this.isSelectable) {
-                var fadedEl = $('<span></span>')
-					    .css({
-					        background: '#ffffff',
-					        display: 'none',
-					        height: '100%',
-					        left: 0,
-					        opacity: 0.35,
-					        position: 'absolute',
-					        top: 0,
-					        width: '100%'
-					    })
-					    .appendTo(thumbnailEl);
-
-                var checkedEl = $('<img></img>')
-					    .css({
-					        bottom: 5,
-					        display: 'none',
-					        position: 'absolute',
-					        right: 5
-					    })
-					    .attr('src', Images.getPath() + 'check.png')
-					    .appendTo(thumbnailEl);
-
-                var picture = {
-                    isSelected: false,
-                    asset: asset,
-                    fadedEl: fadedEl,
-                    checkedEl: checkedEl,
-                    thumbnailEl: thumbnailEl
-                };
-                this.pictures.push(picture);
-
-                thumbnailEl.on(TOUCHSTART, this.touchStart.bind(this));
-                thumbnailEl.on('touchmove', this.touchMove.bind(this));
-                thumbnailEl.on(TOUCHEND, this.touchEnd.bind(this, picture));
-            }
+            var assetElement = new AssetElement(asset, this.isSelectable, this.selectionChanged,  this);
+            this.assetElements.push(assetElement);
+            assetElement.getEl()
+                .appendTo(thumbnailEl);  
         }
     },
 
@@ -366,7 +400,7 @@ var AddPictures = Class.extend({
      * Returns the number of pictures being displayed.
      */
     getNumPictures: function () {
-        return this.pictures.length;
+        return this.assets.length;
     },
 
     /**
@@ -375,43 +409,22 @@ var AddPictures = Class.extend({
      */
     getSelected: function () {
         var assets = [];
-        for (var i = 0, picture; picture = this.pictures[i]; i++) {
-            if (!picture.isSelected) {
+        for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+            if (!assetElement.isSelected || !assetElement.assets)
                 continue;
-            }
-            assets.push(picture.asset);
+            
+            for (var j = 0, asset; asset = assetElement.assets[j]; j++)
+                assets.push(asset);
         }
         return assets;
-    },
-
-    /**
-	 * Toggles the selected status of an individual picture.
-	 */
-    toggleSelectedStatus: function (picture) {
-        var isSelected = picture.isSelected;
-        picture.isSelected = !picture.isSelected;
-
-        if (!isSelected) {
-            picture.thumbnailEl.addClass('selected');
-            picture.fadedEl.show();
-            picture.checkedEl.show();
-            this.setSelectAllText(this.areAllSelected());
-            this.numSelected++;
-        } else {
-            picture.thumbnailEl.removeClass('selected');
-            picture.fadedEl.hide();
-            picture.checkedEl.hide();
-            this.setSelectAllText(false);
-            this.numSelected--;
-        }
     },
 
     /**
 	 * Returns true if all the pictures are selected.
 	 */
     areAllSelected: function () {
-        for (var i = 0, picture; picture = this.pictures[i]; i++) {
-            if (!picture.isSelected) {
+        for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+            if (!assetElement.isSelected) {
                 return false;
             }
         }
@@ -439,19 +452,18 @@ var AddPictures = Class.extend({
 	 */
     toggleSelectAll: function (e) {
         if (this.areAllSelected()) {
-            for (var i = 0, picture; picture = this.pictures[i]; i++) {
-                this.toggleSelectedStatus(picture);
+            for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+                assetElements.toggleSelectedStatus();
             }
             this.setSelectAllText(false);
-            this.numSelected = 0;
-        } else {
-            for (var i = 0, picture; picture = this.pictures[i]; i++) {
-                if (!picture.isSelected) {
-                    this.toggleSelectedStatus(picture);
+        } 
+        else {
+            for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+                if (!assetElement.isSelected) {
+                    this.toggleSelectedStatus(assetElement);
                 }
             }
             this.setSelectAllText(true);
-            this.numSelected = this.pictures.length;
         }
 
         if (this.onSelectionChanged) {
@@ -482,7 +494,6 @@ var AddPictures = Class.extend({
                     this.pictures.splice(i, 1);
                 }
             }
-            this.numSelected = 0;
 
             // Update the remaining margins.
             for (var i = 0, picture; picture = this.pictures[i]; i++) {
@@ -496,33 +507,8 @@ var AddPictures = Class.extend({
     },
 
     /**
-	 * Event handler. Called when the user first touches an image.
-	 */
-    touchStart: function (e) {
-        this.touchStartY = this.touchEndY = e.originalEvent.pageY;
-    },
-
-    /**
-	 * Event handler. Called when the user moves her finger. We intercept this event
-	 * to keep track of how far the user is moving her finger.
-	 */
-    touchMove: function (e) {
-        this.touchEndY = e.originalEvent.pageY;
-    },
-
-    /**
-	 * Event handler. Called when the touch ends. Only toggle the select status of
-	 * the image if the user hasn't moved her finger by very much.
-	 */
-    touchEnd: function (picture) {
-        if (Math.abs(this.touchEndY - this.touchStartY) < 5) {
-            this.toggleSelectedStatus(picture);
-            if (this.onSelectionChanged) {
-                this.onSelectionChanged(this.numSelected);
-            }
-        }
-    },
-    
+     * Animate the pictures
+     */
     onStepAnimation: function() {
         var top = $(document).scrollTop();
         var height = $(window).height();

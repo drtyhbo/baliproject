@@ -71,6 +71,10 @@ Users.getUserById = function (userId) {
     return null;
 };
 
+Users.getAllUsers = function () {
+    return Users.userDB;
+}
+
 Users.getUsers = function (userIds) {
     var users = Users.userDB.filter(function (user) {
             return ($.inArray(user.id, userIds) != -1);

@@ -28,10 +28,12 @@
     <script type="text/javascript" src="js/RegistrationCreateUserPage.js"></script>
     <script type="text/javascript" src="js/PersonalLibrary.js"></script>
     <script type="text/javascript" src="js/LifeStreamView.js"></script>
+    <script type="text/javascript" src="js/LifeStreamShareView.js"></script>
     <script type="text/javascript" src="js/Feed.js"></script>
     <script type="text/javascript" src="js/FeedView.js"></script>
     <script type="text/javascript" src="js/AddPicturesView.js"></script>
     <script type="text/javascript" src="js/ShareView.js"></script>
+    <script type="text/javascript" src="js/SelectFriendsView.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -231,7 +233,53 @@
         </div>
     </div>
 
+    <!-- Life stream share view-->
+    <div data-role="page" id="life-stream-share-view">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false"
+            id="header">
+            <h2>Touch to Select</h2>
+            <button class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left"
+                id="back-button">
+                Back</button>
+        </div>
 
+        <div>
+            <div id="moments"></div>
+        </div>
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="footer" data-id="main-footer">
+            <div data-role="navbar" id="navbar">
+                <ul>
+                    <li><a href="#" id="share-btn">Share</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Select Friends page-->
+    <div data-role="page" id="select-friends-view">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false"
+            id="header">
+            <h2>Select Friends</h2>
+            <button class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left"
+                id="back-button">
+                Back</button>
+        </div>
+
+        <div>
+            <div id="friends"></div>
+        </div>
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="footer" data-id="main-footer">
+            <div data-role="navbar" id="navbar">
+                <ul>
+                    <li><a href="#" id="share-btn">Share</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
 </body>
 
