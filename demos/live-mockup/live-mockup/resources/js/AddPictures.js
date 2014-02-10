@@ -3,7 +3,7 @@ var ADD_PICTURES_SPACING = 5;
 var USE_VARIOUS_SPACING_UI = true;
 
 var AssetElement = Class.extend({
-    init: function (asset, isSelectable, onSelectionChanged, onSelectionChangedArgs) {
+    init: function (asset, isSelectable, onSelectionChanged) {
         this.assets = [];
         this.addAsset(asset);
         
@@ -17,10 +17,7 @@ var AssetElement = Class.extend({
 
         this.isSelectable = isSelectable || false;
         this.onSelectionChanged = onSelectionChanged || null;
-        this.onSelectionChangedArgs = onSelectionChangedArgs || null;
-        this.isSelected = false;
-
-        
+        this.isSelected = false;        
     },
     
     getOffset: function() {
@@ -72,7 +69,7 @@ var AssetElement = Class.extend({
             && this.isSelectable) {
             this.toggleSelectedStatus();
             if (this.onSelectionChanged) {
-                this.onSelectionChanged(this.onSelectionChangedArgs);
+                this.onSelectionChanged();
             }
         }
     },
@@ -192,13 +189,13 @@ var AddPictures = Class.extend({
      * Called when a picture selection changed to set the text on the 'select all' link
      * and also calls onSelectionChangedCallback
      */
-    selectionChanged: function (me) {
+    selectionChanged: function () {
         //set select all text
-        me.setSelectAllText(me.areAllSelected());
+        this.setSelectAllText(me.areAllSelected());
         
         //callback
-        if (me.isSelectable && me.onSelectionChangedCallback) {
-            this.onSelectionChangedCallback(me.getSelected().length);
+        if (this.isSelectable && this.onSelectionChangedCallback) {
+            this.onSelectionChangedCallback(this.getSelected().length);
         }
     },
 
@@ -265,7 +262,9 @@ var AddPictures = Class.extend({
                     this.animatedAssetElements.push(
                             this.assetElements[this.assetElements.length - 1]);
                 }
-                this.assetElements.push(new AssetElement(asset, this.isSelectable, this.selectionChanged, this));
+                this.assetElements.push(
+                        new AssetElement(asset, this.isSelectable,
+                                this.selectionChanged.bind(this)));
             }
             lastAsset = asset;
         }
@@ -389,7 +388,8 @@ var AddPictures = Class.extend({
 		      })
 		      .appendTo(this.picturesEl);
 
-            var assetElement = new AssetElement(asset, this.isSelectable, this.selectionChanged,  this);
+            var assetElement = new AssetElement(asset, this.isSelectable,
+                        this.selectionChanged.bind(this));
             this.assetElements.push(assetElement);
             assetElement.getEl()
                 .appendTo(thumbnailEl);  
