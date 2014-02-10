@@ -130,6 +130,9 @@ var PictureWidgets = {
 };
 
 PictureWidgets.init = function (callback) {
+    PictureWidgets.loadFromPictureProps(
+            JSON.parse(localStorage.getItem('pictures') || '[]'));
+
     var assets = CameraRoll.getCameraRoll();
     for (var i = 0, asset; asset = assets[i]; i++)
         PictureWidgets.pictureWidgetDB.push(
@@ -207,6 +210,7 @@ PictureWidgets.ajaxAdd = function(assets, callback) {
 PictureWidgets.ajaxGetAll = function(callback) {
     Util.makeRequest('api/picture/get/all/', {
         uid: Util.GET['uid'],
+        ts: localStorage.getItem('pictures-timestamp') || 0
     }, PictureWidgets.ajaxCallback.bind(this, callback));
 };
 
@@ -216,15 +220,31 @@ PictureWidgets.ajaxGetAll = function(callback) {
  */
 PictureWidgets.ajaxCallback = function(callback, data) {
     if (data) {
-        for (var i = 0, props; props = data[i]; i++) {
-            var widget = new PictureWidget(props);
-            PictureWidgets.pictures.push(widget);
-            PictureWidgets.picturesByAssetId[props.assetId] = widget;
-        }
+        PictureWidgets.loadFromPictureProps(data.pictures);
+
+        localStorage.setItem('pictures-timestamp', data.ts);
+        // Concatenate the new picture properties with the picture properties
+        // stored in local storage.
+        var storedPictureProps =
+                JSON.parse(localStorage.getItem('pictures') || "[]");
+        localStorage.setItem('pictures',
+                JSON.stringify(data.pictures.concat(storedPictureProps)));
+
     }
     if (callback) {
         callback();
     }
+};
+
+/*
+ * Loads an array of picture properties into the list of picture widgets.
+ */
+PictureWidgets.loadFromPictureProps = function(pictureProps) {
+    for (var i = 0, props; props = pictureProps[i]; i++) {
+        var widget = new PictureWidget(props);
+        PictureWidgets.pictures.push(widget);
+        PictureWidgets.picturesByAssetId[props.assetId] = widget;
+    }    
 };
 
 /*******************************************
