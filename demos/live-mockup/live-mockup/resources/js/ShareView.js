@@ -1,4 +1,4 @@
-﻿var ShareViewItem = Class.extend({
+var ShareViewItem = Class.extend({
     init: function (share) {
         this.share= share;
     },

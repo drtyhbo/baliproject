@@ -1,4 +1,4 @@
-﻿var LifeStreamShareItem = Class.extend({
+var LifeStreamShareItem = Class.extend({
     init: function (moment, pageWidth) {
         this.moment = moment;
         this.pageWidth = pageWidth;

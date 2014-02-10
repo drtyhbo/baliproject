@@ -5,12 +5,14 @@ var SHARE_VIEW_PAGE_IDX = 3;
 var LIFE_STREAM_SHARE_PAGE_IDX = 4;
 var SELECT_FRIEND_VIEW_IDX = 5;
 
+var LOCALDEV_SERVER = 'http://127.0.0.1:8000';
+var CENTRALDEV_SERVER = 'http://drtyhbo.net';
+
 $(document).ready(function () {
     $(document.body).show();
     setTimeout(function () {
-        Util.init();
-        //ServerSettings.init(ServerSettings.CENTRALDEV_SERVER_IDX);
-        ServerSettings.init(ServerSettings.LOCALDEV_SERVER_IDX);
+//        Util.init(CENTRALDEV_SERVER);
+        Util.init(LOCALDEV_SERVER);
         CameraRoll.init(initApp);
     }, 400);
 });
@@ -24,7 +26,10 @@ function initApp() {
         } else if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
             RegistrationCreateUserPage.show(false);
         } else {
-            if (localStorage.getItem('current-view') == ADD_PICTURES_VIEW_PAGE_IDX)
+            // NOTE: Was getting stuck on various pages with no way out so
+            // I left the big three that are accessible via the tabs at the
+            // bottom. Maybe only uncomment for testing?
+/*            if (localStorage.getItem('current-view') == ADD_PICTURES_VIEW_PAGE_IDX)
                 AddPicturesView.show(false);
             else if (localStorage.getItem('current-view') == LIFE_STREAM_VIEW_PAGE_IDX)
                 LifeStreamView.show(false);
@@ -41,13 +46,14 @@ function initApp() {
                     var shareIds = loadedShareIds.split(',').map(function (x) { return parseInt(x) });
                     ShareView.show(Share.getShares(shareIds), false);
                 }
-            }
-            else
+            }*/
+            if (localStorage.getItem('current-view') == LIFE_STREAM_VIEW_PAGE_IDX) {
+                LifeStreamView.show(false);
+            } else if (localStorage.getItem('current-view') == ADD_PICTURES_VIEW_PAGE_IDX) {
+                AddPicturesView.show(false);
+            } else {
                 FeedView.show(false);
+            }
         }
     });
-}
-
-var Session = {
-    
 }

@@ -234,4 +234,4 @@ LifeStreamView.loadMoments = function (moments) {
         .on(TOUCHSTART, function () {
             LifeStreamShareView.show(LifeStreamView.lifeStream, false);
         });
-}
+};

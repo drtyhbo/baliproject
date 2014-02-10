@@ -1,4 +1,4 @@
-﻿var FriendItem = Class.extend({
+var FriendItem = Class.extend({
     init: function (friend) {
         this.friend = friend;
         this.isSelected = false;
@@ -88,7 +88,6 @@ var SelectFriendsView = {
 };
 
 SelectFriendsView.show = function (animate) {
-    
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
                             SelectFriendsView.beforeTransition);
     $.mobile.pageContainer.pagecontainer('change', '#select-friends-view', {
@@ -110,7 +109,6 @@ SelectFriendsView.beforeTransition = function (event, ui) {
     }
     SelectFriendsView.shown = true;
 
-
     //save pointer to UI elements
     SelectFriendsView.ui = ui;
     SelectFriendsView.headerEl = ui.toPage.find('#load-view-header');
@@ -123,11 +121,5 @@ SelectFriendsView.beforeTransition = function (event, ui) {
     var friends = Users.getAllUsers();
     for (var i = 0, friend; friend = friends[i]; i++) {
         new FriendItem(friend).getEl().appendTo(friendsEl);
-    }
-
-
-
-    
+    }    
 };
-
-

@@ -192,7 +192,7 @@ var AddPictures = Class.extend({
      * Called when a picture selection changed to set the text on the 'select all' link
      * and also calls onSelectionChangedCallback
      */
-    selectionChanged: function (me) { //ATODO: is there a better way of doing this
+    selectionChanged: function (me) {
         //set select all text
         me.setSelectAllText(me.areAllSelected());
         

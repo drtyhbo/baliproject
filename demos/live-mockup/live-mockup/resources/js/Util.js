@@ -1,17 +1,23 @@
-
 var Util = {
-  GET: {}
+  GET: {},
+  baseUrl: null
 }
 
 /*
  * Initializes the utilities.
  */
-Util.init = function() {
+Util.init = function(host) {
   var keyValuePairs = window.location.search.substr(1).split('&');
   for (var i = 0, pair; pair = keyValuePairs[i]; i++) {
     var keyValue = pair.split('=');
     Util.GET[keyValue[0]] = decodeURIComponent(keyValue[1]);
-  }  
+  }
+  
+  if (Util.GET['host']) {
+      Util.baseUrl = Util.GET['host'];
+  } else {
+      Util.baseUrl = host || 'http://drtyhbo.net';
+  }
 };
 
 /*
@@ -50,11 +56,10 @@ Util.getElapsedTime = function (timeStamp) {
 
 /*
  * Issues an AJAX request to the specified path. Automatically prefixes the
- * path with the server url (currently http://drtyhbo.net/).
+ * path with the server url.
  */
 Util.makeRequest = function(path, data, success) {
-    var host = Util.GET['host'] || ServerSettings.getServerUrl();
-    $.ajax(host + path, {
+    $.ajax(Util.baseUrl + '/' + path, {
         data: data,
         success: success,
         type: 'POST'

@@ -26,7 +26,7 @@
   [self.view addSubview:_webView];
   
   NSString *pathToHtml = [[NSBundle mainBundle] pathForResource:@"iphone-main" ofType:@"html"];
-  NSString *queryString = [NSString stringWithFormat:@"?uid=%@", [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString]];
+  NSString *queryString = [NSString stringWithFormat:@"?uid=%@&host=http://drtyhbo.net", [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString]];
   NSString *pathWithQuery = [pathToHtml stringByAppendingString:queryString];
   
   NSURLRequest *htmlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:pathWithQuery]];
