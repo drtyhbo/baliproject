@@ -36,14 +36,14 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
             LifeStreamView.show();
         });
         
-  new Scroller($('#scrollable'));
+    var scroller = new Scroller($('#scrollable'));
 
-	var cameraRoll = CameraRoll.getCameraRoll();
-	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(),
-            true, true, RegistrationAddPicturesPage.onSelectionChanged,
-            cameraRoll);
-	RegistrationAddPicturesPage.addPictures.getEl()
-			.appendTo(ui.toPage.find('#pictures'));
+    var picturesEl = ui.toPage.find('#pictures');
+	RegistrationAddPicturesPage.addPictures =
+            new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(),
+                    scroller);
+	RegistrationAddPicturesPage.addPictures.getEl(picturesEl)
+			.appendTo(picturesEl);
 };
 
 /**

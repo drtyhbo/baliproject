@@ -11,17 +11,17 @@ var Point2d = Class.extend({
 
 var Scroller = Class.extend({
   init: function(el) {
-    // Chrome should use browser scrolling.
-    if (!isIOS) {
-      el.parent().css('overflow', 'auto');
-      return;
-    }
-
     this.el = el;
-    el
-        .bind(TOUCHSTART, this.mouseDown.bind(this))
-        .bind(TOUCHMOVE, this.mouseMove.bind(this))
-        .bind(TOUCHEND, this.mouseUp.bind(this));
+
+    // Chrome should use browser scrolling.
+/*    if (!isIOS) {
+      el.parent().css('overflow', 'auto');
+    } else {*/
+      el
+          .bind(TOUCHSTART, this.mouseDown.bind(this))
+          .bind(TOUCHMOVE, this.mouseMove.bind(this))
+          .bind(TOUCHEND, this.mouseUp.bind(this));
+//    }
 
     // When true, the user is touching the scroller, so no need to move it on
     // our own.
@@ -41,6 +41,23 @@ var Scroller = Class.extend({
     this.scrollVelocity = null;
     // The position of the scroller.
     this.scrollPosition = new Point2d(0, 0);
+    
+    // A list of callbacks to fire on scroll.
+    this.callbacks = [];
+  },
+  
+  /**
+   * Returns the scrollable element.
+   */
+  getEl: function() {
+    return this.el;
+  },
+  
+  /**
+   * Use the jQuery scroll() function to bind a scroll callback.
+   */
+  scroll: function(callback) {
+    this.callbacks.push(callback);
   },
 
   getTouchPoint: function(e) {
@@ -140,5 +157,9 @@ var Scroller = Class.extend({
     }
 
     this.el.css('transform', 'translate3d(0, ' + -this.scrollPosition.y + 'px, 0)');
+
+    for (var i = 0, callback; callback = this.callbacks[i]; i++) {
+      callback(this, this.scrollPosition, parentHeight);
+    }
   }
 });
