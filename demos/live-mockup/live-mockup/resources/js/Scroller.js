@@ -11,8 +11,13 @@ var Point2d = Class.extend({
 
 var Scroller = Class.extend({
   init: function(el) {
+    // Chrome should use browser scrolling.
+    if (!isIOS) {
+      el.parent().css('overflow', 'auto');
+      return;
+    }
+
     this.el = el;
-   
     el
         .bind(TOUCHSTART, this.mouseDown.bind(this))
         .bind(TOUCHMOVE, this.mouseMove.bind(this))
@@ -37,7 +42,7 @@ var Scroller = Class.extend({
     // The position of the scroller.
     this.scrollPosition = new Point2d(0, 0);
   },
-  
+
   getTouchPoint: function(e) {
     return new Point2d(
         e.pageX !== undefined ? e.pageX : e.originalEvent.touches[0].pageX,
