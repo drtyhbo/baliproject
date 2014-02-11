@@ -162,8 +162,6 @@ var AddPictures = Class.extend({
      */
     init: function (width, showSelectAll, isSelectable, onSelectionChangedCallback,
             assets, baseSpacing, numColumns) {
-        
-        
         //asset data
         this.assets = assets;
         this.assetElements = [];

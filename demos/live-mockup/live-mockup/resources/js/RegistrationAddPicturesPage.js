@@ -35,6 +35,8 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
         .on(TOUCHSTART, function () {
             LifeStreamView.show();
         });
+        
+  new Scroller($('#scrollable'));
 
 	var cameraRoll = CameraRoll.getCameraRoll();
 	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(),
@@ -59,9 +61,9 @@ RegistrationAddPicturesPage.onSelectionChanged = function(numSelected) {
  * user to the second step of the registration flow.
  */
 RegistrationAddPicturesPage.touchFooterButton = function(e) {
-    e.preventDefault();
+  e.preventDefault();
   
-    var assets = RegistrationAddPicturesPage.addPictures.getSelected();
+  var assets = RegistrationAddPicturesPage.addPictures.getSelected();
 
 	// "Upload" those pictures which are selected.
 	PersonalLibrary.add(assets);

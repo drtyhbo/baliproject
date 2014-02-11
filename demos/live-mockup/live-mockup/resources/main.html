@@ -8,10 +8,11 @@
         }
     </style>
     <script type="text/javascript">
-        var isIOS = navigator.userAgent.indexOf('iPhone; CPU iPhone OS') != -1;
+        var isIOS = navigator.userAgent.indexOf('iPhone; CPU iPhone OS') != -1 ||
+            navigator.userAgent.indexOf('iPod touch; CPU iPhone OS') != -1;
         var TOUCHSTART = isIOS ? 'touchstart' : 'mousedown';
         var TOUCHMOVE = isIOS ? 'touchmove' : 'mousemove';
-        var TOUCHEND = isIOS ? 'touchend' : 'mouseup';        
+        var TOUCHEND = isIOS ? 'touchend' : 'mouseup';
     </script>
 
     <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
@@ -19,6 +20,7 @@
     <script type="text/javascript" src="js/jquery-inheritance.js"></script>
     <script type="text/javascript" src="js/Util.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/Scroller.js"></script>
     <script type="text/javascript" src="js/CameraRoll.js"></script>
     <script type="text/javascript" src="js/ModelObjects.js"></script>
     <script type="text/javascript" src="js/DataObjects.js"></script>
@@ -56,21 +58,34 @@
                 text-align: center;
                 width: 50px;
             }
+            
+            .container {
+              bottom: 43px;
+              left: 0;
+              overflow: hidden;
+              position: absolute;
+              top: 0;
+              width: 100%;
+            }
         </style>
         <div data-role="content">
-            <div style="margin-top: 10px; text-align: center">
-                <div class="circle"
-                    style="background: #bbb; margin-right: 10px">
-                    1
+            <div class="container">
+                <div id="scrollable">
+                    <div style="margin-top: 10px; text-align: center">
+                        <div class="circle"
+                            style="background: #bbb; margin-right: 10px">
+                            1
+                        </div>
+                        <div class="circle"
+                            style="background: #ddd">
+                            2
+                        </div>
+                        <h3 style="margin: 5px 0">Add to your personal stream</h3>
+                        <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
+                    </div>
+                    <div id="pictures" style="margin: 10px 5px"></div>
                 </div>
-                <div class="circle"
-                    style="background: #ddd">
-                    2
-                </div>
-                <h3 style="margin: 5px 0">Add to your personal stream</h3>
-                <h3 style="margin: 5px 0 20px">(they're private till you share)</h3>
             </div>
-            <div id="pictures" style="margin: 10px 5px"></div>
         </div>
         <div data-role="footer" data-position="fixed" data-tap-toggle="false"
             id="add-pictures-footer">
