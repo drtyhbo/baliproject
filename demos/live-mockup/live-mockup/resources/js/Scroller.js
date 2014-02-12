@@ -12,16 +12,10 @@ var Point2d = Class.extend({
 var Scroller = Class.extend({
   init: function(el) {
     this.el = el;
-
-    // Chrome should use browser scrolling.
-/*    if (!isIOS) {
-      el.parent().css('overflow', 'auto');
-    } else {*/
-      el
-          .bind(TOUCHSTART, this.mouseDown.bind(this))
-          .bind(TOUCHMOVE, this.mouseMove.bind(this))
-          .bind(TOUCHEND, this.mouseUp.bind(this));
-//    }
+    el
+        .bind(TOUCHSTART, this.mouseDown.bind(this))
+        .bind(TOUCHMOVE, this.mouseMove.bind(this))
+        .bind(TOUCHEND, this.mouseUp.bind(this));
 
     // When true, the user is touching the scroller, so no need to move it on
     // our own.
@@ -51,6 +45,20 @@ var Scroller = Class.extend({
    */
   getEl: function() {
     return this.el;
+  },
+  
+  /**
+   * Returns the height of the container element.
+   */
+  getContainerHeight: function() {
+    return this.el.parent().height();
+  },
+
+  /**
+   * Returns the current scroll position.
+   */
+  getScrollPosition: function() {
+    return this.scrollPosition;
   },
   
   /**
@@ -147,17 +155,17 @@ var Scroller = Class.extend({
   
   render: function() {
     var contentHeight = this.el.height();
-    var parentHeight = this.el.parent().height();
+    var containerHeight = this.getContainerHeight();
 
     if (this.scrollPosition.y < 0) {
       this.scrollPosition.y = 0;
     }
-    if (this.scrollPosition.y > contentHeight - parentHeight) {
-      this.scrollPosition.y = contentHeight - parentHeight;
+    if (this.scrollPosition.y > contentHeight - containerHeight) {
+      this.scrollPosition.y = contentHeight - containerHeight;
     }
 
     for (var i = 0, callback; callback = this.callbacks[i]; i++) {
-      callback(this, this.scrollPosition, parentHeight);
+      callback();
     }
 
     this.el.css('transform', 'translate3d(0, ' + -this.scrollPosition.y + 'px, 0)');

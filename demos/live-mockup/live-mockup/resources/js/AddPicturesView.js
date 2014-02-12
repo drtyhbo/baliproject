@@ -8,74 +8,75 @@ var AddPicturesView = {
  * Makes the add pictures registration page the current page.
  */
 AddPicturesView.show = function () {
-    $.mobile.pageContainer.on('pagecontainerbeforetransition',
-              AddPicturesView.beforeTransition);
-    $.mobile.pageContainer.pagecontainer('change', '#add-pictures-view', {
-        changeHash: false,
-        showLoadMsg: false,
-        transition: 'none'
-    });
+  $.mobile.pageContainer.on('pagecontainershow',
+      AddPicturesView.onShow);
+  $.mobile.pageContainer.pagecontainer('change', '#add-pictures-view', {
+    changeHash: false,
+    showLoadMsg: false,
+    transition: 'none'
+  });
 };
 
 /**
- * Event handler. Called before the add pictures registration page is made
- * visible.
+ * Event handler. Called once the AddPicturesView is made visible.
  */
-AddPicturesView.beforeTransition = function (event, ui) {
-    $.mobile.pageContainer.off('pagecontainerbeforetransition',
-              arguments.callee);
+AddPicturesView.onShow = function (event, ui) {
+  $.mobile.pageContainer.off('pagecontainershow',
+      arguments.callee);
 
-    if (AddPicturesView.shown) {
-        return;
-    }
-    AddPicturesView.shown = true;
+  if (AddPicturesView.shown) {
+      return;
+  }
+  AddPicturesView.shown = true;
 
-    AddPicturesView.pageEl = ui.toPage;
-    var homeBtn = ui.toPage.find('#home-btn')
+  var pageEl = $('#add-pictures-view');
+  
+  AddPicturesView.pageEl = pageEl;
+  var homeBtn = pageEl.find('#home-btn')
 			.on(TOUCHSTART, function () {
-			    FeedView.show();
+		    FeedView.show();
 			});
-    var viewProfileBtn = ui.toPage.find('#profile-btn')
+  var viewProfileBtn = pageEl.find('#profile-btn')
 			.on(TOUCHSTART, function () {
-			    LifeStreamView.show();
+		    LifeStreamView.show();
 			});
 
-    var headerEl = ui.toPage.find('#header');
-    $('<img></img>')
-			.css({
-			    left: '5px',
-			    position: 'absolute',
-			    top: '5px'
-			})
-			.attr({
-			    height: 32,
-			    src: Images.getPath('icons/') + 'camera.png',
-			    width: 32
-			})
-			.appendTo(headerEl);
+  var headerEl = pageEl.find('#header');
+  $('<img></img>')
+  		.css({
+  	    left: '5px',
+  	    position: 'absolute',
+  	    top: '5px'
+  		})
+  		.attr({
+  	    height: 32,
+  	    src: Images.getPath('icons/') + 'camera.png',
+  	    width: 32
+  		})
+  		.appendTo(headerEl);
 
-    AddPicturesView.addEl = ui.toPage.find('#add-button')
-			.on(TOUCHEND, AddPicturesView.onAddPictures);
+  AddPicturesView.addEl = pageEl.find('#add-button')
+  		.on(TOUCHEND, AddPicturesView.onAddPictures);
 
-    var picturesEl = ui.toPage.find('#pictures')
-			.empty();
+  var assets = CameraRoll.getCameraRoll().filter(function(asset) {
+    return !PictureWidgets.getPictureByAssetId(asset.id);
+  });
 
-    var assets = CameraRoll.getCameraRoll().filter(function(asset) {
-        return !PictureWidgets.getPictureByAssetId(asset.id);
-    });
+  var scroller = new Scroller(pageEl.find('#scrollable'));
+  var addPictures =
+      new AddPictures(pageEl.width(), assets, scroller);
+  addPictures.setSelectable(true, false, AddPicturesView.onSelectionChanged);
+  addPictures.getEl()
+      .appendTo(pageEl.find('#pictures'));
+  AddPicturesView.addPictures = addPictures;
 
-    AddPicturesView.addPictures = new AddPictures(ui.toPage.width(),
-			false, true, AddPicturesView.onSelectionChanged, assets);
-    AddPicturesView.addPictures.getEl()
-			.appendTo(picturesEl);
+  if (assets.length) {
+    AddPicturesView.addPictures.toggleSelectAll();
+  } else {
+    AddPicturesView.showEmptyUi();
+  }
 
-    if (AddPicturesView.addPictures.getNumPictures()) {
-        AddPicturesView.addPictures.toggleSelectAll();
-    } else {
-        AddPicturesView.showEmptyUi();
-    }
-
-    localStorage.setItem('current-view', ADD_PICTURES_VIEW_PAGE_IDX);
+  localStorage.setItem('current-view', ADD_PICTURES_VIEW_PAGE_IDX);
 };
 
 /**

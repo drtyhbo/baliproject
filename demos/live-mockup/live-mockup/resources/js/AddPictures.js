@@ -368,7 +368,7 @@ var AddPictures = Class.extend({
     this.rowHeight = this.pictureDimension + PICTURE_SPACING;
     
     this.scroller = scroller;
-    this.scroller.scroll(this.onScroll.bind(this));
+    this.scroller.scroll(this.updateVisibleElements.bind(this));
   },
 
   /**
@@ -422,6 +422,8 @@ var AddPictures = Class.extend({
       } else {
           this.renderStandardUi();
       }
+      
+      this.updateVisibleElements();
 
       return this.el;
   },
@@ -709,7 +711,7 @@ var AddPictures = Class.extend({
   /**
    * Determines which rows are currently within the viewport.
    */
-  determineViewport: function(scrollPosition, parentHeight) {
+  determineViewport: function(scrollPosition, containerHeight) {
     // The picture selector might not be flush with the top of the scrollable content,
     // so calculate the scroll top as if the picture selector were at the top. We
     // use the aboveViewportEl as the top because the Select all toggle might be
@@ -720,7 +722,7 @@ var AddPictures = Class.extend({
 
     // A negative relativeScrollTop means the picture selector is further down on the
     // page, perhaps all the way off the screen.
-    if (relativeScrollTop < 0 && relativeScrollTop < -parentHeight) {
+    if (relativeScrollTop < 0 && relativeScrollTop < -containerHeight) {
       // Not visible.
       return null;
     } else if (relativeScrollTop < 0) {
@@ -728,7 +730,7 @@ var AddPictures = Class.extend({
     } else {
       var firstRowIndex = Math.floor(relativeScrollTop / this.rowHeight);
     }
-    var lastRowIndex = Math.ceil((relativeScrollTop + parentHeight) / this.rowHeight);
+    var lastRowIndex = Math.ceil((relativeScrollTop + containerHeight) / this.rowHeight);
 
     return {
       firstRowIndex: firstRowIndex,
@@ -748,7 +750,7 @@ var AddPictures = Class.extend({
       }
     }
   },
-
+  
   /**
    * This optimization works by only showing those rows in the DOM that are
    * currently within the viewport. There are three divs in the following DOM
@@ -768,8 +770,9 @@ var AddPictures = Class.extend({
    * In addition, this allows us to only create DOM elements and load images as they
    * come into view, thereby speeding up the initial rendering immensely.
    */
-  onScroll: function(scroller, scrollPosition, parentHeight) {
-    var viewport = this.determineViewport(scrollPosition, parentHeight);
+  updateVisibleElements: function() {
+    var viewport = this.determineViewport(this.scroller.getScrollPosition(),
+        this.scroller.getContainerHeight());
 
     if (this.currentViewport) {
       this.clearHiddenRows(viewport);
@@ -806,7 +809,7 @@ var AddPictures = Class.extend({
       }
     
       this.currentViewport = viewport;
-    }
+    }    
   },
 
   /**

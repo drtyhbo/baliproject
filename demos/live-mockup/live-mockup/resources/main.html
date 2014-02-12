@@ -163,6 +163,16 @@
 
     <!-- Add pictures view -->
     <div data-role="page" id="add-pictures-view">
+        <style type="text/css">
+          .container {
+            bottom: 43px;
+            left: 0;
+            overflow: hidden;
+            position: absolute;
+            top: 43px;
+            width: 100%;
+          }
+        </style>
         <div data-role="content">
             <div data-role="header" data-position="fixed" data-tap-toggle="false"
                 id="header">
@@ -171,7 +181,11 @@
                     id="add-button">
                     Add</button>
             </div>
-            <div id="pictures" style="margin: 5px"></div>
+            <div class="container">
+              <div id="scrollable">
+                <div id="pictures" style="margin: 5px"></div>
+              </div>
+            </div>
             <div data-role="footer" data-position="fixed" data-tap-toggle="false"
                 id="footer" data-id="main-footer">
                 <div data-role="navbar" id="navbar">

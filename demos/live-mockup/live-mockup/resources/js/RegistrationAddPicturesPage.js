@@ -37,7 +37,6 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
       });
         
   var scroller = new Scroller($('#scrollable'));
-
   var addPictures =
       new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(), scroller);
   addPictures.setSelectable(true, true,
