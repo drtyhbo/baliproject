@@ -138,7 +138,7 @@ var AssetElement = Class.extend({
     getImageEl: function(url) {
         return $('<span></span>')
 	      .css({
-          backgroundImage: 'url(' + url + ')',
+          background: '#eee',
           backgroundSize: 'cover',
           display: 'inline-block',
           height: '100%',
@@ -147,9 +147,16 @@ var AssetElement = Class.extend({
           top: 0,
           width: '100%'
 	      });
+    },
+    
+    loadImages: function() {
+      this.imageEl.css('background-image', 'url(' + this.assets[0].getSrc() + ')');
     }
 });
 
+/**
+ * Encapulates the logic to handle a row of asset elements.
+ */
 var AssetRowElement = Class.extend({
    init: function(assets, pictureDimension) {
      this.el = null;
@@ -158,10 +165,12 @@ var AssetRowElement = Class.extend({
        this.assetElements.push(new AssetElement(asset, false, null));
      }
      this.pictureDimension = pictureDimension;
-   },
-   
-   isCreated: function() {
-     return this.el != null;
+     
+     // A boolean specifying whether the images have already been loaded for this
+     // row.
+     this.imagesLoaded = false;
+     // The id for the setTimeout() that loads the images in this row.
+     this.loadImagesTimerId = 0;
    },
    
    getEl: function() {
@@ -172,7 +181,7 @@ var AssetRowElement = Class.extend({
      this.el = $('<div></div>')
          .css('margin-bottom', PICTURE_SPACING + 'px');
      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-       var assetEl = $('<span></span>')
+       var parentEl = $('<span></span>')
            .css({
                display: 'inline-block',
                height: this.pictureDimension + 'px',
@@ -183,9 +192,41 @@ var AssetRowElement = Class.extend({
                width: this.pictureDimension + 'px'
            })
            .appendTo(this.el);
-       assetElement.getEl().appendTo(assetEl);
+       assetElement.getEl()
+           .appendTo(parentEl);
      }
      return this.el;
+   },
+   
+   /**
+    * Should be called when the asset row is shown. Loads images.
+    */
+   show: function() {
+     this.shown = true;
+
+     if (this.imagesLoaded || this.loadImagesTimerId) {
+       return;
+     }
+     this.loadImagesTimerId = setTimeout(this.loadImages.bind(this), 500);
+   },
+   
+   /**
+    * Should be called when the asset row is hidden.
+    */
+   hide: function() {
+     this.shown = false;
+     
+     clearTimeout(this.loadImagesTimerId);
+     this.loadImagesTimerId = 0;
+     this.el.detach();
+   },
+   
+   loadImages: function() {
+     for (var i = 0, assetElement;
+         assetElement = this.assetElements[i]; i++) {
+       assetElement.loadImages();
+     }
+     this.imagesLoaded = true;     
    }
 });
 
@@ -200,16 +241,18 @@ var AddPictures = Class.extend({
      *   scroller - The scroller object that encompasses this set of pictures.
      */
     init: function(width, assets, scroller) {
-      assets = assets.slice(0, 100);
+      // The main element for the picture selector.
       this.el = null;
-      
       // This block contains all the content which is above the viewport.
       this.aboveViewportEl = null;
       // This block contains all the content which is in the viewport.
       this.viewportEl = null;
       // This block contains all the content which is below the viewport.
       this.belowViewportEl = null;
-      // Specifies which rows are currently in the viewport.
+      // Specifies which rows are currently in the viewport. Object with
+      // two properties:
+      //     firstRowIndex - The index of the first row.
+      //     lastRowIndex - The index of the last row.
       this.currentViewport = null;
 
       this.width = width;
@@ -232,7 +275,8 @@ var AddPictures = Class.extend({
       // plus the interrow spacing.
       this.rowHeight = this.pictureDimension + PICTURE_SPACING;
       
-      scroller.scroll(this.onScroll.bind(this));
+      this.scroller = scroller;
+      this.scroller.scroll(this.onScroll.bind(this));
     },
 
     /**
@@ -562,47 +606,64 @@ var AddPictures = Class.extend({
         }).bind(this));
     },
 
-    determineViewport: function(elementTop, scrollPosition, parentHeight) {
-        var firstRow = Math.max(elementTop - scrollPosition.y > 0 ?
-                0 : Math.floor(Math.abs(elementTop - scrollPosition.y) / this.rowHeight) - 1, 0);
-        var lastRow = Math.ceil(
-            (parentHeight - elementTop + scrollPosition.y) / this.rowHeight) + 1;
+    determineViewport: function(scrollPosition, parentHeight) {
+      // Determine which asset rows are in the viewport.
+      var scrollerEl = this.scroller.getEl();
+      var elementTop = this.el.offset().top - scrollerEl.offset().top;
 
-        return {
-            first: firstRow,
-            last: lastRow
-        };
+      var firstRowIndex = Math.max(elementTop - scrollPosition.y > 0 ?
+              0 : Math.floor(Math.abs(elementTop - scrollPosition.y) / this.rowHeight) - 1, 0);
+      var lastRowIndex = Math.ceil(
+          (parentHeight - elementTop + scrollPosition.y) / this.rowHeight) + 1;
+
+      return {
+        firstRowIndex: firstRowIndex,
+        lastRowIndex: lastRowIndex
+      };
+    },
+
+    /**
+     * Determines which rows are now hidden and removes them from the DOM.
+     */
+    clearHiddenRows: function(viewport) {
+      // Hide rows that are not currently visible to simplify the DOM.
+      for (var i = this.currentViewport.firstRowIndex;
+          i < this.currentViewport.lastRowIndex; i++) {
+        if (i < viewport.firstRowIndex || i > viewport.lastRowIndex) {
+          this.assetRows[i].hide();
+        }
+      }
     },
 
     /**
      * Called when the user scrolls the view.
      */
     onScroll: function(scroller, scrollPosition, parentHeight) {
-      // Determine which asset rows are in the viewport.
-      var scrollerEl = scroller.getEl();
-      var elementTop = this.el.offset().top - scrollerEl.offset().top;
-      var viewport = this.determineViewport(elementTop,
-              scrollPosition, parentHeight);
+      var viewport = this.determineViewport(scrollPosition, parentHeight);
 
-      // The viewport has changed, update the viewport elements. 
-      if (this.currentViewport &&
-          (viewport.first != this.currentViewport.first ||
-          viewport.last != this.currentViewport.last)) {
-        for (var i = this.currentViewport.first; i < this.currentViewport.last;
-            i++) {
-          this.assetRows[i].getEl().detach();
-        }
+      // The viewport has changed, update the viewport elements.
+      if (this.currentViewport) {
+        this.clearHiddenRows(viewport);
       }
 
-      this.aboveViewportEl.css('height', viewport.first * this.rowHeight + 'px');
+      this.aboveViewportEl.css('height',
+          viewport.firstRowIndex * this.rowHeight + 'px');
       this.belowViewportEl.css('height',
-          (this.assetRows.length - viewport.last) * this.rowHeight + 'px');
+          (this.assetRows.length - viewport.lastRowIndex) * this.rowHeight + 'px');
 
-      for (var i = viewport.first; i < viewport.last; i++) {
+      var insertAfter = null;
+      for (var i = viewport.firstRowIndex; i < viewport.lastRowIndex; i++) {
         var assetRowEl = this.assetRows[i].getEl();
-        if (!assetRowEl.parent().length) {
-          assetRowEl.appendTo(this.viewportEl);
+        if (!this.assetRows[i].shown) {
+//        if (!assetRowEl.parent().length) {
+          if (!insertAfter) {
+            this.viewportEl.prepend(assetRowEl);
+          } else {
+            assetRowEl.insertAfter(insertAfter);
+          }
+          this.assetRows[i].show();
         }
+        insertAfter = assetRowEl;
       }
       
       this.currentViewport = viewport;
