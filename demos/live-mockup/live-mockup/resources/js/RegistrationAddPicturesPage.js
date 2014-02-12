@@ -7,8 +7,8 @@ var RegistrationAddPicturesPage = {
  * Makes the add pictures registration page the current page.
  */
 RegistrationAddPicturesPage.show = function(animate) {
-  $.mobile.pageContainer.on('pagecontainerbeforetransition',
-			RegistrationAddPicturesPage.beforeTransition);
+  $.mobile.pageContainer.on('pagecontainershow',
+			RegistrationAddPicturesPage.onShow);
 	$.mobile.pageContainer.pagecontainer('change', '#registration-add-pictures', {
 		changeHash: false,
 		showLoadMsg: false,
@@ -17,32 +17,29 @@ RegistrationAddPicturesPage.show = function(animate) {
 };
 
 /**
- * Event handler. Called before the add pictures registration page is made
- * visible.
+ * Event handler. Called once the RegistrationAddPicturesPage is made visible.
  */
-RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
-  if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
-    $.mobile.pageContainer.off('pagecontainerbeforetransition',
-        arguments.callee);
-    return;
-  }
+RegistrationAddPicturesPage.onShow = function(event, ui) {
+  $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
 
-	RegistrationAddPicturesPage.footerEl = ui.toPage
+  var pageEl = $('#registration-add-pictures');
+
+	RegistrationAddPicturesPage.footerEl = pageEl
 			.find('#add-pictures-footer')
 			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
 
-	var viewProfileBtn = ui.toPage.find('#profile-btn')
+	var viewProfileBtn = pageEl.find('#profile-btn')
       .on(TOUCHSTART, function () {
           LifeStreamView.show();
       });
         
   var scroller = new Scroller($('#scrollable'));
   var addPictures =
-      new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(), scroller);
+      new AddPictures(pageEl.width(), CameraRoll.getCameraRoll(), scroller);
   addPictures.setSelectable(true, true,
       RegistrationAddPicturesPage.onSelectionChanged);
   addPictures.getEl()
-			.appendTo(ui.toPage.find('#pictures'));
+			.appendTo(pageEl.find('#pictures'));
 	RegistrationAddPicturesPage.addPictures = addPictures;
 };
 

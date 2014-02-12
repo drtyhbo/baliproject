@@ -21,8 +21,7 @@ AddPicturesView.show = function () {
  * Event handler. Called once the AddPicturesView is made visible.
  */
 AddPicturesView.onShow = function (event, ui) {
-  $.mobile.pageContainer.off('pagecontainershow',
-      arguments.callee);
+  $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
 
   if (AddPicturesView.shown) {
       return;
