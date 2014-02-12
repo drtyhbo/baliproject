@@ -21,29 +21,29 @@ RegistrationAddPicturesPage.show = function(animate) {
  * visible.
  */
 RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
-    if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
-        $.mobile.pageContainer.off('pagecontainerbeforetransition',
-		        arguments.callee);
-        return;
-    }
+  if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
+    $.mobile.pageContainer.off('pagecontainerbeforetransition',
+        arguments.callee);
+    return;
+  }
 
 	RegistrationAddPicturesPage.footerEl = ui.toPage
 			.find('#add-pictures-footer')
 			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
 
 	var viewProfileBtn = ui.toPage.find('#profile-btn')
-        .on(TOUCHSTART, function () {
-            LifeStreamView.show();
-        });
+      .on(TOUCHSTART, function () {
+          LifeStreamView.show();
+      });
         
-    var scroller = new Scroller($('#scrollable'));
+  var scroller = new Scroller($('#scrollable'));
 
-    var picturesEl = ui.toPage.find('#pictures');
-	RegistrationAddPicturesPage.addPictures =
-            new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(),
-                    scroller);
-	RegistrationAddPicturesPage.addPictures.getEl(picturesEl)
-			.appendTo(picturesEl);
+  var addPictures = new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(),
+      scroller);
+  addPictures.setSelectable(true, RegistrationAddPicturesPage.onSelectionChanged);
+  addPictures.getEl()
+			.appendTo(ui.toPage.find('#pictures'));
+	RegistrationAddPicturesPage.addPictures = addPictures;
 };
 
 /**
