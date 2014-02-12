@@ -30,7 +30,7 @@ RegistrationAddPicturesPage.onShow = function(event, ui) {
 
 	var viewProfileBtn = pageEl.find('#profile-btn')
       .on(TOUCHSTART, function () {
-          LifeStreamView.show();
+        LifeStreamView.show();
       });
         
   var scroller = new Scroller($('#scrollable'));
@@ -61,14 +61,12 @@ RegistrationAddPicturesPage.touchFooterButton = function(e) {
   e.preventDefault();
   
   var assets = RegistrationAddPicturesPage.addPictures.getSelected();
-
-	// "Upload" those pictures which are selected.
 	PersonalLibrary.add(assets);
-    PictureWidgets.ajaxAdd(assets, function() {
-        if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
-            RegistrationCreateUserPage.show(true);
-        } else {
-            FeedView.show(true);
-        }
-    });
+  PictureWidgets.ajaxAdd(assets, function() {
+    if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
+      RegistrationCreateUserPage.show(true);
+    } else {
+      FeedView.show(true);
+    }
+  });
 };
