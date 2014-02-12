@@ -82,31 +82,31 @@ AddPicturesView.onShow = function (event, ui) {
  * Creates and returns a UI that can be shown when there are no photos left.
  */
 AddPicturesView.showEmptyUi = function (e) {
-    var emptyUiContainer = $('<div></div>')
-        .css({
-            color: '#ccc',
-            fontSize: '20px',
-            left: 0,
-            marginTop: '-57px',
-            position: 'absolute',
-            right: 0,
-            textAlign: 'center',
-            top: '50%'
-        })
-        .appendTo(AddPicturesView.pageEl);
-    $('<div></div>')
-        .text('All photos added!')
-        .appendTo(emptyUiContainer);
-    $('<img></img>')
-			.attr({
-			    height: 64,
-			    src: Images.getPath('icons/') + 'camera-64.png',
-			    width: 64
-			})
-			.appendTo(emptyUiContainer);
-    $('<div></div>')
-        .text('Take a new one :)')
-        .appendTo(emptyUiContainer);
+  var emptyUiContainer = $('<div></div>')
+      .css({
+        color: '#ccc',
+        fontSize: '20px',
+        left: 0,
+        marginTop: '-57px',
+        position: 'absolute',
+        right: 0,
+        textAlign: 'center',
+        top: '50%'
+      })
+      .appendTo(AddPicturesView.pageEl);
+  $('<div></div>')
+      .text('All photos added!')
+      .appendTo(emptyUiContainer);
+  $('<img></img>')
+  		.attr({
+  	    height: 64,
+  	    src: Images.getPath('icons/') + 'camera-64.png',
+  	    width: 64
+  		})
+		.appendTo(emptyUiContainer);
+  $('<div></div>')
+      .text('Take a new one :)')
+      .appendTo(emptyUiContainer);
 };
 
 
@@ -114,27 +114,27 @@ AddPicturesView.showEmptyUi = function (e) {
  * Event handler. Called when the user clicks the 'Add' button.
  */
 AddPicturesView.onAddPictures = function (e) {
-    var assets = AddPicturesView.addPictures.getSelected();
+  var assets = AddPicturesView.addPictures.getSelected();
 
-    // "Upload" those pictures which are selected.
-    PersonalLibrary.add(assets);
-    PictureWidgets.ajaxAdd(assets);
+  // "Upload" those pictures which are selected.
+  PersonalLibrary.add(assets);
+  PictureWidgets.ajaxAdd(assets);
 
-    AddPicturesView.addPictures.removeSelected(function () {
-        AddPicturesView.onSelectionChanged(0);
-        if (!AddPicturesView.addPictures.getNumPictures()) {
-            AddPicturesView.showEmptyUi();
-        }
-    });
+  AddPicturesView.addPictures.removeSelected(function () {
+    AddPicturesView.onSelectionChanged(0);
+    if (!AddPicturesView.addPictures.getNumPictures()) {
+      AddPicturesView.showEmptyUi();
+    }
+  });
 };
 
 /**
  * Event handler. Called when the user selects new pictures.
  */
 AddPicturesView.onSelectionChanged = function (numSelected) {
-    if (numSelected == 0) {
-        AddPicturesView.addEl.text('Add');
-    } else {
-        AddPicturesView.addEl.text('Add ' + numSelected);
-    }
+  if (numSelected == 0) {
+    AddPicturesView.addEl.text('Add');
+  } else {
+    AddPicturesView.addEl.text('Add ' + numSelected);
+  }
 };
