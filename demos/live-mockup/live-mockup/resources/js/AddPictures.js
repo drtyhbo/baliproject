@@ -77,6 +77,10 @@ var AssetElement = Class.extend({
       this.assets.push(asset);
   },
   
+  getAssets: function() {
+    return this.assets;
+  },
+  
   getNumFrames: function() {
       return this.assets.length;
   },
@@ -263,6 +267,19 @@ var AssetRowElement = Class.extend({
      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
        assetElement.setSelected(isSelected)
      }
+   },
+   
+   /**
+    * Returns a list of selected asset elements.
+    */
+   getSelected: function() {
+     var selected = [];
+     for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+       if (assetElement.isSelected) {
+         selected = selected.concat(assetElement.getAssets());
+       }
+     }
+     return selected;
    },
 
    /**
@@ -608,6 +625,7 @@ var AddPictures = Class.extend({
     if (this.selectionChangedCallback) {
       this.selectionChangedCallback(this.numSelected);
     }
+    this.setSelectAllText(this.numSelected != this.assets.length);
   },
 
   /**
@@ -615,41 +633,18 @@ var AddPictures = Class.extend({
    * selected.
    */
   getSelected: function () {
-      var assets = [];
-      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-          if (!assetElement.isSelected || !assetElement.assets)
-              continue;
-          
-          for (var j = 0, asset; asset = assetElement.assets[j]; j++)
-              assets.push(asset);
-      }
-      return assets;
+    var selected = [];
+    for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
+      selected = selected.concat(assetRow.getSelected());
+    }
+    return selected;
   },
 
   /**
- * Returns true if all the pictures are selected.
- */
-  areAllSelected: function () {
-      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-          if (!assetElement.isSelected) {
-              return false;
-          }
-      }
-      return true;
-  },
-
-  /**
- * Sets the text on the Select all/Select none link. Sets text to:
- *   All are already selected: "Select none".
- *   Some are unselected: "Select all".
- */
-  setSelectAllText: function (areAllSelected) {
-      if (!this.selectAllEl) {
-          return;
-      }
-
-      this.selectAllEl.text(
-			areAllSelected ? 'Select none' : 'Select all');
+   * Sets the text on the Select all/Select none link.
+   */
+  setSelectAllText: function (isSelectAll) {
+    this.selectAllEl.text(isSelectAll ? 'Select all' : 'Select none');
   },
 
   /**
@@ -662,7 +657,7 @@ var AddPictures = Class.extend({
     for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
       assetRow.selectAll(shouldSelectAll);
     }
-    this.setSelectAllText(shouldSelectAll);
+    this.setSelectAllText(!shouldSelectAll);
     this.numSelected = shouldSelectAll ? this.assets.length : 0;
 
     if (this.selectionChangedCallback) {
