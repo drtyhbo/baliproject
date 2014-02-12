@@ -1,6 +1,6 @@
-var ADD_PICTURES_NUM_COLUMNS = 3;
-var ADD_PICTURES_SPACING = 5;
-var USE_VARIOUS_SPACING_UI = true;
+var NUM_COLUMNS = 3;
+var PICTURE_SPACING = 5;
+var USE_VARIOUS_SPACING_UI = false;
 
 var AssetElement = Class.extend({
     init: function (asset, isSelectable, onSelectionChanged) {
@@ -138,29 +138,55 @@ var AssetElement = Class.extend({
     getImageEl: function(url) {
         return $('<span></span>')
 	      .css({
-              background: 'black',
-	          backgroundSize: 'cover',
-	          display: 'inline-block',
-	          height: '100%',
-	          left: 0,
-	          position: 'absolute',
-	          top: 0,
-	          width: '100%'
+          backgroundImage: 'url(' + url + ')',
+          backgroundSize: 'cover',
+          display: 'inline-block',
+          height: '100%',
+          left: 0,
+          position: 'absolute',
+          top: 0,
+          width: '100%'
 	      });
-    },
-    
-    loadImages: function() {
-        if (this.imagesLoaded) {
-            return;
-        }
-        this.imageEl.css('background-image',
-                'url(' + this.assets[0].getSrc() + ')');
-        this.imagesLoaded = true;
     }
 });
 
-var AssetRow = Class.extend({
-    
+var AssetRowElement = Class.extend({
+   init: function(assets, pictureDimension) {
+     this.el = null;
+     this.assetElements = [];
+     for (var i = 0, asset; asset = assets[i]; i++) {
+       this.assetElements.push(new AssetElement(asset, false, null));
+     }
+     this.pictureDimension = pictureDimension;
+   },
+   
+   isCreated: function() {
+     return this.el != null;
+   },
+   
+   getEl: function() {
+     if (this.el) {
+       return this.el;
+     }
+
+     this.el = $('<div></div>')
+         .css('margin-bottom', PICTURE_SPACING + 'px');
+     for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+       var assetEl = $('<span></span>')
+           .css({
+               display: 'inline-block',
+               height: this.pictureDimension + 'px',
+               marginLeft: i % this.assetElements.length != 0 ?
+                           PICTURE_SPACING + 'px' :
+                           0,
+               position: 'relative',
+               width: this.pictureDimension + 'px'
+           })
+           .appendTo(this.el);
+       assetElement.getEl().appendTo(assetEl);
+     }
+     return this.el;
+   }
 });
 
 /**
@@ -174,30 +200,39 @@ var AddPictures = Class.extend({
      *   scroller - The scroller object that encompasses this set of pictures.
      */
     init: function(width, assets, scroller) {
-        this.width = width;
+      assets = assets.slice(0, 100);
+      this.el = null;
+      
+      // This block contains all the content which is above the viewport.
+      this.aboveViewportEl = null;
+      // This block contains all the content which is in the viewport.
+      this.viewportEl = null;
+      // This block contains all the content which is below the viewport.
+      this.belowViewportEl = null;
+      // Specifies which rows are currently in the viewport.
+      this.currentViewport = null;
 
-        this.assets = assets;
-        this.assetElements = [];
+      this.width = width;
 
-        this.isSelectable = false;
-        // The callback for when the selection changes.
-        this.selectionChangedCallback = null;
+      this.assets = assets;
+      this.assetRows = [];
 
-        this.selectAllEl = null;
-        
-        this.baseSpacing = ADD_PICTURES_SPACING;
-        this.numColumns = ADD_PICTURES_NUM_COLUMNS;
-        
-        // The dimension of an individual picture. This corresponds to the
-        // width and height since pictures are square.
-        this.pictureDimension = (this.width - (this.baseSpacing * 2) -
-				this.baseSpacing * (this.numColumns - 1)) /
-				this.numColumns;
-        // The height of an individual row is equal to the height of a picture
-        // plus the interrow spacing.
-        this.rowHeight = this.pictureDimension + this.baseSpacing;
-        
-        scroller.scroll(this.onScroll.bind(this));
+      this.isSelectable = false;
+      // The callback for when the selection changes.
+      this.selectionChangedCallback = null;
+
+      this.selectAllEl = null;
+      
+      // The dimension of an individual picture. This corresponds to the
+      // width and height since pictures are square.
+      this.pictureDimension = (this.width - (PICTURE_SPACING * 2) -
+          PICTURE_SPACING * (NUM_COLUMNS - 1)) /
+          NUM_COLUMNS;
+      // The height of an individual row is equal to the height of a picture
+      // plus the interrow spacing.
+      this.rowHeight = this.pictureDimension + PICTURE_SPACING;
+      
+      scroller.scroll(this.onScroll.bind(this));
     },
 
     /**
@@ -213,7 +248,6 @@ var AddPictures = Class.extend({
             this.onSelectionChangedCallback(this.getSelected().length);
         }
     },
-
     
     /**
      * Creates and returns the picture selector element. Only adds pictures that
@@ -221,12 +255,18 @@ var AddPictures = Class.extend({
      */
     getEl: function () {
         //top level div
-        this.el = $('<div></div>')
-                .css('padding', '0 ' + this.baseSpacing + 'px');
+        this.el = $('<div></div>');
+
+        this.aboveViewportEl = $('<div></div>')
+            .appendTo(this.el);
+        this.viewportEl = $('<div></div>')
+            .appendTo(this.el);
+        this.belowViewportEl = $('<div></div>')
+            .appendTo(this.el);
 
         this.selectAllContainerEl = $('<div></div>')
 				.css({
-                    display: 'none',
+            display: 'none',
 				    marginBottom: '10px',
 				    textAlign: 'right'
 				})
@@ -309,9 +349,9 @@ var AddPictures = Class.extend({
                     .css({
                         height:
                             bigImageIndex != -1 ?
-                                    this.pictureDimension * 2 + this.baseSpacing + 'px':
+                                    this.pictureDimension * 2 + PICTURE_SPACING + 'px':
                                     this.pictureDimension + 'px',
-                        marginBottom: isLastRow ? 0 : this.baseSpacing + 'px',
+                        marginBottom: isLastRow ? 0 : PICTURE_SPACING + 'px',
                         position: 'relative'
                     })
                     .appendTo(this.el);
@@ -319,14 +359,14 @@ var AddPictures = Class.extend({
             // Layout the row where one of the images is large.
             if (bigImageIndex != -1) {
                 var isLeftAligned = bigImageCount++ % 2 == 0;
-                var bigImageDimension = this.pictureDimension * 2 + this.baseSpacing;
+                var bigImageDimension = this.pictureDimension * 2 + PICTURE_SPACING;
 
                 // Layout the big mama jama first.
                 this.assetElements[bigImageIndex].getEl()
                     .css({
                         height: bigImageDimension + 'px',
                         left: isLeftAligned ?
-                                0 : this.pictureDimension + this.baseSpacing + 'px',
+                                0 : this.pictureDimension + PICTURE_SPACING + 'px',
                         position: 'absolute',
                         top: 0,
         		        width: bigImageDimension + 'px'
@@ -345,14 +385,14 @@ var AddPictures = Class.extend({
                         .css({
                             height: this.pictureDimension + 'px',
                             left: isLeftAligned ?
-                                    bigImageDimension + this.baseSpacing + 'px' :
+                                    bigImageDimension + PICTURE_SPACING + 'px' :
                                     0,
                             position: 'absolute',
                             top: top,
             		        width: this.pictureDimension + 'px'
             		    })
                         .appendTo(currentRow);
-                    top += this.pictureDimension + this.baseSpacing;  
+                    top += this.pictureDimension + PICTURE_SPACING;  
                 }
             // Layout the row where all the images are small.
             } else {
@@ -363,7 +403,7 @@ var AddPictures = Class.extend({
                     }
                     var thumbnailEl = assetElement.getEl()
                         .css({
-                            left: (i % this.numColumns) * (this.pictureDimension + this.baseSpacing) + 'px',
+                            left: (i % NUM_COLUMNS) * (this.pictureDimension + PICTURE_SPACING) + 'px',
                             height: this.pictureDimension + 'px',
                             position: 'absolute',
                             top: 0,
@@ -380,29 +420,20 @@ var AddPictures = Class.extend({
      * Render pictures in a regular grid
      */
     renderStandardUi: function() {
-        for (var i = 0, asset; asset = this.assets[i]; i++) {
-            var numRows = Math.ceil(this.assets.length / this.numColumns);
-            var isLastRow = i >= numRows * this.numColumns - this.numColumns;
+      // The DOM for the various asset rows will be created dynamically, so
+      // we need to set a fixed height now.
+      var numRows = Math.ceil(this.assets.length / NUM_COLUMNS);
+      this.el.css('height',
+          numRows * (this.pictureDimension + PICTURE_SPACING));
 
-            var thumbnailEl = $('<span></span>')
-		      .css({
-		          display: 'inline-block',
-		          height: this.pictureDimension + 'px',
-		          marginBottom: isLastRow ? 0 : this.baseSpacing,
-		          marginLeft: i % this.numColumns != 0 ?
-                          this.baseSpacing + 'px' :
-                          0,
-		          position: 'relative',
-		          width: this.pictureDimension + 'px'
-		      })
-		      .appendTo(this.el);
-
-            var assetElement = new AssetElement(asset, this.isSelectable,
-                        this.selectionChanged.bind(this));
-            this.assetElements.push(assetElement);
-            assetElement.getEl()
-                .appendTo(thumbnailEl);  
+      var numAssets = this.assets.length;
+      for (var i = 0; i < numAssets; i += 3) {
+        var assetsForRow = [];
+        for (var j = i; j < numAssets && j < i + 3; j++) {
+          assetsForRow.push(this.assets[j]);
         }
+        this.assetRows.push(new AssetRowElement(assetsForRow, this.pictureDimension));
+      }
     },
     
     /**
@@ -523,23 +554,23 @@ var AddPictures = Class.extend({
             // Update the remaining margins.
             for (var i = 0, picture; picture = this.pictures[i]; i++) {
                 picture.thumbnailEl.css('margin-left',
-                          i % this.numColumns != 0 ?
-                                  this.baseSpacing + 'px' : 0);
+                          i % NUM_COLUMNS != 0 ?
+                                  PICTURE_SPACING + 'px' : 0);
             }
 
             onRemoved();
         }).bind(this));
     },
 
-    determineVisibleAssetIndices:
-            function(elementTop, scrollPosition, parentHeight) {
-        var firstRow = elementTop - scrollPosition.y > 0 ?
-                0 : Math.ceil(Math.abs(elementTop - scrollPosition.y) / this.rowHeight);
-        var lastRow = Math.ceil((parentHeight - elementTop + scrollPosition.y) / this.rowHeight);
+    determineViewport: function(elementTop, scrollPosition, parentHeight) {
+        var firstRow = Math.max(elementTop - scrollPosition.y > 0 ?
+                0 : Math.floor(Math.abs(elementTop - scrollPosition.y) / this.rowHeight) - 1, 0);
+        var lastRow = Math.ceil(
+            (parentHeight - elementTop + scrollPosition.y) / this.rowHeight) + 1;
 
         return {
-            first: firstRow * this.numColumns,
-            last: lastRow * this.numColumns
+            first: firstRow,
+            last: lastRow
         };
     },
 
@@ -547,13 +578,34 @@ var AddPictures = Class.extend({
      * Called when the user scrolls the view.
      */
     onScroll: function(scroller, scrollPosition, parentHeight) {
-        var scrollerEl = scroller.getEl();
-        var elementTop = this.el.offset().top - scrollerEl.offset().top;
-        var assetIndices = this.determineVisibleAssetIndices(elementTop,
-                scrollPosition, parentHeight);
-        for (var i = assetIndices.first; i < assetIndices.last; i++) {
-            this.assetElements[i].loadImages();
+      // Determine which asset rows are in the viewport.
+      var scrollerEl = scroller.getEl();
+      var elementTop = this.el.offset().top - scrollerEl.offset().top;
+      var viewport = this.determineViewport(elementTop,
+              scrollPosition, parentHeight);
+
+      // The viewport has changed, update the viewport elements. 
+      if (this.currentViewport &&
+          (viewport.first != this.currentViewport.first ||
+          viewport.last != this.currentViewport.last)) {
+        for (var i = this.currentViewport.first; i < this.currentViewport.last;
+            i++) {
+          this.assetRows[i].getEl().detach();
         }
+      }
+
+      this.aboveViewportEl.css('height', viewport.first * this.rowHeight + 'px');
+      this.belowViewportEl.css('height',
+          (this.assetRows.length - viewport.last) * this.rowHeight + 'px');
+
+      for (var i = viewport.first; i < viewport.last; i++) {
+        var assetRowEl = this.assetRows[i].getEl();
+        if (!assetRowEl.parent().length) {
+          assetRowEl.appendTo(this.viewportEl);
+        }
+      }
+      
+      this.currentViewport = viewport;
     },
 
     /**
