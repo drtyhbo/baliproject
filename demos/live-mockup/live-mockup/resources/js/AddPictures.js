@@ -218,7 +218,6 @@ var AssetRowElement = Class.extend({
      
      clearTimeout(this.loadImagesTimerId);
      this.loadImagesTimerId = 0;
-     this.el.detach();
    },
    
    loadImages: function() {
@@ -607,14 +606,22 @@ var AddPictures = Class.extend({
     },
 
     determineViewport: function(scrollPosition, parentHeight) {
-      // Determine which asset rows are in the viewport.
-      var scrollerEl = this.scroller.getEl();
-      var elementTop = this.el.offset().top - scrollerEl.offset().top;
+      // The picture selector might not be flush with the top of the scrollable content,
+      // so calculate the scroll top as if the picture selector were at the top.
+      var relativeScrollTop = scrollPosition.y -
+          (this.el.offset().top - this.scroller.getEl().offset().top);
 
-      var firstRowIndex = Math.max(elementTop - scrollPosition.y > 0 ?
-              0 : Math.floor(Math.abs(elementTop - scrollPosition.y) / this.rowHeight) - 1, 0);
-      var lastRowIndex = Math.ceil(
-          (parentHeight - elementTop + scrollPosition.y) / this.rowHeight) + 1;
+      // A negative relativeScrollTop means the picture selector is further down on the
+      // page, perhaps all the way off the screen.
+      if (relativeScrollTop < 0 && relativeScrollTop < -parentHeight) {
+        // Not visible.
+        return null;
+      } else if (relativeScrollTop < 0) {
+        var firstRowIndex = 0;
+      } else {
+        var firstRowIndex = Math.floor(relativeScrollTop / this.rowHeight);
+      }
+      var lastRowIndex = Math.ceil((relativeScrollTop + parentHeight) / this.rowHeight);
 
       return {
         firstRowIndex: firstRowIndex,
@@ -626,10 +633,10 @@ var AddPictures = Class.extend({
      * Determines which rows are now hidden and removes them from the DOM.
      */
     clearHiddenRows: function(viewport) {
-      // Hide rows that are not currently visible to simplify the DOM.
       for (var i = this.currentViewport.firstRowIndex;
           i < this.currentViewport.lastRowIndex; i++) {
-        if (i < viewport.firstRowIndex || i > viewport.lastRowIndex) {
+        if (i < viewport.firstRowIndex || i >= viewport.lastRowIndex) {
+          this.assetRows[i].getEl().detach();
           this.assetRows[i].hide();
         }
       }
@@ -639,34 +646,58 @@ var AddPictures = Class.extend({
      * Called when the user scrolls the view.
      */
     onScroll: function(scroller, scrollPosition, parentHeight) {
+      // This optimization works by only showing those rows in the DOM that are
+      // currently within the viewport. There are three divs in the following DOM
+      // order:
+      //
+      // - aboveViewportEl
+      // - viewportEl
+      // - belowViewportEl
+      //
+      // The viewportEl element is the only one that contains content. The other two
+      // elements are used to pad the height of the content div to keep the scroll
+      // height the same.
+      //
+      // Each time the page moves, we calculate the current viewport, show/hide rows
+      // as necessary, and update the height of the various viewport sections.
       var viewport = this.determineViewport(scrollPosition, parentHeight);
 
-      // The viewport has changed, update the viewport elements.
       if (this.currentViewport) {
         this.clearHiddenRows(viewport);
       }
 
       this.aboveViewportEl.css('height',
           viewport.firstRowIndex * this.rowHeight + 'px');
+      this.viewportEl.css('height',
+          (viewport.lastRowIndex - viewport.firstRowIndex) * this.rowHeight + 'px');
       this.belowViewportEl.css('height',
           (this.assetRows.length - viewport.lastRowIndex) * this.rowHeight + 'px');
 
-      var insertAfter = null;
-      for (var i = viewport.firstRowIndex; i < viewport.lastRowIndex; i++) {
-        var assetRowEl = this.assetRows[i].getEl();
-        if (!this.assetRows[i].shown) {
-//        if (!assetRowEl.parent().length) {
-          if (!insertAfter) {
-            this.viewportEl.prepend(assetRowEl);
-          } else {
-            assetRowEl.insertAfter(insertAfter);
+      if (!this.currentViewport ||
+          viewport.firstRowIndex != this.currentViewport.firstRowIndex ||
+          viewport.lastRowIndex != this.currentViewport.lastRowIndex) {
+        // The clearHiddenRows call above may have trimmed some of the rows, but not
+        // all of them. Therefore, we may need to insert some rows at the beginning of
+        // the viewport, and some rows at the end.
+        var insertAfter = null;
+        for (var i = viewport.firstRowIndex; i < viewport.lastRowIndex; i++) {
+          var assetRowEl = this.assetRows[i].getEl();
+          // A row that already has a parent is already in the DOM so we can safely
+          // skip it.
+          if (!assetRowEl.parent().length) {
+            // First row wont have a previous sibling, so place at the front.
+            if (!insertAfter) {
+              this.viewportEl.prepend(assetRowEl);
+            } else {
+              assetRowEl.insertAfter(insertAfter);
+            }
+            this.assetRows[i].show();
           }
-          this.assetRows[i].show();
+          insertAfter = assetRowEl;
         }
-        insertAfter = assetRowEl;
-      }
       
-      this.currentViewport = viewport;
+        this.currentViewport = viewport;
+      }
     },
 
     /**

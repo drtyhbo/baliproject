@@ -156,10 +156,10 @@ var Scroller = Class.extend({
       this.scrollPosition.y = contentHeight - parentHeight;
     }
 
-    this.el.css('transform', 'translate3d(0, ' + -this.scrollPosition.y + 'px, 0)');
-
     for (var i = 0, callback; callback = this.callbacks[i]; i++) {
       callback(this, this.scrollPosition, parentHeight);
     }
+
+    this.el.css('transform', 'translate3d(0, ' + -this.scrollPosition.y + 'px, 0)');
   }
 });
