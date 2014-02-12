@@ -38,9 +38,10 @@ RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
         
   var scroller = new Scroller($('#scrollable'));
 
-  var addPictures = new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(),
-      scroller);
-  addPictures.setSelectable(true, RegistrationAddPicturesPage.onSelectionChanged);
+  var addPictures =
+      new AddPictures(ui.toPage.width(), CameraRoll.getCameraRoll(), scroller);
+  addPictures.setSelectable(true, true,
+      RegistrationAddPicturesPage.onSelectionChanged);
   addPictures.getEl()
 			.appendTo(ui.toPage.find('#pictures'));
 	RegistrationAddPicturesPage.addPictures = addPictures;

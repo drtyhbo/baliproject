@@ -158,30 +158,38 @@ var AssetElement = Class.extend({
     // Only trigger the selection when the user has barely moved her finger.
     if (Math.abs(this.touchEndY - this.touchStartY) < 5 &&
         this.assetRow.isSelectable()) {
-      this.toggleSelectedStatus();
-      this.assetRow.onSelectionChanged()
+      this.toggleSelected();
+      this.assetRow.onSelectionChanged(this.isSelected)
     }
   },
 
   /**
-   * Toggles the section status of this element.
+   * Sets whether this element is selected, including updating the DOM if
+   * necessary.
    */
-  toggleSelectedStatus: function () {
-    this.isSelected = !this.isSelected;
-    
+  setSelected: function (isSelected) {
+    this.isSelected = isSelected;
+
     // Nothing to do when the DOM doesn't exist.
     if (!this.el) {
       return;
     }
-    
-    if (this.isSelected) {
+
+    if (isSelected) {
       this.createSelectionEl();
     }
 
     if (this.fadedEl) {
-      this.fadedEl[this.isSelected ? 'show' : 'hide']();
-      this.checkedEl[this.isSelected ? 'show' : 'hide']();
+      this.fadedEl[isSelected ? 'show' : 'hide']();
+      this.checkedEl[isSelected ? 'show' : 'hide']();
     }
+  },
+
+  /**
+   * Toggles whether this element is selected.
+   */
+  toggleSelected: function () {
+    this.setSelected(!this.isSelected);
   },
   
   loadImages: function() {
@@ -239,6 +247,23 @@ var AssetRowElement = Class.extend({
    isSelectable: function() {
      return this.addPictures.isSelectable;
    },
+   
+   /**
+    * Called when an asset element changes it's selection state.
+    */
+   onSelectionChanged: function(isSelected) {
+     this.addPictures.onSelectionChanged(isSelected);
+   },
+   
+   /**
+    * Selects all the asset elements if isSelected is true. Unselects all
+    * elements otherwise.
+    */
+   selectAll: function(isSelected) {
+     for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+       assetElement.setSelected(isSelected)
+     }
+   },
 
    /**
     * Should be called when the asset row is shown. Loads images.
@@ -249,7 +274,8 @@ var AssetRowElement = Class.extend({
      if (this.imagesLoaded || this.loadImagesTimerId) {
        return;
      }
-     this.loadImagesTimerId = setTimeout(this.loadImages.bind(this), 500);
+     this.loadImagesTimerId =
+         setTimeout(this.loadImages.bind(this), Math.random() * 250 + 250);
    },
    
    /**
@@ -304,9 +330,14 @@ var AddPictures = Class.extend({
     this.assets = assets;
     this.assetRows = [];
 
+    // If true, the asset elements become selectable.
     this.isSelectable = false;
+    // If true, shows the Select all/select none toggle.
+    this.showSelectAll = false;
     // The callback for when the selection changes.
     this.selectionChangedCallback = null;
+    // The number of asset elements that are selected.
+    this.numSelected = 0;
 
     this.selectAllEl = null;
     
@@ -345,28 +376,28 @@ var AddPictures = Class.extend({
       //top level div
       this.el = $('<div></div>');
 
+      this.selectAllContainerEl = $('<div></div>')
+    			.css({
+              display: this.showSelectAll ? 'block' : 'none',
+    			    marginBottom: '10px',
+    			    textAlign: 'right'
+    			})
+    			.appendTo(this.el);
+      this.selectAllEl = $('<span></span>')
+    			.css({
+    			    color: 'blue',
+    			    cursor: 'pointer'
+    			})
+    			.text('Select all')
+    			.on(TOUCHEND, this.toggleSelectAll.bind(this))
+    			.appendTo(this.selectAllContainerEl);
+
       this.aboveViewportEl = $('<div></div>')
           .appendTo(this.el);
       this.viewportEl = $('<div></div>')
           .appendTo(this.el);
       this.belowViewportEl = $('<div></div>')
           .appendTo(this.el);
-
-      this.selectAllContainerEl = $('<div></div>')
-			.css({
-          display: 'none',
-			    marginBottom: '10px',
-			    textAlign: 'right'
-			})
-			.appendTo(this.el);
-      this.selectAllEl = $('<span></span>')
-			.css({
-			    color: 'blue',
-			    cursor: 'pointer'
-			})
-			.text('Select all')
-			.on(TOUCHEND, this.toggleSelectAll.bind(this))
-			.appendTo(this.selectAllContainerEl);
       
       //render pics
       if (USE_VARIOUS_SPACING_UI) {
@@ -520,7 +551,8 @@ var AddPictures = Class.extend({
       for (var j = i; j < numAssets && j < i + 3; j++) {
         assetsForRow.push(this.assets[j]);
       }
-      this.assetRows.push(new AssetRowElement(this, assetsForRow, this.pictureDimension));
+      this.assetRows.push(
+          new AssetRowElement(this, assetsForRow, this.pictureDimension));
     }
   },
   
@@ -556,10 +588,27 @@ var AddPictures = Class.extend({
   /**
    * Enables/disables selection.
    */
-  setSelectable: function (isSelectable, selectionChangedCallback) {
+  setSelectable: function (isSelectable, showSelectAll, selectionChangedCallback) {
     this.isSelectable = isSelectable;
+
+    this.showSelectAll = showSelectAll;
+    if (this.selectAllContainerEl) {
+      this.selectAllContainerEl.css('display',
+          showSelectAll ? 'block' : 'none');
+    }
+
     this.selectionChangedCallback = selectionChangedCallback;
   }, 
+
+  /**
+   * Called when the user taps one of the asset elements.
+   */  
+  onSelectionChanged: function(isSelected) {
+    this.numSelected += isSelected ? 1 : -1;
+    if (this.selectionChangedCallback) {
+      this.selectionChangedCallback(this.numSelected);
+    }
+  },
 
   /**
    * Returns an array containing all the pictures that are currently
@@ -604,29 +653,21 @@ var AddPictures = Class.extend({
   },
 
   /**
- * Toggles the selected status of the images. When:
- *   All are already selected: Unselects all of them.
- *   Some are unselected: Selects all of them.
- */
+   * Toggles the selected status of the images. When:
+   *   All are already selected: Unselects all of them.
+   *   Some are unselected: Selects all of them.
+   */
   toggleSelectAll: function (e) {
-      if (this.areAllSelected()) {
-          for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-              assetElements.toggleSelectedStatus();
-          }
-          this.setSelectAllText(false);
-      } 
-      else {
-          for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-              if (!assetElement.isSelected) {
-                  this.toggleSelectedStatus(assetElement);
-              }
-          }
-          this.setSelectAllText(true);
-      }
+    var shouldSelectAll = this.numSelected != this.assets.length;
+    for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
+      assetRow.selectAll(shouldSelectAll);
+    }
+    this.setSelectAllText(shouldSelectAll);
+    this.numSelected = shouldSelectAll ? this.assets.length : 0;
 
-      if (this.onSelectionChanged) {
-          this.onSelectionChanged(this.numSelected);
-      }
+    if (this.selectionChangedCallback) {
+      this.selectionChangedCallback(this.numSelected);
+    }
   },
 
   /**
@@ -675,9 +716,12 @@ var AddPictures = Class.extend({
    */
   determineViewport: function(scrollPosition, parentHeight) {
     // The picture selector might not be flush with the top of the scrollable content,
-    // so calculate the scroll top as if the picture selector were at the top.
+    // so calculate the scroll top as if the picture selector were at the top. We
+    // use the aboveViewportEl as the top because the Select all toggle might be
+    // visible.
     var relativeScrollTop = scrollPosition.y -
-        (this.el.offset().top - this.scroller.getEl().offset().top);
+        (this.aboveViewportEl.offset().top -
+            this.scroller.getEl().offset().top);
 
     // A negative relativeScrollTop means the picture selector is further down on the
     // page, perhaps all the way off the screen.
