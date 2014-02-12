@@ -643,23 +643,25 @@ var AddPictures = Class.extend({
     },
 
     /**
-     * Called when the user scrolls the view.
+     * This optimization works by only showing those rows in the DOM that are
+     * currently within the viewport. There are three divs in the following DOM
+     * order:
+     *
+     * - aboveViewportEl
+     * - viewportEl
+     * - belowViewportEl
+     *
+     * The viewportEl element is the only one that contains content. The other two
+     * elements are used to pad the height of the content div to keep the scroll
+     * height the same.
+     *
+     * Each time the page moves, we calculate the current viewport, show/hide rows
+     * as necessary, and update the height of the various viewport sections.
+     *
+     * In addition, this allows us to only create DOM elements and load images as they
+     * come into view, thereby speeding up the initial rendering immensely.
      */
     onScroll: function(scroller, scrollPosition, parentHeight) {
-      // This optimization works by only showing those rows in the DOM that are
-      // currently within the viewport. There are three divs in the following DOM
-      // order:
-      //
-      // - aboveViewportEl
-      // - viewportEl
-      // - belowViewportEl
-      //
-      // The viewportEl element is the only one that contains content. The other two
-      // elements are used to pad the height of the content div to keep the scroll
-      // height the same.
-      //
-      // Each time the page moves, we calculate the current viewport, show/hide rows
-      // as necessary, and update the height of the various viewport sections.
       var viewport = this.determineViewport(scrollPosition, parentHeight);
 
       if (this.currentViewport) {
