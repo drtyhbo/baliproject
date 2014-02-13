@@ -384,20 +384,6 @@ var AddPictures = Class.extend({
   },
 
   /**
-   * Called when a picture selection changed to set the text on the 'select all' link
-   * and also calls onSelectionChangedCallback
-   */
-  selectionChanged: function () {
-      //set select all text
-      this.setSelectAllText(me.areAllSelected());
-      
-      //callback
-      if (this.isSelectable && this.onSelectionChangedCallback) {
-          this.onSelectionChangedCallback(this.getSelected().length);
-      }
-  },
-  
-  /**
    * Creates and returns the picture selector element. Only adds pictures that
    * are not currently added to the personal library.
    */
@@ -587,22 +573,6 @@ var AddPictures = Class.extend({
     }
   },
   
-  /**
-   * Enable/disable the ability to select assets.
-   * isSelectable - True to enable, false to disable.
-   * selectionChangedCallback - This gets called when the set of selected
-   *    items changes.
-   * enableSelectAll - True to enable the Select all/Select none link.
-   */
-  enableSelection: function(isSelectable, selectionChangedCallback,
-          enableSelectAll) {
-      this.isSelectable = isSelectable;
-      this.selectionChangedCallback = selectionChangedCallback;
-      if (this.isSelectable && enableSelectAll) {
-          this.selectAllContainerEl.css('display', 'block');
-      }
-  },
-
   /**
    * Returns the number of pictures being displayed.
    */
