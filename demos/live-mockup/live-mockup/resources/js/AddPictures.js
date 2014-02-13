@@ -17,6 +17,9 @@ var AssetElement = Class.extend({
     this.fadedEl = null;
     this.checkedEl = null;
     this.offset = null;
+    
+    // The current opacity of this element.
+    this.opacity = 1;
 
     // True when this element is selected.
     this.isSelected = false;
@@ -30,7 +33,8 @@ var AssetElement = Class.extend({
   },
   
   getEl: function () {
-    this.el = $('<span></span>');
+    this.el = $('<span></span>')
+        .css('opacity', this.opacity);
 
     this.imageEl = this.getImageEl()
           .appendTo(this.el);
@@ -100,6 +104,14 @@ var AssetElement = Class.extend({
               .css('opacity', 0)
               .appendTo(this.el);            
       }.bind(this))
+  },
+  
+  setOpacity: function(opacity) {
+    if (this.el) {
+      this.el.css('opacity', opacity);
+    } else {
+      this.opacity = opacity;
+    }
   },
   
   /**************************
@@ -276,7 +288,7 @@ var AssetRowElement = Class.extend({
      var selected = [];
      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
        if (assetElement.isSelected) {
-         selected = selected.concat(assetElement.getAssets());
+         selected = selected.concat(assetElement);
        }
      }
      return selected;
@@ -635,11 +647,27 @@ var AddPictures = Class.extend({
    * selected.
    */
   getSelected: function () {
+    var selectedAssetElements = this.getSelectedAssetElements();
+
     var selected = [];
-    for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
-      selected = selected.concat(assetRow.getSelected());
+    for (var i = 0, assetElement; assetElement = selectedAssetElements[i];
+        i++) {
+      selected = selected.concat(assetElement.getAssets());
     }
     return selected;
+  },
+
+  /**
+   * Returns an array containing all the AssetElements that are currently
+   * selected.
+   */
+  getSelectedAssetElements: function () {
+    var selectedAssetElements = [];
+    for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
+      selectedAssetElements =
+          selectedAssetElements.concat(assetRow.getSelected());
+    }
+    return selectedAssetElements;
   },
 
   /**
@@ -670,36 +698,26 @@ var AddPictures = Class.extend({
   /**
  * Removes all the selected pictures.
  */
-  removeSelected: function (onRemoved) {
-      var selectedPicturesEl = this.el.find('.selected');
-      var alreadyRemoved = false;
-      selectedPicturesEl.animate({
-          opacity: 0
-      }, 500, 'swing', (function () {
-          // This gets called for each picture. Only need to remove the pictures
-          // once.
-          if (alreadyRemoved) {
-              return;
-          }
-          alreadyRemoved = true;
+  removeSelected: function(onRemoved) {
+    var selectedAssetElements = this.getSelectedAssetElements();
 
-          selectedPicturesEl.remove();
-          // Remove the selected pictures from the list of pictures.
-          for (var i = this.pictures.length - 1; i >= 0; i--) {
-              if (this.pictures[i].isSelected) {
-                  this.pictures.splice(i, 1);
-              }
-          }
-
-          // Update the remaining margins.
-          for (var i = 0, picture; picture = this.pictures[i]; i++) {
-              picture.thumbnailEl.css('margin-left',
-                        i % NUM_COLUMNS != 0 ?
-                                PICTURE_SPACING + 'px' : 0);
-          }
-
-          onRemoved();
-      }).bind(this));
+    // Create a temporare element to use for animations. We just want access to the
+    // step function.
+    var elementToAnimate = $('<span></span>');
+    elementToAnimate.animate({      
+      opacity: 0
+    }, {
+      duration: 500,
+      easing: 'swing',
+      step: function(now) {
+        for (var i = 0, assetElement; assetElement = selectedAssetElements[i];
+            i++) {
+          assetElement.setOpacity(now);
+        }
+      },
+      complete: function () {
+      }
+    });
   },
 
   /**************************
