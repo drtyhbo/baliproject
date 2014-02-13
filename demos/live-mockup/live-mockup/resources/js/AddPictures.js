@@ -1,13 +1,19 @@
 var NUM_COLUMNS = 3;
 var PICTURE_SPACING = 5;
 var USE_VARIOUS_SPACING_UI = false;
+// Assets with timestamps smaller than this will be combined into a single
+// asset element when using fancy pants rendering.
+var FANCY_PANTS_TIME_DELTA_SEC = 15;
 
 var AssetElement = Class.extend({
-  init: function (asset, assetRow) {
+  init: function (asset, baseDimension) {
     this.assets = [];
-
-    this.assetRow = assetRow;
     this.addAsset(asset);
+    
+    // AssetElements are square, so baseDimension specifies both the base width
+    // and height of this asset. AssetElements may be rendered as some multiple
+    // of baseDimension depending on how special they are.
+    this.baseDimension = baseDimension;
     
     this.nextAsset = 1;
 
@@ -34,7 +40,14 @@ var AssetElement = Class.extend({
   
   getEl: function () {
     this.el = $('<span></span>')
-        .css('opacity', this.opacity);
+        .css({
+            display: 'inline-block',
+            height: this.baseDimension + 'px',
+            marginLeft: PICTURE_SPACING + 'px',
+            opacity: this.opacity,
+            position: 'relative',
+            width: this.baseDimension + 'px'
+        });
 
     this.imageEl = this.getImageEl()
           .appendTo(this.el);
@@ -217,15 +230,10 @@ var AssetElement = Class.extend({
  * Encapulates the logic to handle a row of asset elements.
  */
 var AssetRowElement = Class.extend({
-   init: function(addPictures, assets, pictureDimension) {
-     this.addPictures = addPictures;
-     this.pictureDimension = pictureDimension;
-
+   init: function(addPictures, assetElements) {
      this.el = null;
-     this.assetElements = [];
-     for (var i = 0, asset; asset = assets[i]; i++) {
-       this.assetElements.push(new AssetElement(asset, this));
-     }
+     this.addPictures = addPictures;
+     this.assetElements = assetElements;
      
      // A boolean specifying whether the images have already been loaded for this
      // row.
@@ -242,17 +250,7 @@ var AssetRowElement = Class.extend({
      this.el = $('<div></div>')
          .css('margin-bottom', PICTURE_SPACING + 'px');
      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-       assetElement.getEl()
-         .css({
-             display: 'inline-block',
-             height: this.pictureDimension + 'px',
-             marginLeft: i % this.assetElements.length != 0 ?
-                         PICTURE_SPACING + 'px' :
-                         0,
-             position: 'relative',
-             width: this.pictureDimension + 'px'
-         })
-         .appendTo(this.el);
+       assetElement.getEl().appendTo(this.el);
      }
      return this.el;
    },
@@ -338,8 +336,10 @@ var AddPictures = Class.extend({
    *   width - The width of the parent element.
    *   assets - The list of assets to render.
    *   scroller - The scroller object that encompasses this set of pictures.
+   *   useFancyPants - If true, combines assets into fancy pants animated elements,
+   *       and uses fancy pants, different size, rendering.
    */
-  init: function(width, assets, scroller) {
+  init: function(width, assets, scroller, useFancyPants) {
     // The main element for the picture selector.
     this.el = null;
     // This block contains all the content which is above the viewport.
@@ -355,9 +355,6 @@ var AddPictures = Class.extend({
     this.currentViewport = null;
 
     this.width = width;
-
-    this.assets = assets;
-    this.assetRows = [];
 
     // If true, the asset elements become selectable.
     this.isSelectable = false;
@@ -378,6 +375,11 @@ var AddPictures = Class.extend({
     // The height of an individual row is equal to the height of a picture
     // plus the interrow spacing.
     this.rowHeight = this.pictureDimension + PICTURE_SPACING;
+
+    // assetElementsFromAssets depends on this.pictureDimension so this call
+    // must go here.
+    this.assetElements = this.assetElementsFromAssets(assets, useFancyPants);
+    this.assetRows = [];
     
     this.scroller = scroller;
     this.scroller.scroll(this.updateVisibleElements.bind(this));
@@ -427,32 +429,33 @@ var AddPictures = Class.extend({
   },
 
   /**
+   * Returns a list of AssetElements from a list of Assets. May combine many
+   * Assets into a single AssetElement if useFancyPants is set to true.
+   */
+  assetElementsFromAssets: function(assets, useFancyPants) {
+    var lastAsset = null;
+
+    var assetElements = [];
+    for (var i = 0, asset; asset = assets[i]; i++) {
+      // Combine assets that are within 
+      if (useFancyPants && lastAsset &&
+          asset.timestamp - lastAsset.timestamp < FANCY_PANTS_TIME_DELTA_SEC) {
+        assetElements[assetElements.length - 1].addAsset(asset);
+      } else {
+        assetElements.push(new AssetElement(asset, this.pictureDimension));
+      }
+      lastAsset = asset;
+    }
+    
+    return assetElements;
+  },
+
+  /**
    * Render pictures in an animated view
    */
   renderVariousSpacingUi: function() {
       this.animatedAssetElements = [];
 
-      var lastAsset = null;
-
-      //parse assets into assetelements with assets that are within 15
-      //of each other belonging to the same assetelement
-      for (var i = 0, asset; asset = this.assets[i]; i++) {
-          if (lastAsset && asset.timestamp - lastAsset.timestamp < 15) {
-              this.assetElements[this.assetElements.length - 1].addAsset(asset);
-          } else {
-              // Keep track of all the animated elements so we can step
-              // through them later.
-              if (this.assetElements.length > 0 &&
-                      this.assetElements[this.assetElements.length - 1].getNumFrames() > 1) {
-                  this.animatedAssetElements.push(
-                          this.assetElements[this.assetElements.length - 1]);
-              }
-              this.assetElements.push(
-                      new AssetElement(asset, this.isSelectable,
-                              this.selectionChanged.bind(this)));
-          }
-          lastAsset = asset;
-      }
 
       var bigImageCount = 0;
       var numRows = Math.ceil(this.assetElements.length / 3);
@@ -558,18 +561,18 @@ var AddPictures = Class.extend({
   renderStandardUi: function() {
     // The DOM for the various asset rows will be created dynamically, so
     // we need to set a fixed height now.
-    var numRows = Math.ceil(this.assets.length / NUM_COLUMNS);
+    var numRows = Math.ceil(this.assetElements.length / NUM_COLUMNS);
     this.el.css('height',
         numRows * (this.pictureDimension + PICTURE_SPACING));
 
-    var numAssets = this.assets.length;
-    for (var i = 0; i < numAssets; i += 3) {
-      var assetsForRow = [];
-      for (var j = i; j < numAssets && j < i + 3; j++) {
-        assetsForRow.push(this.assets[j]);
+    var numElements = this.assetElements.length;
+    for (var i = 0; i < numElements; i += 3) {
+      var assetElementsForRow = [];
+      for (var j = i; j < numElements && j < i + 3; j++) {
+        assetElementsForRow.push(this.assetElements[j]);
       }
       this.assetRows.push(
-          new AssetRowElement(this, assetsForRow, this.pictureDimension));
+          new AssetRowElement(this, assetElementsForRow));
     }
   },
   
@@ -653,12 +656,12 @@ var AddPictures = Class.extend({
    *   Some are unselected: Selects all of them.
    */
   toggleSelectAll: function (e) {
-    var shouldSelectAll = this.numSelected != this.assets.length;
+    var shouldSelectAll = this.numSelected != this.assetElements.length;
     for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
       assetRow.selectAll(shouldSelectAll);
     }
     this.setSelectAllText(!shouldSelectAll);
-    this.numSelected = shouldSelectAll ? this.assets.length : 0;
+    this.numSelected = shouldSelectAll ? this.assetElements.length : 0;
 
     if (this.selectionChangedCallback) {
       this.selectionChangedCallback(this.numSelected);
