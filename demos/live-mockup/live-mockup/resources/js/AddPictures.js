@@ -6,7 +6,12 @@ var USE_VARIOUS_SPACING_UI = false;
 var FANCY_PANTS_TIME_DELTA_SEC = 15;
 
 var AssetElement = Class.extend({
-  init: function (asset, baseDimension) {
+  init: function (addPictures, asset, baseDimension) {
+    // We need access to the AddPicture object to check if selections
+    // are enabled, and to fire the onSelectionChanged callback when the 
+    // selections change.
+    this.addPictures = addPictures;
+
     this.assets = [];
     this.addAsset(asset);
     
@@ -186,9 +191,9 @@ var AssetElement = Class.extend({
   touchEnd: function (picture) {
     // Only trigger the selection when the user has barely moved her finger.
     if (Math.abs(this.touchEndY - this.touchStartY) < 5 &&
-        this.assetRow.isSelectable()) {
+        this.addPictures.isSelectable) {
       this.toggleSelected();
-      this.assetRow.onSelectionChanged(this.isSelected)
+      this.addPictures.onSelectionChanged(this.isSelected)
     }
   },
 
@@ -255,20 +260,6 @@ var AssetRowElement = Class.extend({
      return this.el;
    },
 
-   /**
-    * Returns true if this asset row is selectable.
-    */
-   isSelectable: function() {
-     return this.addPictures.isSelectable;
-   },
-   
-   /**
-    * Called when an asset element changes it's selection state.
-    */
-   onSelectionChanged: function(isSelected) {
-     this.addPictures.onSelectionChanged(isSelected);
-   },
-   
    /**
     * Selects all the asset elements if isSelected is true. Unselects all
     * elements otherwise.
@@ -397,6 +388,7 @@ var AddPictures = Class.extend({
     			.css({
               display: this.showSelectAll ? 'block' : 'none',
     			    marginBottom: '10px',
+              marginRight: PICTURE_SPACING + 'px',
     			    textAlign: 'right'
     			})
     			.appendTo(this.el);
@@ -442,7 +434,8 @@ var AddPictures = Class.extend({
           asset.timestamp - lastAsset.timestamp < FANCY_PANTS_TIME_DELTA_SEC) {
         assetElements[assetElements.length - 1].addAsset(asset);
       } else {
-        assetElements.push(new AssetElement(asset, this.pictureDimension));
+        assetElements.push(
+            new AssetElement(this, asset, this.pictureDimension));
       }
       lastAsset = asset;
     }
@@ -612,7 +605,7 @@ var AddPictures = Class.extend({
     if (this.selectionChangedCallback) {
       this.selectionChangedCallback(this.numSelected);
     }
-    this.setSelectAllText(this.numSelected != this.assets.length);
+    this.setSelectAllText(this.numSelected != this.assetElements.length);
   },
 
   /**
