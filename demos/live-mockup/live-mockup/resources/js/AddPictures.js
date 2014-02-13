@@ -1,5 +1,5 @@
 var NUM_COLUMNS = 3;
-var PICTURE_SPACING = 5;
+var PICTURE_SPACING = 2;
 var USE_VARIOUS_SPACING_UI = false;
 // Assets with timestamps smaller than this will be combined into a single
 // asset element when using fancy pants rendering.
