@@ -35,25 +35,25 @@ Users.init = function (callback) {
     // once everything is coming from the server.
     Users.userDB.push(
         new User({
-            id: Users.currentId++,
+            id: 1,
             name: 'Amine Zejli',
             thumbnailSrc: Images.getPath('users/') + 'amine.jpg'
         }));
     Users.userDB.push(
         new User({
-            id: Users.currentId++,
-            name: 'Marcello Chermak',
-            thumbnailSrc: Images.getPath('users/') + 'marcello.jpg'
-        }));
-    Users.userDB.push(
-        new User({
-            id: Users.currentId++,
+            id: 2,
             name: 'Veronica Marian',
             thumbnailSrc: Images.getPath('users/') + 'veronica.jpg'
         }));
     Users.userDB.push(
         new User({
-            id: Users.currentId++,
+            id: 3,
+            name: 'Marcello Chermak',
+            thumbnailSrc: Images.getPath('users/') + 'marcello.jpg'
+        }));
+    Users.userDB.push(
+        new User({
+            id: 4,
             name: 'Andreas Binnewies',
             thumbnailSrc: Images.getPath('users/') + 'andreas.jpg'
         }));
@@ -302,6 +302,37 @@ Shares.getIds = function (shares) {
         return share.id;
     });
 }
+
+
+Shares.ajaxCreateShare = function (assetIds, friendIds, callback) {
+    Util.makeRequest('api/share/add/', {
+        sharedBy: Util.GET['uid'],
+        sharedWith: friendIds,
+        sharedAssets: assetIds
+    }, function (data) {
+        callback(data ? data.id : false);
+    });
+};
+
+
+Shares.ajaxGetAll = function (assetIds, friendIds, callback) {
+    Util.makeRequest('api/share/get/all/', {
+        uid: Util.GET['uid']
+    }, Shares.ajaxGetAllShareCallback.bind(this, callback));
+};
+
+/**
+ * This callback function handles the return data from a picture related ajax
+ * call.
+ */
+Shares.ajaxGetAllShareCallback = function (callback, data) {
+    if (data) {
+        //TODO: check success?
+    }
+    if (callback) {
+        callback();
+    }
+};
 
 
 

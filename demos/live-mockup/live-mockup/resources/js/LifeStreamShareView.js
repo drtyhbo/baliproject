@@ -1,7 +1,9 @@
 var LifeStreamShareItem = Class.extend({
-    init: function (moment, pageWidth) {
+    init: function (moment, pageWidth, onSelectionChanged) {
         this.moment = moment;
         this.pageWidth = pageWidth;
+        this.onSelectionChanged = onSelectionChanged || null;
+        this.addPictures = null;
     },
 
     /**
@@ -70,14 +72,32 @@ var LifeStreamShareItem = Class.extend({
                 position: 'relative'
             })
             .appendTo(this.el);
-        var addPictures = new AddPictures(
-                this.pageWidth, false, true, null,
+        this.addPictures = new AddPictures(
+                this.pageWidth, false, true, this.onSelectionChanged,
                 this.moment.widgets, 1, 3);
-        addPictures.getEl()
+        this.addPictures.getEl()
               .appendTo(pictureContainerEl);
 
 
         return this.el;
+    },
+
+    /**
+     * Returns count of selected animated pictures
+     */
+    getElementsSelectedCount: function () {
+        if (this.addPictures)
+            return this.addPictures.getElementsSelectedCount();
+        return 0;
+    },
+
+    /***
+     * Return array of selected assets
+     */
+    getAssetsSelected: function(){
+        if (this.addPictures)
+            return this.addPictures.getSelected();
+        return null;
     }
 
 });
@@ -90,9 +110,7 @@ var LifeStreamShareView = {
     lifeStream: null
 };
 
-/**
- * Makes the life stream view the current view.
- */
+
 LifeStreamShareView.show = function (lifeStream, animate) {
     LifeStreamShareView.lifeStream = lifeStream;
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
@@ -104,10 +122,6 @@ LifeStreamShareView.show = function (lifeStream, animate) {
     });
 };
 
-/**
- * Event handler. Called before the life stream view is made visible:
- * used to wire up buttons and loads content of life stream
- */
 LifeStreamShareView.beforeTransition = function (event, ui) {
     if (ui.absUrl.indexOf('#life-stream-share-view') == -1) {
         $.mobile.pageContainer.off('pagecontainerbeforetransition',
@@ -138,8 +152,12 @@ LifeStreamShareView.loadMoments = function (moments) {
     //load all moments
     var momentsEl = LifeStreamShareView.ui.toPage.find('#moments');
     momentsEl.empty();
-    for (var idx = 0, moment; moment = moments[idx]; idx++)
-        new LifeStreamShareItem(moment, LifeStreamShareView.ui.toPage.width()).getEl((idx % 2 == 0)).appendTo(momentsEl);
+    LifeStreamShareView.items = [];
+    for (var idx = 0, moment; moment = moments[idx]; idx++) {
+        var item = new LifeStreamShareItem(moment, LifeStreamShareView.ui.toPage.width(), LifeStreamShareView.selectionChanged.bind(LifeStreamShareView));
+        item.getEl((idx % 2 == 0)).appendTo(momentsEl);
+        LifeStreamShareView.items.push(item)
+    }
 
     //save current view
     localStorage.setItem('current-view', LIFE_STREAM_SHARE_PAGE_IDX);
@@ -147,11 +165,35 @@ LifeStreamShareView.loadMoments = function (moments) {
     //wire buttons
     var backBtn = LifeStreamShareView.ui.toPage.find('#back-button')
         .on(TOUCHSTART, function () {
-            LifeStreamView.show(LifeStreamShareView.lifeStream, false);
+            LifeStreamShareView.show(LifeStreamShareView.lifeStream, false);
         });
 
     var shareBtn = LifeStreamShareView.ui.toPage.find('#share-btn')
         .on(TOUCHSTART, function () {
             SelectFriendsView.show(false);
         });
+}
+
+LifeStreamShareView.selectionChanged = function () {
+    var count = 0;
+    if (LifeStreamShareView.items) {
+        for (var i = 0, item; item = LifeStreamShareView.items[i]; i++) {
+            count += item.getElementsSelectedCount();
+        }
+    }
+
+    var shareBtn = LifeStreamShareView.ui.toPage.find('#share-btn')
+        .text(count == 0? 'Share': 'Share ' + count);
+}
+
+LifeStreamShareView.getAssetsSelected = function () {
+    var selectedAssets = [];
+    if (LifeStreamShareView.items) {
+        for (var i = 0, item; item = LifeStreamShareView.items[i]; i++) {
+            var selected = item.getAssetsSelected();
+            if (selected)
+                selectedAssets = selectedAssets.concat(selected);
+        }
+    }
+    return selectedAssets;
 }

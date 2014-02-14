@@ -11,7 +11,7 @@ var CENTRALDEV_SERVER = 'http://drtyhbo.net';
 $(document).ready(function () {
     $(document.body).show();
     setTimeout(function () {
-//        Util.init(CENTRALDEV_SERVER);
+        //Util.init(CENTRALDEV_SERVER);
         Util.init(LOCALDEV_SERVER);
         CameraRoll.init(initApp);
     }, 400);
@@ -21,6 +21,7 @@ function initApp() {
     Db.init(function() {
         Feed.init();
         PersonalLibrary.init();
+        //if user has no uploaded pictures, show him photo sleection page
         if (!PictureWidgets.getPictures().length) {
             RegistrationAddPicturesPage.show(false);
         } else if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {

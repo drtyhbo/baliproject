@@ -189,7 +189,7 @@ var AddPictures = Class.extend({
      */
     selectionChanged: function () {
         //set select all text
-        this.setSelectAllText(me.areAllSelected());
+        this.setSelectAllText(this.areAllSelected());
         
         //callback
         if (this.isSelectable && this.onSelectionChangedCallback) {
@@ -415,6 +415,19 @@ var AddPictures = Class.extend({
                 assets.push(asset);
         }
         return assets;
+    },
+
+    /**
+     * Returns an array containing all the pictures that are currently
+     * selected.
+     */
+    getElementsSelectedCount: function(){
+        var assetElements = [];
+        for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+            if (assetElement.isSelected)
+                assetElements.push(assetElement);
+        }
+        return assetElements.length;
     },
 
     /**
