@@ -43,7 +43,14 @@ var AssetElement = Class.extend({
     this.imagesLoaded = false;       
   },
   
-  getEl: function () {
+  getEl: function (dontCreate) {
+    if (this.el) {
+      return this.el;
+    }
+    if (!this.el && dontCreate) {
+      return null;
+    }
+    
     this.el = $('<span></span>')
         .css({
             display: 'inline-block',
@@ -269,19 +276,6 @@ var AssetRowElement = Class.extend({
        assetElement.setSelected(isSelected)
      }
    },
-   
-   /**
-    * Returns a list of selected asset elements.
-    */
-   getSelected: function() {
-     var selected = [];
-     for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-       if (assetElement.isSelected) {
-         selected = selected.concat(assetElement);
-       }
-     }
-     return selected;
-   },
 
    /**
     * Should be called when the asset row is shown. Loads images.
@@ -414,7 +408,6 @@ var AddPictures = Class.extend({
       } else {
           this.renderStandardUi();
       }
-      
       this.updateVisibleElements();
 
       return this.el;
@@ -573,7 +566,7 @@ var AddPictures = Class.extend({
    * Returns the number of pictures being displayed.
    */
   getNumPictures: function () {
-      return this.assets.length;
+    return this.assetElements.length;
   },
 
   /**************************
@@ -613,7 +606,7 @@ var AddPictures = Class.extend({
    * selected.
    */
   getSelected: function () {
-    var selectedAssetElements = this.getSelectedAssetElements();
+    var selectedAssetElements = this.getSelectedElements();
 
     var selected = [];
     for (var i = 0, assetElement; assetElement = selectedAssetElements[i];
@@ -627,13 +620,14 @@ var AddPictures = Class.extend({
    * Returns an array containing all the AssetElements that are currently
    * selected.
    */
-  getSelectedAssetElements: function () {
-    var selectedAssetElements = [];
-    for (var i = 0, assetRow; assetRow = this.assetRows[i]; i++) {
-      selectedAssetElements =
-          selectedAssetElements.concat(assetRow.getSelected());
+  getSelectedElements: function () {
+    var selectedElements = [];
+    for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+      if (assetElement.isSelected) {
+        selectedElements.push(assetElement);
+      }
     }
-    return selectedAssetElements;
+    return selectedElements;
   },
 
   /**
@@ -662,10 +656,10 @@ var AddPictures = Class.extend({
   },
 
   /**
- * Removes all the selected pictures.
- */
-  removeSelected: function(onRemoved) {
-    var selectedAssetElements = this.getSelectedAssetElements();
+   * Removes all the selected pictures.
+   */
+  removeSelected: function(callback) {
+    var selectedAssetElements = this.getSelectedElements();
 
     // Create a temporare element to use for animations. We just want access to the
     // step function.
@@ -682,7 +676,30 @@ var AddPictures = Class.extend({
         }
       },
       complete: function () {
-      }
+        for (var i = this.assetElements.length - 1; i >= 0; i--) {
+          var assetElement = this.assetElements[i];
+          if (assetElement.isSelected) {
+            var el = assetElement.getEl(true);
+            if (el) {
+              el.remove();
+            }
+            this.assetElements.splice(i, 1);        
+          }
+        }
+
+        // We could try to be super fancy and recalculate which assets belong
+        // in which rows, but that seems way to complicated. Easier to remove
+        // all the rows and start from scratch. We can always revisit if this
+        // becomes a performance issue.
+        this.viewportEl.empty();
+        this.assetRows = [];
+        this.renderStandardUi();
+        
+        this.currentViewport = null;
+        this.scroller.updateHeight();
+        
+        callback();
+      }.bind(this)
     });
   },
 
@@ -755,6 +772,10 @@ var AddPictures = Class.extend({
    * come into view, thereby speeding up the initial rendering immensely.
    */
   updateVisibleElements: function() {
+    if (!this.assetRows.length) {
+      return;
+    }
+
     var viewport = this.determineViewport(this.scroller.getScrollPosition(),
         this.scroller.getContainerHeight());
 

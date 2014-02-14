@@ -33,6 +33,8 @@ var Scroller = Class.extend({
 
     // The velocity of the scroller.
     this.scrollVelocity = null;
+    // The last position of the scroller.
+    this.lastScrollPosition = null;
     // The position of the scroller.
     this.scrollPosition = new Point2d(0, 0);
     
@@ -59,6 +61,14 @@ var Scroller = Class.extend({
    */
   getScrollPosition: function() {
     return this.scrollPosition;
+  },
+  
+  /**
+   * Call this when the height of the content has changed.
+   */  
+  updateHeight: function() {
+    this.lastScrollPosition = null;
+    this.render();
   },
   
   /**
@@ -154,15 +164,23 @@ var Scroller = Class.extend({
   },
   
   render: function() {
+    if (this.lastScrollPosition &&
+        this.scrollPosition.x == this.lastScrollPosition.x &&
+        this.scrollPosition.y == this.lastScrollPosition.y) {
+      return;
+    }
     var contentHeight = this.el.height();
     var containerHeight = this.getContainerHeight();
 
-    if (this.scrollPosition.y < 0) {
-      this.scrollPosition.y = 0;
-    }
     if (this.scrollPosition.y > contentHeight - containerHeight) {
       this.scrollPosition.y = contentHeight - containerHeight;
     }
+    if (this.scrollPosition.y < 0) {
+      this.scrollPosition.y = 0;
+    }
+    
+    this.lastScrollPosition =
+        new Point2d(this.scrollPosition.x, this.scrollPosition.y);
 
     for (var i = 0, callback; callback = this.callbacks[i]; i++) {
       callback();
