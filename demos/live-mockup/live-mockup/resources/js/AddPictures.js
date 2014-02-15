@@ -1,6 +1,7 @@
 var NUM_COLUMNS = 3;
 var PICTURE_SPACING = 2;
 var USE_VARIOUS_SPACING_UI = false;
+var LOAD_IMAGES_DELAY_MS = 250;
 // Assets with timestamps smaller than this will be combined into a single
 // asset element when using fancy pants rendering.
 var FANCY_PANTS_TIME_DELTA_SEC = 15;
@@ -81,7 +82,7 @@ var VisibleElementRenderer = Class.extend({
     if (this.el) {
       return this.el;
     }
-
+    
     this.el = $('<div></div>')
         .css('height', this.getHeight() + 'px');
     this.aboveEl = $('<div></div>')
@@ -460,8 +461,8 @@ var AssetRowElement = Class.extend({
      this.el = null;
      this.assetElements = assetElements;
 
-     // A boolean specifying whether the images have already been loaded for this
-     // row.
+     // A boolean specifying whether the images have already been loaded for
+     // this row.
      this.imagesLoaded = false;
      // The id for the setTimeout() that loads the images in this row.
      this.loadImagesTimerId = 0;
@@ -503,7 +504,8 @@ var AssetRowElement = Class.extend({
        return;
      }
      this.loadImagesTimerId =
-         setTimeout(this.loadImages.bind(this), Math.random() * 250 + 250);
+         setTimeout(this.loadImages.bind(this),
+             Math.random() * LOAD_IMAGES_DELAY_MS + LOAD_IMAGES_DELAY_MS);
    },
 
    /**
@@ -529,8 +531,8 @@ var AssetRowElement = Class.extend({
 });
 
 /**
- * Encapulates a group of assets. A group contains an optional header row,
- * the grid of assets, then an optional footer row.
+ * Encapulates a group of AssetRows. A group contains an optional header row
+ * then a series of AssetRows.
  */
 var AssetGroup = VisibleElementRenderer.extend({
   init: function(headerEl, assetElements, pictureDimension) {
@@ -583,16 +585,16 @@ var AssetGroup = VisibleElementRenderer.extend({
     return elements;
   },
 
+  showElement: function(isShown, assetRow) {
+    assetRow[isShown ? 'show' : 'hide']();
+  },
+  
   getEl: function() {
     if (!this.el) {
       this._super();
       this.headerEl.prependTo(this.el);
     }
     return this.el;
-  },
-
-  showElement: function(isShown, assetRow) {
-    assetRow[isShown ? 'show' : 'hide']();
   }
 });
 
@@ -638,26 +640,6 @@ var AddPictures = VisibleElementRenderer.extend({
 
   /**************************
    *
-   * VisibleElementRenderer overrides
-   *
-   **************************/
-
-  getElements: function() {
-    var elements = [];
-    for (var i = 0; i < this.getNumGroups(); i++) {
-      var assetElementsForGroup =
-          this.assetElementsFromAssets(this.getAssetsForGroup(i),
-              this.useFancyPants);
-      elements.push(
-          new AssetGroup(this.getGroupHeaderEl(i), assetElementsForGroup,
-              this.pictureDimension));
-      this.assetElements = this.assetElements.concat(assetElementsForGroup);
-    }
-    return elements;
-  },
-
-  /**************************
-   *
    * OVERRIDE THESE FUNCTIONS!!!
    *
    **************************/
@@ -687,9 +669,23 @@ var AddPictures = VisibleElementRenderer.extend({
 
   /**************************
    *
-   * Initialization
+   * VisibleElementRenderer overrides
    *
    **************************/
+
+  getElements: function() {
+    var elements = [];
+    for (var i = 0; i < this.getNumGroups(); i++) {
+      var assetElementsForGroup =
+          this.assetElementsFromAssets(this.getAssetsForGroup(i),
+              this.useFancyPants);
+      elements.push(
+          new AssetGroup(this.getGroupHeaderEl(i), assetElementsForGroup,
+              this.pictureDimension));
+      this.assetElements = this.assetElements.concat(assetElementsForGroup);
+    }
+    return elements;
+  },
 
   /**
    * Creates and returns the picture selector element. Only adds pictures that
@@ -719,6 +715,21 @@ var AddPictures = VisibleElementRenderer.extend({
 
     return this.el;
   },
+  
+  updateVisibleElements: function() {
+    var scrollPosition = this.scroller.getScrollPosition();
+    // Use the aboveEl to calculate the top of the picture viewer in case the
+    // select all/select none element is visible.
+    var scrollTop = scrollPosition.y -
+        (this.aboveEl.offset().top - this.scroller.getEl().offset().top);
+    this._super(scrollTop, this.scroller.getContainerHeight());
+  },
+  
+  /**************************
+   *
+   * End VisibleElementRenderer overrides
+   *
+   **************************/
 
   /**
    * Returns a list of AssetElements from a list of Assets. May combine many
@@ -873,15 +884,6 @@ var AddPictures = VisibleElementRenderer.extend({
         callback();
       }.bind(this)
     });
-  },
-
-  updateVisibleElements: function() {
-    var scrollPosition = this.scroller.getScrollPosition();
-    // Use the aboveEl to calculate the top of the picture viewer in case the
-    // select all/select none element is visible.
-    var scrollTop = scrollPosition.y -
-        (this.aboveEl.offset().top - this.scroller.getEl().offset().top);
-    this._super(scrollTop, this.scroller.getContainerHeight());
   },
 
   /**
