@@ -145,18 +145,24 @@ var LifeStreamItem = Class.extend({
 
 });
 
-var LifeStreamPictureViewer = AddPictures.extend({
+var LifeStreamMomentViewer = AddPictures.extend({
  init: function(width, scroller, moments) {
-   this._super(width, true, scroller);
    this.moments = moments;
+   this._super(width, scroller, true);
  },
  
- getNumSections: function() {
+ /**************************
+  *
+  * AddPictures overrides
+  *
+  **************************/
+ 
+ getNumGroups: function() {
    return this.moments.length;
  },
  
- getAssetsForSection: function(sectionIndex) {
-   return this.moments.widgets;
+ getAssetsForGroup: function(groupIndex) {
+   return this.moments[groupIndex].widgets;
  },
 });
 
@@ -165,7 +171,7 @@ var LifeStreamView = {
   headerEl: null,
   profilePicEl: null,
   footerEl: null,
-  pictureViewer: null
+  momentViewer: null
 };
 
 /**
@@ -222,12 +228,13 @@ LifeStreamView.onShow = function(event) {
 
 
 LifeStreamView.loadMoments = function (moments) {
-  var scroller = new Scroller(pageEl.find('#scrollable'));
-  var pictureViewer =
-      new LifeStreamPictureViewer(pageEl.width(), scroller, moments);
-  pictureViewer.getEl()
-      .appendTo(pageEl.find('#picture-viewer'));
-  LifeStreamView.pictureViewer = pictureViewer;
+  var scroller = new Scroller(LifeStreamView.pageEl.find('#scrollable'));
+  var momentViewer =
+      new LifeStreamMomentViewer(LifeStreamView.pageEl.width(), scroller,
+          moments);
+  momentViewer.getEl()
+      .appendTo(LifeStreamView.pageEl.find('#picture-viewer'));
+  LifeStreamView.momentViewer = momentViewer;
 
 /*    var shareBtn = LifeStreamView.ui.toPage.find('#share-button')
         .on(TOUCHSTART, function () {

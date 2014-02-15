@@ -1,8 +1,14 @@
-var RegistrationPictureViewer = AddPictures.extend({
+var RegistrationPictureSelector = AddPictures.extend({
  init: function(width, scroller, assets) {
    this.assets = assets;
    this._super(width, scroller, false);
  },
+ 
+ /**************************
+  *
+  * AddPictures overrides
+  *
+  **************************/
  
  getNumGroups: function() {
    return 1
@@ -14,7 +20,7 @@ var RegistrationPictureViewer = AddPictures.extend({
 });
 
 var RegistrationAddPicturesPage = {
-	pictureViewer: null,
+	pictureSelector: null,
 	footerEl: null
 };
 
@@ -49,14 +55,14 @@ RegistrationAddPicturesPage.onShow = function(event, ui) {
       });
         
   var scroller = new Scroller($('#scrollable'));
-  var pictureViewer =
-      new RegistrationPictureViewer(pageEl.width(), scroller,
+  var pictureSelector =
+      new RegistrationPictureSelector(pageEl.width(), scroller,
           CameraRoll.getCameraRoll());
-  pictureViewer.setSelectable(true, true,
+  pictureSelector.setSelectable(true, true,
       RegistrationAddPicturesPage.onSelectionChanged);
-  pictureViewer.getEl()
+  pictureSelector.getEl()
 			.appendTo(pageEl.find('#pictures'));
-	RegistrationAddPicturesPage.pictureViewer = pictureViewer;
+	RegistrationAddPicturesPage.pictureSelector = pictureSelector;
 };
 
 /**
@@ -76,7 +82,7 @@ RegistrationAddPicturesPage.onSelectionChanged = function(numSelected) {
 RegistrationAddPicturesPage.touchFooterButton = function(e) {
   e.preventDefault();
   
-  var assets = RegistrationAddPicturesPage.pictureViewer.getSelected();
+  var assets = RegistrationAddPicturesPage.pictureSelector.getSelected();
 	PersonalLibrary.add(assets);
   PictureWidgets.ajaxAdd(assets, function() {
     if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {

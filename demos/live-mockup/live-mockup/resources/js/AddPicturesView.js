@@ -1,3 +1,24 @@
+var AddPicturesSelector = AddPictures.extend({
+ init: function(width, scroller, assets) {
+   this.assets = assets;
+   this._super(width, scroller, false);
+ },
+ 
+ /**************************
+  *
+  * AddPictures overrides
+  *
+  **************************/
+ 
+ getNumGroups: function() {
+   return 1
+ },
+ 
+ getAssetsForGroup: function(groupIndex) {
+   return this.assets;
+ },
+});
+
 var AddPicturesView = {
     addPictures: null,
     pageEl: null,
@@ -61,16 +82,16 @@ AddPicturesView.onShow = function (event, ui) {
     return !PictureWidgets.getPictureByAssetId(asset.id);
   });
 
-  var scroller = new Scroller(pageEl.find('#scrollable'));
-  var addPictures =
-      new AddPictures(pageEl.width(), assets, scroller);
-  addPictures.setSelectable(true, false, AddPicturesView.onSelectionChanged);
-  addPictures.getEl()
-      .appendTo(pageEl.find('#pictures'));
-  AddPicturesView.addPictures = addPictures;
 
   if (assets.length) {
-    AddPicturesView.addPictures.toggleSelectAll();
+    var scroller = new Scroller(pageEl.find('#scrollable'));
+    var addPictures =
+        new AddPicturesSelector(pageEl.width(), scroller, assets);
+    addPictures.setSelectable(true, false, AddPicturesView.onSelectionChanged);
+    addPictures.getEl()
+        .appendTo(pageEl.find('#pictures'));
+    addPictures.toggleSelectAll();
+    AddPicturesView.addPictures = addPictures;
   } else {
     AddPicturesView.showEmptyUi();
   }
