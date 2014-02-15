@@ -595,6 +595,10 @@ var AssetGroup = VisibleElementRenderer.extend({
 
   calculateHeight: function() {
     var height = this._super();
+    if (!this.headerEl) {
+      return height;
+    }
+    
     // This is GHETTO. Figure out a better way to do this.
     this.headerEl
         .css('visibility', 'hidden')
@@ -635,7 +639,9 @@ var AssetGroup = VisibleElementRenderer.extend({
   getEl: function() {
     if (!this.el) {
       this._super();
-      this.headerEl.prependTo(this.el);
+      if (this.headerEl) {
+        this.headerEl.prependTo(this.el);
+      }
     }
     return this.el;
   }
