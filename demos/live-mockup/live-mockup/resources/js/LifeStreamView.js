@@ -145,93 +145,92 @@ var LifeStreamItem = Class.extend({
 
 });
 
-
+var LifeStreamPictureViewer = AddPictures.extend({
+ init: function(width, scroller, moments) {
+   this._super(width, true, scroller);
+   this.moments = moments;
+ },
+ 
+ getNumSections: function() {
+   return this.moments.length;
+ },
+ 
+ getAssetsForSection: function(sectionIndex) {
+   return this.moments.widgets;
+ },
+});
 
 var LifeStreamView = {
-    headerEl: null,
-    profilePicEl: null,
-    footerEl: null,
-    ui: null,
+  pageEl: null,
+  headerEl: null,
+  profilePicEl: null,
+  footerEl: null,
+  pictureViewer: null
 };
 
 /**
  * Makes the life stream view the current view.
  */
-LifeStreamView.show = function (lifeStream, animate) {
-    LifeStreamView.lifeStream = lifeStream;
-    $.mobile.pageContainer.on('pagecontainerbeforetransition',
-                            LifeStreamView.beforeTransition);
-    $.mobile.pageContainer.pagecontainer('change', '#life-stream-load-view', {
-        changeHash: false,
-        showLoadMsg: false,
-        transition: animate ? 'slide' : 'none'
-    });
+LifeStreamView.show = function (animate) {
+  $.mobile.pageContainer.on('pagecontainershow', LifeStreamView.onShow);
+  $.mobile.pageContainer.pagecontainer('change', '#life-stream-load-view', {
+    changeHash: false,
+    showLoadMsg: false,
+    transition: animate ? 'slide' : 'none'
+  });
 };
 
 /**
- * Event handler. Called before the life stream view is made visible:
- * used to wire up buttons and loads content of life stream
+ * Event handler. Called once the LifeStreamView is made visible.
  */
-LifeStreamView.beforeTransition = function (event, ui) {
-    if (ui.absUrl.indexOf('#life-stream-load-view') == -1) {
-        $.mobile.pageContainer.off('pagecontainerbeforetransition',
-                    arguments.callee);
-        return;
-    }
+LifeStreamView.onShow = function(event) {
+  $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
 
-    if (LifeStreamView.shown) {
-        return;
-    }
-    LifeStreamView.shown = true;
+  if (LifeStreamView.shown) {
+    return;
+  }
+  LifeStreamView.shown = true;
 
-    //wire footer buttons
-    var homeBtn = ui.toPage.find('#home-btn')
-        .on(TOUCHSTART, function () {
-            FeedView.show();
-        });
+  var pageEl = $('#life-stream-load-view');
+  LifeStreamView.pageEl = pageEl;
 
-    var addPictureBtn = ui.toPage.find('#add-pictures-btn')
-		.on(TOUCHSTART, function () {
-		    AddPicturesView.show();
-		});
+  var homeBtn = pageEl.find('#home-btn')
+      .on(TOUCHSTART, function () {
+        FeedView.show();
+      });
+  var addPictureBtn = pageEl.find('#add-pictures-btn')
+    	.on(TOUCHSTART, function () {
+        AddPicturesView.show();
+    	});
 
+  LifeStreamView.headerEl = pageEl.find('#load-view-header');
+  LifeStreamView.footerEl = pageEl.find('#load-view-footer');
 
-    //save pointer to UI elements
-    LifeStreamView.ui = ui;
-    LifeStreamView.headerEl = ui.toPage.find('#load-view-header');
-    LifeStreamView.footerEl = ui.toPage.find('#load-view-footer');
-    LifeStreamView.profilePicEl = ui.toPage.find('#profile-pic');
+  pageEl.find('#share-moment-icon')
+      .css('background-image', 'url(' + Images.getPath() + 'check32.png)')
+  pageEl.find('#lifestream-user-name')
+      .text(Users.getCurrentUser().firstName);
 
-    //display share icon
-    ui.toPage.find('#share-moment-icon')
-        .css('background-image', 'url(' + Images.getPath() + 'check32.png)')
+  if (!LifeStreamView.lifeStream) {
+    Moments.ajaxGetAll(LifeStreamView.loadMoments);
+  } else {
+    LifeStreamView.loadMoments(LifeStreamView.lifeStream.moments);
+  }
 
-    ui.toPage.find('#lifestream-user-name').text(Users.getCurrentUser().firstName);
-
-    //reload 
-    if (!LifeStreamView.lifeStream) {
-        LifeStreamView.lifeStream = new LifeStream();
-        LifeStreamView.lifeStream.loadData(LifeStreamView.loadMoments);
-    }
-    else
-        LifeStreamView.loadMoments(LifeStreamView.lifeStream.moments);
-
+  localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
 };
 
 
 LifeStreamView.loadMoments = function (moments) {
-    //load sample life stream
-    var momentsEl = LifeStreamView.ui.toPage.find('#moments');
-    momentsEl.empty();
-    for (var idx = 0, moment; moment = moments[idx]; idx++)
-        new LifeStreamItem(moment, LifeStreamView.ui.toPage.width()).getEl((idx % 2 == 0)).appendTo(momentsEl);
+  var scroller = new Scroller(pageEl.find('#scrollable'));
+  var pictureViewer =
+      new LifeStreamPictureViewer(pageEl.width(), scroller, moments);
+  pictureViewer.getEl()
+      .appendTo(pageEl.find('#picture-viewer'));
+  LifeStreamView.pictureViewer = pictureViewer;
 
-    //save current view
-    localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
-
-    //wire share btn
-    var shareBtn = LifeStreamView.ui.toPage.find('#share-button')
+/*    var shareBtn = LifeStreamView.ui.toPage.find('#share-button')
         .on(TOUCHSTART, function () {
             LifeStreamShareView.show(LifeStreamView.lifeStream, false);
-        });
+        });*/
 };

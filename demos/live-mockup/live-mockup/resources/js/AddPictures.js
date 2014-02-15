@@ -5,6 +5,146 @@ var USE_VARIOUS_SPACING_UI = false;
 // asset element when using fancy pants rendering.
 var FANCY_PANTS_TIME_DELTA_SEC = 15;
 
+var VisibleElementSelector = Class.extend({
+  init: function() {
+    this.el = null;
+    this.elements = [];
+    this.tops = [];
+    this.height = 0;
+  },
+  
+  getEl: function() {
+    this.el = $('<div></div>');
+    this.aboveEl = $('<div></div>')
+        .appendTo(this.el);
+    this.visibleEl = $('<div></div>')
+        .appendTo(this.el);
+    this.belowEl = $('<div></div>')
+        .appendTo(this.el);
+        
+    var top = 0;
+    for (var i = 0, element; element = this.elements[i]; i++) {
+      this.tops[i] = top;
+      top += element.getHeight();
+    }
+    
+    this.height = top;
+  },
+
+  /**
+   * Determines which elements are currently within the viewport.
+   */
+  determineVisibleElements: function(viewportTop, viewportHeight) {
+    // A negative viewportTop means the picture selector is further down on the
+    // page, perhaps all the way off the screen.
+    if (viewportTop < 0 && viewportTop < -viewportHeight) {
+      // Not visible.
+      return null;
+    }
+    
+    // Do a binary search to find which elements are visible.
+    var low = 0;
+    var high = this.elements.length;
+    while (low != high) {
+      var mid = Math.floor((low + high) / 2);
+      
+      // This group is below the viewport.
+      var top = this.tops[mid];
+      if (tops + this.elements[mid].getHeight() < viewportTop) {
+        low = mid + 1;
+      // This element is at least above the viewport, so use it as the
+      // new high.
+      } else {
+        high = mid;
+      }
+    }
+
+    var firstIndex = low;
+    var lastIndex;
+    var viewportBottom = viewportTop + viewportHeight;
+    for (var i = firstIndex + 1, element; element = this.elements[i]; i++) {
+      if (this.tops[i] + this.elements[i].getHeight() < viewportBottom) {
+        lastIndex = i;
+      }
+    }
+    
+    return {
+      firstIndex: firstIndex,
+      lastIndex: lastIndex
+    }
+  },
+
+  /**
+   * Determines which elements are now hidden and removes them from the DOM.
+   */
+  clearHiddenElements: function(visibleElements) {
+    for (var i = this.visibleElements.firstGroupIndex;
+        i < this.visibleElements.lastGroupIndex; i++) {
+      if (i < visibleElements.firstGroupIndex || i >= visibleElements.lastGroupIndex) {
+        this.groups[i].getEl().detach();
+      }
+    }
+  },
+  
+  /**
+   * This optimization works by only showing those rows in the DOM that are
+   * currently within the viewport. There are three divs in the following DOM
+   * order:
+   *
+   * - aboveEl
+   * - visibleEl
+   * - belowEl
+   *
+   * The visibleEl element is the only one that contains content. The other two
+   * elements are used to pad the height of the content div to keep the scroll
+   * height the same.
+   *
+   * Each time the page moves, we calculate the current viewport, show/hide rows
+   * as necessary, and update the height of the various viewport sections.
+   *
+   * In addition, this allows us to only create DOM elements and load images as they
+   * come into view, thereby speeding up the initial rendering immensely.
+   */
+  updateVisibleElements: function(viewportTop, viewportHeight) {
+    var visibleElements =
+        this.determineVisibleElements(viewportTop, viewportHeight);
+
+    if (this.visibleElements) {
+      this.clearHiddenElements(visibleElements);
+    }
+
+    this.aboveEl.css('height', this.tops[visibleElements.firstIndex] + 'px');
+    this.belowEl.css('height',
+        this.height - this.tops[visibleElements.lastRowIndex] + 'px');
+
+    if (!this.visibleGroups ||
+        visibleGroups.firstRowIndex != this.visibleGroups.firstRowIndex ||
+        visibleGroups.lastRowIndex != this.visibleGroups.lastRowIndex) {
+      // The clearHiddenRows call above may have trimmed some of the rows, but not
+      // all of them. Therefore, we may need to insert some rows at the beginning of
+      // the viewport, and some rows at the end.
+      var insertAfter = null;
+      for (var i = viewport.firstRowIndex; i < viewport.lastRowIndex; i++) {
+        var assetRowEl = this.assetRows[i].getEl();
+        // A row that already has a parent is already in the DOM so we can safely
+        // skip it.
+        if (!assetRowEl.parent().length) {
+          // First row wont have a previous sibling, so place at the front.
+          if (!insertAfter) {
+            this.viewportEl.prepend(assetRowEl);
+          } else {
+            assetRowEl.insertAfter(insertAfter);
+          }
+          this.assetRows[i].show();
+        }
+        insertAfter = assetRowEl;
+      }
+    
+      this.currentViewport = viewport;
+    }    
+  }
+});
+
 var AssetElement = Class.extend({
   init: function (addPictures, asset, baseDimension) {
     // We need access to the AddPicture object to check if selections
@@ -242,9 +382,8 @@ var AssetElement = Class.extend({
  * Encapulates the logic to handle a row of asset elements.
  */
 var AssetRowElement = Class.extend({
-   init: function(addPictures, assetElements) {
+   init: function(assetElements) {
      this.el = null;
-     this.addPictures = addPictures;
      this.assetElements = assetElements;
      
      // A boolean specifying whether the images have already been loaded for this
@@ -313,31 +452,144 @@ var AssetRowElement = Class.extend({
 });
 
 /**
+ * Encapulates a group of assets. A group contains an optional header row,
+ * the grid of assets, then an optional footer row.
+ */
+var AssetGroup = Class.extend({
+  init: function(assetElements, pictureDimension) {
+    this.pictureDimension = pictureDimension;
+    this.assetElements = assetElements;
+
+    this.visibleRows = null;
+    // Contains all the rows that are above the visible content.
+    this.aboveEl = null;
+    // Contains all the rows that are visible.
+    this.visibleEl = null;
+    // Contains all the rows that are below the visible content.
+    this.belowViewportEl = null;
+
+    this.assetRows = [];
+
+    // The total height of this section.
+    this.height;
+  },
+  
+  getHeight: function() {
+    return this.height;
+  },
+  
+  layout: function() {
+    // The DOM for the various asset rows will be created dynamically, so
+    // we need to set a fixed height now.
+    var numRows = Math.ceil(this.assetElements.length / NUM_COLUMNS);
+    var numElements = this.assetElements.length;
+    for (var i = 0; i < numElements; i += 3) {
+      var assetElementsForRow = [];
+      for (var j = i; j < numElements && j < i + 3; j++) {
+        assetElementsForRow.push(this.assetElements[j]);
+      }
+      this.assetRows.push(
+          new AssetRowElement(this, assetElementsForRow));
+    }
+    
+    this.rowHeight = this.pictureDimension + PICTURE_SPACING;
+    this.height = numRows * (this.pictureDimension + PICTURE_SPACING);
+  },
+
+  /**
+   * Determines which rows are currently within the viewport.
+   */
+  determineVisibleRows: function(scrollTop, viewportHeight) {
+    if (scrollTop < 0) {
+      var firstRowIndex = 0;
+    } else {
+      var firstRowIndex = Math.floor(scrollTop / this.rowHeight);
+    }
+    var lastRowIndex = Math.ceil((scrollTop + viewportHeight) / this.rowHeight);
+
+    return {
+      firstRowIndex: firstRowIndex,
+      lastRowIndex: lastRowIndex
+    };
+  },
+
+  /**
+   * Determines which rows are now hidden and removes them from the DOM.
+   */
+  clearHiddenRows: function(viewport) {
+    for (var i = this.visibleRows.firstRowIndex;
+        i < this.visibleRows.lastRowIndex; i++) {
+      if (i < visibleRows.firstRowIndex || i >= visibleRows.lastRowIndex) {
+        this.assetRows[i].getEl().detach();
+        this.assetRows[i].hide();
+      }
+    }
+  },
+
+  updateVisibleElements: function(scrollTop, viewportHeight) {
+    var visibleRows = this.determineVisibleRows(scrollTop, viewportHeight);
+
+    if (this.visibleRows) {
+      this.clearHiddenRows(visibleRows);
+    }
+
+    this.aboveEl.css('height', visibleRows.firstRowIndex * this.rowHeight + 'px');
+    this.visibleEl.css('height',
+        (visibleRows.lastRowIndex - visibleRows.firstRowIndex) * this.rowHeight + 'px');
+    this.belowEl.css('height',
+        (this.assetRows.length - visibleRows.lastRowIndex) * this.rowHeight + 'px');
+
+    if (!this.visibleRows ||
+        visibleRows.firstRowIndex != this.visibleRows.firstRowIndex ||
+        visibleRows.lastRowIndex != this.visibleRows.lastRowIndex) {
+      // The clearHiddenRows call above may have trimmed some of the rows, but not
+      // all of them. Therefore, we may need to insert some rows at the beginning of
+      // the viewport, and some rows at the end.
+      var insertAfter = null;
+      for (var i = visibleRows.firstRowIndex;
+          i < visibleRows.lastRowIndex; i++) {
+        var assetRowEl = this.assetRows[i].getEl();
+        // A row that already has a parent is already in the DOM so we can safely
+        // skip it.
+        if (!assetRowEl.parent().length) {
+          // First row wont have a previous sibling, so place at the front.
+          if (!insertAfter) {
+            this.visibleEl.prepend(assetRowEl);
+          } else {
+            assetRowEl.insertAfter(insertAfter);
+          }
+          this.assetRows[i].show();
+        }
+        insertAfter = assetRowEl;
+      }
+    
+      this.visibleRows = visibleRows;
+    }
+  }
+});
+
+/**
  * Encapulates the logic for a picture selector based around the camera roll.
  */
-var AddPictures = Class.extend({
+var AddPictures = VisibleElementSelector.extend({
   /**
    * props - The list of configuration properties.
    *   width - The width of the parent element.
-   *   assets - The list of assets to render.
    *   scroller - The scroller object that encompasses this set of pictures.
    *   useFancyPants - If true, combines assets into fancy pants animated elements,
    *       and uses fancy pants, different size, rendering.
    */
-  init: function(width, assets, scroller, useFancyPants) {
-    // The main element for the picture selector.
-    this.el = null;
-    // This block contains all the content which is above the viewport.
-    this.aboveViewportEl = null;
-    // This block contains all the content which is in the viewport.
-    this.viewportEl = null;
-    // This block contains all the content which is below the viewport.
-    this.belowViewportEl = null;
-    // Specifies which rows are currently in the viewport. Object with
-    // two properties:
-    //     firstRowIndex - The index of the first row.
-    //     lastRowIndex - The index of the last row.
-    this.currentViewport = null;
+  init: function(width, scroller, useFancyPants) {
+    this._super();
+
+    // This block contains all the content which is above the visible content.
+    this.aboveEl = null;
+    // This block contains all the content which is currently visible.
+    this.visibleEl = null;
+    // This block contains all the content which is below the visible content.
+    this.belowEl = null;
+
+    this.visibleGroups = null;
 
     this.width = width;
 
@@ -349,7 +601,7 @@ var AddPictures = Class.extend({
     this.selectionChangedCallback = null;
     // The number of asset elements that are selected.
     this.numSelected = 0;
-
+    // The element that contains the select all/select none link.
     this.selectAllEl = null;
     
     // The dimension of an individual picture. This corresponds to the
@@ -361,14 +613,45 @@ var AddPictures = Class.extend({
     // plus the interrow spacing.
     this.rowHeight = this.pictureDimension + PICTURE_SPACING;
 
-    // assetElementsFromAssets depends on this.pictureDimension so this call
-    // must go here.
-    this.assetElements = this.assetElementsFromAssets(assets, useFancyPants);
-    this.assetRows = [];
+    for (var i = 0; i < this.getNumGroups(); i++) {
+      var assetElementsForGroup =
+          this.assetElementsFromAssets(this.getAssetsForGroup(i),
+              useFancyPants);
+      this.elements.push(
+        new AssetGroup(assetElementsForGroup, this.pictureDimension));
+    }
     
     this.scroller = scroller;
-    this.scroller.scroll(this.updateVisibleElements.bind(this));
+    this.scroller.scroll(this.updateVisibleGroups.bind(this));
   },
+
+  /**************************
+   *
+   * OVERRIDE THESE FUNCTIONS!!!
+   *
+   **************************/
+
+  /**
+   * Returns the number of groups that should be rendered.
+   */
+  getNumGroups: function() {
+    throw 'AddPictures must be subclassed. ' +
+        'getNumGroups must be implemented.';
+  },
+  
+  /**
+   * Returns a list of assets for the specified group.
+   */
+  getAssetsForGroup: function(groupIndex) {
+    throw 'AddPictures must be subclassed. ' +
+        'getAssetsForGroup must be implemented.';
+  },
+
+  /**************************
+   *
+   * Initialization
+   *
+   **************************/
 
   /**
    * Creates and returns the picture selector element. Only adds pictures that
@@ -395,19 +678,6 @@ var AddPictures = Class.extend({
     			.on(TOUCHEND, this.toggleSelectAll.bind(this))
     			.appendTo(this.selectAllContainerEl);
 
-      this.aboveViewportEl = $('<div></div>')
-          .appendTo(this.el);
-      this.viewportEl = $('<div></div>')
-          .appendTo(this.el);
-      this.belowViewportEl = $('<div></div>')
-          .appendTo(this.el);
-      
-      //render pics
-      if (USE_VARIOUS_SPACING_UI) {
-          this.renderVariousSpacingUi();
-      } else {
-          this.renderStandardUi();
-      }
       this.updateVisibleElements();
 
       return this.el;
@@ -539,27 +809,6 @@ var AddPictures = Class.extend({
               }
           }
       }
-  },
-  
-  /**
-   * Render pictures in a regular grid
-   */
-  renderStandardUi: function() {
-    // The DOM for the various asset rows will be created dynamically, so
-    // we need to set a fixed height now.
-    var numRows = Math.ceil(this.assetElements.length / NUM_COLUMNS);
-    this.el.css('height',
-        numRows * (this.pictureDimension + PICTURE_SPACING));
-
-    var numElements = this.assetElements.length;
-    for (var i = 0; i < numElements; i += 3) {
-      var assetElementsForRow = [];
-      for (var j = i; j < numElements && j < i + 3; j++) {
-        assetElementsForRow.push(this.assetElements[j]);
-      }
-      this.assetRows.push(
-          new AssetRowElement(this, assetElementsForRow));
-    }
   },
   
   /**
@@ -710,9 +959,9 @@ var AddPictures = Class.extend({
    **************************/
 
   /**
-   * Determines which rows are currently within the viewport.
+   * Determines which groups are currently within the viewport.
    */
-  determineViewport: function(scrollPosition, containerHeight) {
+  determineVisibleGroups: function(scrollPosition, viewportHeight) {
     // The picture selector might not be flush with the top of the scrollable content,
     // so calculate the scroll top as if the picture selector were at the top. We
     // use the aboveViewportEl as the top because the Select all toggle might be
@@ -723,76 +972,74 @@ var AddPictures = Class.extend({
 
     // A negative relativeScrollTop means the picture selector is further down on the
     // page, perhaps all the way off the screen.
-    if (relativeScrollTop < 0 && relativeScrollTop < -containerHeight) {
+    if (relativeScrollTop < 0 && relativeScrollTop < -viewportHeight) {
       // Not visible.
       return null;
-    } else if (relativeScrollTop < 0) {
-      var firstRowIndex = 0;
-    } else {
-      var firstRowIndex = Math.floor(relativeScrollTop / this.rowHeight);
     }
-    var lastRowIndex = Math.ceil((relativeScrollTop + containerHeight) / this.rowHeight);
+    
+    // Do a binary search to find which group is visible.
+    var low = 0;
+    var high = this.groups.length;
+    while (low != high) {
+      var mid = Math.floor((low + high) / 2);
+      
+      // This group is below the viewport.
+      var groupTop = this.groupTops[mid];
+      if (groupTop + this.groups[mid].height < relativeScrollTop) {
+        low = mid + 1;
+      // This group is at least above the viewport, so use it as the
+      // new high.
+      } else {
+        high = mid;
+      }
+    }
 
+    var firstGroupIndex = low;
+    var lastGroupIndex;
+    for (var i = firstGroupIndex + 1, group; group = this.groups[i]; i++) {
+      if (this.groupTops[i] + this.group[i].getHeight() <
+          relativeScrollTop + viewportHeight) {
+        lastGroupIndex = i;
+      }
+    }
+    
     return {
-      firstRowIndex: firstRowIndex,
-      lastRowIndex: lastRowIndex
-    };
+      firstGroupIndex: firstGroupIndex,
+      lastGroupIndex: lastGroupIndex
+    }
   },
 
   /**
-   * Determines which rows are now hidden and removes them from the DOM.
+   * Determines which groups are now hidden and removes them from the DOM.
    */
-  clearHiddenRows: function(viewport) {
-    for (var i = this.currentViewport.firstRowIndex;
-        i < this.currentViewport.lastRowIndex; i++) {
-      if (i < viewport.firstRowIndex || i >= viewport.lastRowIndex) {
-        this.assetRows[i].getEl().detach();
-        this.assetRows[i].hide();
+  clearHiddenGroups: function(visibleGroups) {
+    for (var i = this.visibleGroups.firstGroupIndex;
+        i < this.visibleGroups.lastGroupIndex; i++) {
+      if (i < visibleGroups.firstGroupIndex || i >= visibleGroups.lastGroupIndex) {
+        this.groups[i].getEl().detach();
       }
     }
   },
   
-  /**
-   * This optimization works by only showing those rows in the DOM that are
-   * currently within the viewport. There are three divs in the following DOM
-   * order:
-   *
-   * - aboveViewportEl
-   * - viewportEl
-   * - belowViewportEl
-   *
-   * The viewportEl element is the only one that contains content. The other two
-   * elements are used to pad the height of the content div to keep the scroll
-   * height the same.
-   *
-   * Each time the page moves, we calculate the current viewport, show/hide rows
-   * as necessary, and update the height of the various viewport sections.
-   *
-   * In addition, this allows us to only create DOM elements and load images as they
-   * come into view, thereby speeding up the initial rendering immensely.
-   */
-  updateVisibleElements: function() {
-    if (!this.assetRows.length) {
-      return;
+  updateVisibleGroups: function() {
+    var visibleGroups =
+        this.determineVisibleGroups(this.scroller.getScrollPosition(),
+            this.scroller.getContainerHeight());
+
+    if (this.visibleGroups) {
+      this.clearHiddenGroups(visibleGroups);
     }
 
-    var viewport = this.determineViewport(this.scroller.getScrollPosition(),
-        this.scroller.getContainerHeight());
-
-    if (this.currentViewport) {
-      this.clearHiddenRows(viewport);
-    }
-
-    this.aboveViewportEl.css('height',
-        viewport.firstRowIndex * this.rowHeight + 'px');
-    this.viewportEl.css('height',
-        (viewport.lastRowIndex - viewport.firstRowIndex) * this.rowHeight + 'px');
+    this.aboveEl.css('height',
+        visibleGroups.firstRowIndex * this.rowHeight + 'px');
+    this.visibleGroupsEl.css('height',
+        (visibleGroups.lastRowIndex - visibleGroups.firstRowIndex) * this.rowHeight + 'px');
     this.belowViewportEl.css('height',
-        (this.assetRows.length - viewport.lastRowIndex) * this.rowHeight + 'px');
+        (this.assetRows.length - visibleGroups.lastRowIndex) * this.rowHeight + 'px');
 
-    if (!this.currentViewport ||
-        viewport.firstRowIndex != this.currentViewport.firstRowIndex ||
-        viewport.lastRowIndex != this.currentViewport.lastRowIndex) {
+    if (!this.visibleGroups ||
+        visibleGroups.firstRowIndex != this.visibleGroups.firstRowIndex ||
+        visibleGroups.lastRowIndex != this.visibleGroups.lastRowIndex) {
       // The clearHiddenRows call above may have trimmed some of the rows, but not
       // all of them. Therefore, we may need to insert some rows at the beginning of
       // the viewport, and some rows at the end.

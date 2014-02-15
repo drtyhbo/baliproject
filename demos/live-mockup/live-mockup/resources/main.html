@@ -237,6 +237,17 @@
 
     <!-- Life stream view-->
     <div data-role="page" id="life-stream-load-view">
+      <style type="text/css">
+        .container {
+          bottom: 40px;
+          left: 0;
+          overflow: hidden;
+          position: absolute;
+          top: 43px;
+          width: 100%;
+        }
+      </style>
+      
         <div data-role="header" data-position="fixed" data-tap-toggle="false"
             id="header">
             <h2 id="lifestream-user-name"></h2>
@@ -245,8 +256,10 @@
                 Share</button>
         </div>
 
-        <div>
-            <div id="moments"></div>
+        <div class="container">
+          <div id="scrollable">
+            <div id="picture-viewer"></div>
+          </div>
         </div>
 
         <div data-role="footer" data-position="fixed" data-tap-toggle="false"

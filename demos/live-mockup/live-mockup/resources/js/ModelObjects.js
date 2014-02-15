@@ -146,24 +146,16 @@ var Moment = Class.extend({
 
 //life stream class: top level class used to represent the life stream
 var LifeStream = Class.extend({
-    init: function () {
-        this.userProfile = null;       //logged in user profile: User
-        this.moments = [];      //all moments= Moment[]
-        this.shares = [];
-    },
+  init: function () {
+    this.userProfile = null;
+    this.moments = [];
+    this.shares = [];
+  },
 
-    getUserProfileThumbnailPath: function () {
-        if (!this.userProfile)
-            return null;
+  getUserProfileThumbnailPath: function () {
+    if (!this.userProfile)
+      return null;
 
-        return this.userProfile.thumbnailSrc;
-    },
-
-    loadData: function (callback) {
-        this.userProfile = Users.getCurrentUser();
-        Moments.ajaxGetAll(function(moments) {
-            this.moments = moments;
-            callback(moments);
-        }.bind(this));
-    }
+    return this.userProfile.thumbnailSrc;
+  }
 });

@@ -1,5 +1,20 @@
+var RegistrationPictureViewer = AddPictures.extend({
+ init: function(width, scroller, assets) {
+   this.assets = assets;
+   this._super(width, scroller, false);
+ },
+ 
+ getNumGroups: function() {
+   return 1
+ },
+ 
+ getAssetsForGroup: function(groupIndex) {
+   return this.assets;
+ },
+});
+
 var RegistrationAddPicturesPage = {
-	addPictures: null,
+	pictureViewer: null,
 	footerEl: null
 };
 
@@ -34,13 +49,14 @@ RegistrationAddPicturesPage.onShow = function(event, ui) {
       });
         
   var scroller = new Scroller($('#scrollable'));
-  var addPictures =
-      new AddPictures(pageEl.width(), CameraRoll.getCameraRoll(), scroller);
-  addPictures.setSelectable(true, true,
+  var pictureViewer =
+      new RegistrationPictureViewer(pageEl.width(), scroller,
+          CameraRoll.getCameraRoll());
+  pictureViewer.setSelectable(true, true,
       RegistrationAddPicturesPage.onSelectionChanged);
-  addPictures.getEl()
+  pictureViewer.getEl()
 			.appendTo(pageEl.find('#pictures'));
-	RegistrationAddPicturesPage.addPictures = addPictures;
+	RegistrationAddPicturesPage.pictureViewer = pictureViewer;
 };
 
 /**
@@ -60,7 +76,7 @@ RegistrationAddPicturesPage.onSelectionChanged = function(numSelected) {
 RegistrationAddPicturesPage.touchFooterButton = function(e) {
   e.preventDefault();
   
-  var assets = RegistrationAddPicturesPage.addPictures.getSelected();
+  var assets = RegistrationAddPicturesPage.pictureViewer.getSelected();
 	PersonalLibrary.add(assets);
   PictureWidgets.ajaxAdd(assets, function() {
     if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
