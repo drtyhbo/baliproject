@@ -1,10 +1,14 @@
-var NUM_COLUMNS = 3;
 var PICTURE_SPACING = 2;
 var USE_VARIOUS_SPACING_UI = false;
 var LOAD_IMAGES_DELAY_MS = 250;
 // Assets with timestamps smaller than this will be combined into a single
 // asset element when using fancy pants rendering.
 var FANCY_PANTS_TIME_DELTA_SEC = 15;
+
+var SMALL_PICTURE = 1;
+var MEDIUM_PICTURE = 2;
+var LARGE_PICTURE = 3;
+var EXTRA_LARGE_PICTURE = 4;
 
 /**
  * This class is used to render arbitrarily long lists of vertical elements
@@ -245,6 +249,7 @@ var AssetElement = Class.extend({
     // selections change.
     this.addPictures = addPictures;
 
+    this.type;
     this.assets = [];
     this.addAsset(asset);
 
@@ -276,10 +281,26 @@ var AssetElement = Class.extend({
     this.imagesLoaded = false;
   },
 
-  getHeight: function() {
-    return this.baseDimension;
+  getType: function() {
+    return this.type;
+  },
+  
+  setType: function(type) {
+    this.type = type;
   },
 
+  getHeight: function() {
+    if (this.type == SMALL_PICTURE) {
+      return this.baseDimension;
+    } else if (this.type == MEDIUM_PICTURE) {
+      return this.baseDimension + this.baseDimension / 2 + PICTURE_SPACING / 2;
+    } else if (this.type == LARGE_PICTURE) {
+      return this.baseDimension * 2 + PICTURE_SPACING;
+    } else {
+      return this.baseDimension * 3 + PICTURE_SPACING * 2;
+    }
+  },
+  
   getEl: function (dontCreate) {
     if (this.el) {
       return this.el;
@@ -291,11 +312,10 @@ var AssetElement = Class.extend({
     this.el = $('<span></span>')
         .css({
             display: 'inline-block',
-            height: this.baseDimension + 'px',
-            marginLeft: PICTURE_SPACING + 'px',
+            height: this.getHeight() + 'px',
             opacity: this.opacity,
             position: 'relative',
-            width: this.baseDimension + 'px'
+            width: this.getHeight() + 'px'
         });
 
     this.imageEl = this.getImageEl()
@@ -341,7 +361,14 @@ var AssetElement = Class.extend({
   },
 
   addAsset: function(asset) {
-      this.assets.push(asset);
+    this.assets.push(asset);
+    if (this.assets.length > 5) {
+      this.type = EXTRA_LARGE_PICTURE;
+    } else if (this.assets.length > 2) {
+      this.type = LARGE_PICTURE;
+    } else {
+      this.type = SMALL_PICTURE;
+    }
   },
 
   getAssets: function() {
@@ -484,93 +511,115 @@ var AssetElement = Class.extend({
  * Encapulates the logic to handle a row of asset elements.
  */
 var AssetRowElement = Class.extend({
-   init: function(assetElements) {
-     this.el = null;
-     this.assetElements = assetElements;
+  init: function(assetElements) {
+    this.el = null;
+    this.assetElements = assetElements;
 
-     // A boolean specifying whether the images have already been loaded for
-     // this row.
-     this.imagesLoaded = false;
-     // The id for the setTimeout() that loads the images in this row.
-     this.loadImagesTimerId = 0;
-     // The height of this row.
-     this.height = 0;
-   },
+    // A boolean specifying whether the images have already been loaded for
+    // this row.
+    this.imagesLoaded = false;
+    // The id for the setTimeout() that loads the images in this row.
+    this.loadImagesTimerId = 0;
+    // The height of this row.
+    this.height = 0;
+  },
 
-   /**************************
-    *
-    * Functions called by VisibleElementRenderer
-    *
-    **************************/
+  /**************************
+  *
+  * Functions called by VisibleElementRenderer
+  *
+  **************************/
 
-   getHeight: function() {
-     if (!this.height) {
-       for (var i = 0, asset; asset = this.assetElements[i]; i++) {
-         if (asset.getHeight() > this.height) {
-           this.height = asset.getHeight();
-         }
-       }
-     }
-     return this.height;
-   },
-   
-   getVisibleElements: function() {
-     return this.assetElements;
-   },
+  getHeight: function() {
+    if (!this.height) {
+      for (var i = 0, asset; asset = this.assetElements[i]; i++) {
+        if (asset.getHeight() > this.height) {
+          this.height = asset.getHeight();
+        }
+      }
+    }
+    return this.height;
+  },
 
-   /**************************
-    *
-    * End functions called by VisibleElementRenderer
-    *
-    **************************/
+  getVisibleElements: function() {
+    return this.assetElements;
+  },
 
-   getEl: function() {
-     if (this.el) {
-       return this.el;
-     }
+  /**************************
+  *
+  * End functions called by VisibleElementRenderer
+  *
+  **************************/
 
-     this.el = $('<div></div>')
-         .css('margin-bottom', PICTURE_SPACING + 'px');
-     for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-       assetElement.getEl().appendTo(this.el);
-     }
-     return this.el;
-   },
+  getEl: function() {
+    if (this.el) {
+      return this.el;
+    }
 
-   /**
-    * Should be called when the asset row is shown. Loads images.
-    */
-   show: function() {
-     this.shown = true;
+    this.el = $('<div></div>')
+      .css({
+        height: this.getHeight() + 'px',
+        marginBottom: PICTURE_SPACING + 'px',
+        position: 'relative'
+      });
 
-     if (this.imagesLoaded || this.loadImagesTimerId) {
-       return;
-     }
-     this.loadImagesTimerId =
-         setTimeout(this.loadImages.bind(this),
-             Math.random() * LOAD_IMAGES_DELAY_MS + LOAD_IMAGES_DELAY_MS);
-   },
+    var left = PICTURE_SPACING;
+    var top = 0;
+    // isMixed means this row contains large and small pictures.
+    var isMixed = false;
+    for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+      assetElement.getEl()
+          .css({
+            left: left + 'px',
+            position: 'absolute',
+            top: top + 'px'
+          })
+          .appendTo(this.el);
+      // Not mixed mode, position horizontally.
+      if (!isMixed || assetElement.getType() != SMALL_PICTURE) {
+        left += assetElement.getHeight() + PICTURE_SPACING;
+      // Mixed mode and it's a smallsy. Start stacking vertically.
+      } else if (isMixed && assetElement.getType() == SMALL_PICTURE) {
+        top += assetElement.getHeight() + PICTURE_SPACING;
+      }
+      isMixed |= assetElement.getType() == LARGE_PICTURE;
+    }
+    return this.el;
+  },
 
-   /**
-    * Should be called when the asset row is hidden.
-    */
-   hide: function() {
-     this.shown = false;
+  /**
+  * Should be called when the asset row is shown. Loads images.
+  */
+  show: function() {
+    this.shown = true;
 
-     clearTimeout(this.loadImagesTimerId);
-     this.loadImagesTimerId = 0;
-   },
+    if (this.imagesLoaded || this.loadImagesTimerId) {
+      return;
+    }
+    this.loadImagesTimerId =
+        setTimeout(this.loadImages.bind(this),
+            Math.random() * LOAD_IMAGES_DELAY_MS + LOAD_IMAGES_DELAY_MS);
+  },
 
-   /**
-    * Loads the images for the assets in this row.
-    */
-   loadImages: function() {
-     for (var i = 0, assetElement;
-         assetElement = this.assetElements[i]; i++) {
-       assetElement.loadImages();
-     }
-     this.imagesLoaded = true;
-   }
+  /**
+  * Should be called when the asset row is hidden.
+  */
+  hide: function() {
+    this.shown = false;
+
+    clearTimeout(this.loadImagesTimerId);
+    this.loadImagesTimerId = 0;
+  },
+
+  /**
+  * Loads the images for the assets in this row.
+  */
+  loadImages: function() {
+    for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+      assetElement.loadImages();
+    }
+    this.imagesLoaded = true;
+  }
 });
 
 /**
@@ -616,17 +665,49 @@ var AssetGroup = VisibleElementRenderer.extend({
   getElements: function() {
     var elements = [];
 
-    // The DOM for the various asset rows will be created dynamically, so
-    // we need to set a fixed height now.
-    var numRows = Math.ceil(this.assetElements.length / NUM_COLUMNS);
-    var numElements = this.assetElements.length;
-    for (var i = 0; i < numElements; i += 3) {
-      var assetElementsForRow = [];
-      for (var j = i; j < numElements && j < i + 3; j++) {
-        assetElementsForRow.push(this.assetElements[j]);
+    // Make a copy that we can modify.
+    var elementsToAdd = this.assetElements.slice(0);
+    var assetElementsForRow = [];
+    
+    while (elementsToAdd.length) {
+      var element = elementsToAdd.shift();
+      // Extra large assets take up an entire row so create a new row
+      // immediately whenever we encounter one.
+      if (element.getType() == EXTRA_LARGE_PICTURE) {
+        elements.push(
+            new AssetRowElement([element]));
+      // Large pictures are the complicated case. In a row we can have
+      // a large picture and two small ones, or two large pictures.
+      } else if (element.getType() == LARGE_PICTURE) {
+        assetElementsForRow.unshift(element);
+        // Two assets. If both are medium, the row is finished. We only need
+        // to check the first two because medium sized ones are shifted into
+        // the front of the list.
+        if (assetElementsForRow.length > 1 &&
+              assetElementsForRow[0].getType() ==
+                  assetElementsForRow[1].getType()) {
+          // Add any extra small ones back into the queue.
+          if (assetElementsForRow[2]) {
+            elementsToAdd.unshift(assetElementsForRow[2])
+            assetElementsForRow.pop();
+          }
+          // Special case, make the two assets medium sized.
+          assetElementsForRow[0].setType(MEDIUM_PICTURE);
+          assetElementsForRow[1].setType(MEDIUM_PICTURE);
+          elements.push(
+              new AssetRowElement(assetElementsForRow));
+          assetElementsForRow = [];          
+        }
+      } else {
+        assetElementsForRow.push(element);
       }
-      elements.push(
-          new AssetRowElement(assetElementsForRow));
+      
+      // Finished row, or nothing left.
+      if (assetElementsForRow.length == 3 || !elementsToAdd.length) {
+        elements.push(
+            new AssetRowElement(assetElementsForRow));
+        assetElementsForRow = [];
+      }
     }
 
     return elements;
@@ -673,8 +754,7 @@ var AddPictures = VisibleElementRenderer.extend({
     // The dimension of an individual picture. This corresponds to the
     // width and height since pictures are square.
     this.pictureDimension = (this.width - (PICTURE_SPACING * 2) -
-        PICTURE_SPACING * (NUM_COLUMNS - 1)) /
-        NUM_COLUMNS;
+        PICTURE_SPACING * (3 - 1)) / 3;
     // The height of an individual row is equal to the height of a picture
     // plus the interrow spacing.
     this.rowHeight = this.pictureDimension + PICTURE_SPACING;
