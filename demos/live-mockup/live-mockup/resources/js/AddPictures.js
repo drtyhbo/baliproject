@@ -27,6 +27,7 @@ var VisibleElementRenderer = Class.extend({
     this.tops = [];
     this.height = 0;
     this.elements = this.getElements();
+    this.visibleElements = null;
   },
 
   /**************************
@@ -56,6 +57,22 @@ var VisibleElementRenderer = Class.extend({
    * END OVERRIDE
    *
    **************************/
+
+  getVisibleElements: function() {
+    if (this.visibleElements) {
+      return this.visibleElements;
+    }
+
+    this.visibleElements = [];
+    for (var i = this.visibleRange.firstIndex; i <= this.visibleRange.lastIndex;
+        i++) {
+      if ('getVisibleElements' in this.elements[i]) {
+        this.visibleElements =
+            this.visibleElements.concat(this.elements[i].getVisibleElements());
+      }
+    }
+    return this.visibleElements;
+  },
 
   /**
    * Calculates the height of all the managed elements.
@@ -101,7 +118,7 @@ var VisibleElementRenderer = Class.extend({
     return this.el;
   },
 
-  determineVisibleElements: function(viewportTop, viewportHeight) {
+  determineVisibleRange: function(viewportTop, viewportHeight) {
     // A negative viewportTop means the picture selector is further down on the
     // page, perhaps all the way off the screen.
     if (viewportTop < 0 && viewportTop < -viewportHeight) {
@@ -144,19 +161,19 @@ var VisibleElementRenderer = Class.extend({
     }
   },
 
-  clearHiddenElements: function(visibleElements) {
-    for (var i = this.visibleElements.firstIndex;
-        i < this.visibleElements.lastIndex; i++) {
-      if (i < visibleElements.firstIndex || i >= visibleElements.lastIndex) {
+  clearHiddenElements: function(visibleRange) {
+    for (var i = this.visibleRange.firstIndex;
+        i < this.visibleRange.lastIndex; i++) {
+      if (i < visibleRange.firstIndex || i >= visibleRange.lastIndex) {
         this.showElement(false, this.elements[i]);
         this.elements[i].getEl().detach();
       }
     }
   },
 
-  insertVisibleElements: function(visibleElements) {
+  insertVisibleElements: function(visibleRange) {
     var insertAfter = null;
-    for (var i = visibleElements.firstIndex; i <= visibleElements.lastIndex;
+    for (var i = visibleRange.firstIndex; i <= visibleRange.lastIndex;
         i++) {
       var element = this.elements[i];
       var elementEl = element.getEl();
@@ -181,35 +198,40 @@ var VisibleElementRenderer = Class.extend({
    * above the top.
    */
   updateVisibleElements: function(viewportTop, viewportHeight) {
-    var visibleElements =
-        this.determineVisibleElements(viewportTop, viewportHeight);
+    var visibleRange =
+        this.determineVisibleRange(viewportTop, viewportHeight);
 
-    if (this.visibleElements) {
-      this.clearHiddenElements(visibleElements);
+    if (this.visibleRange) {
+      this.clearHiddenElements(visibleRange);
     }
 
-    if (!this.visibleElements ||
-        visibleElements.firstIndex != this.visibleElements.firstIndex ||
-        visibleElements.lastIndex != this.visibleElements.lastIndex) {
+    if (!this.visibleRange ||
+        visibleRange.firstIndex != this.visibleRange.firstIndex ||
+        visibleRange.lastIndex != this.visibleRange.lastIndex) {
+      this.visibleElements = null;
+
       // The content inside visibleEl will change so we must update the heights
       // of the other two divs to remain a constant overall height.
-      this.aboveEl.css('height', this.tops[visibleElements.firstIndex] + 'px');
+      this.aboveEl.css('height', this.tops[visibleRange.firstIndex] + 'px');
       this.belowEl.css('height',
-          this.height - (this.tops[visibleElements.lastIndex] +
-              this.elements[visibleElements.lastIndex].getHeight()) + 'px');
-      this.insertVisibleElements(visibleElements);
+          this.height - (this.tops[visibleRange.lastIndex] +
+              this.elements[visibleRange.lastIndex].getHeight()) + 'px');
+      this.insertVisibleElements(visibleRange);
 
-      this.visibleElements = visibleElements;
+      this.visibleRange = visibleRange;
     }
 
     // The child elements may in fact be VisibleElementRenderer subclasses,
     // so make sure to propagate this update down the tree.
-    for (var i = visibleElements.firstIndex; i <= visibleElements.lastIndex;
+    for (var i = visibleRange.firstIndex; i <= visibleRange.lastIndex;
         i++) {
       var element = this.elements[i];
       if (!('updateVisibleElements' in element)) {
         break;
       }
+      // We must recalculate all visible elements if any children are
+      // VisibleElementRenderers.
+      this.visibleElements = null;
       element.updateVisibleElements(
           viewportTop - this.tops[i], viewportHeight);
     }
@@ -296,11 +318,12 @@ var AssetElement = Class.extend({
     return this.el;
   },
 
-  getImageEl: function() {
+  getImageEl: function(url) {
     return $('<span></span>')
         .css({
           background: '#eee',
           backgroundSize: 'cover',
+          backgroundImage: url ? 'url(' + url + ')' : 'none',
           display: 'inline-block',
           height: '100%',
           left: 0,
@@ -330,20 +353,20 @@ var AssetElement = Class.extend({
   },
 
   stepAnimation: function() {
-      if (this.assets.lenth < 2)
-          return;
+    if (!this.nextImageEl)
+      return;
 
-      this.nextAsset = (this.nextAsset + 1) % this.assets.length;
+    this.nextAsset = (this.nextAsset + 1) % this.assets.length;
 
-      this.nextImageEl.animate({
-          opacity: 1
-      }, 1000, function() {
-          this.imageEl.remove();
-          this.imageEl = this.nextImageEl;
-          this.nextImageEl = this.getImageEl(this.assets[this.nextAsset].getSrc())
-              .css('opacity', 0)
-              .appendTo(this.el);
-      }.bind(this))
+    this.nextImageEl.animate({
+      opacity: 1
+    }, 1000, function() {
+      this.imageEl.remove();
+      this.imageEl = this.nextImageEl;
+      this.nextImageEl = this.getImageEl(this.assets[this.nextAsset].getSrc())
+          .css('opacity', 0)
+          .appendTo(this.el);
+    }.bind(this))
   },
 
   setOpacity: function(opacity) {
@@ -450,6 +473,10 @@ var AssetElement = Class.extend({
 
   loadImages: function() {
     this.imageEl.css('background-image', 'url(' + this.assets[0].getSrc() + ')');
+    if (this.nextImageEl) {
+      this.nextImageEl.css('background-image',
+          'url(' + this.assets[1].getSrc() + ')');
+    }
   }
 });
 
@@ -470,6 +497,12 @@ var AssetRowElement = Class.extend({
      this.height = 0;
    },
 
+   /**************************
+    *
+    * Functions called by VisibleElementRenderer
+    *
+    **************************/
+
    getHeight: function() {
      if (!this.height) {
        for (var i = 0, asset; asset = this.assetElements[i]; i++) {
@@ -480,6 +513,16 @@ var AssetRowElement = Class.extend({
      }
      return this.height;
    },
+   
+   getVisibleElements: function() {
+     return this.assetElements;
+   },
+
+   /**************************
+    *
+    * End functions called by VisibleElementRenderer
+    *
+    **************************/
 
    getEl: function() {
      if (this.el) {
@@ -712,6 +755,10 @@ var AddPictures = VisibleElementRenderer.extend({
   			.appendTo(this.selectAllContainerEl);
 
     this.updateVisibleElements();
+    
+    if (this.useFancyPants) {
+      setInterval(this.onStepAnimation.bind(this), 2000);
+    }
 
     return this.el;
   },
@@ -890,15 +937,10 @@ var AddPictures = VisibleElementRenderer.extend({
    * Animate the pictures
    */
   onStepAnimation: function() {
-      var top = $(document).scrollTop();
-      var height = $(window).height();
-
-      for (var i = 0, assetElement;
-                  assetElement = this.animatedAssetElements[i]; i++) {
-          var offset = assetElement.getOffset();
-          if (offset.top + assetElement.el.height() > top && offset.top < top + height) {
-              assetElement.stepAnimation();
-          }
-      }
+    var visibleElements = this.getVisibleElements();
+    for (var i = 0, assetElement;
+                assetElement = this.visibleElements[i]; i++) {
+      assetElement.stepAnimation();
+    }
   }
 });
