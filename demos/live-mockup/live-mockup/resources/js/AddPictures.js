@@ -34,12 +34,17 @@ var VisibleElementRenderer = Class.extend({
    *
    **************************/
   
+  calculateHeight: function() {
+    var height = 0;
+    for (var i = 0, element; element = this.elements[i]; i++) {
+      height += element.getHeight();
+    }
+    return height;   
+  },
+  
   getHeight: function() {
     if (!this.height) {
-      this.height = 0;
-      for (var i = 0, element; element = this.elements[i]; i++) {
-        this.height += element.getHeight();
-      }
+      this.height = this.calculateHeight();
     }
     return this.height;
   },
@@ -64,8 +69,6 @@ var VisibleElementRenderer = Class.extend({
       top += element.getHeight();
     }
     
-    this.height = top;
-    
     return this.el;
   },
 
@@ -85,10 +88,6 @@ var VisibleElementRenderer = Class.extend({
     var high = this.elements.length - 1;
     while (low != high) {
       var mid = Math.floor((low + high) / 2);
-      
-      if (!this.elements[mid]) {
-        debugger;
-      }
       
       // This group is below the viewport.
       var top = this.tops[mid];
@@ -523,7 +522,8 @@ var AssetRowElement = Class.extend({
  * the grid of assets, then an optional footer row.
  */
 var AssetGroup = VisibleElementRenderer.extend({
-  init: function(assetElements, pictureDimension) {
+  init: function(headerEl, assetElements, pictureDimension) {
+    this.headerEl = headerEl;
     this.assetElements = assetElements;
     this.pictureDimension = pictureDimension;
 
@@ -536,6 +536,22 @@ var AssetGroup = VisibleElementRenderer.extend({
    * VisibleElementRenderer overrides
    *
    **************************/
+  
+  calculateHeight: function() {
+    var height = this._super();
+    // This is GHETTO. Figure out a better way to do this.
+    this.headerEl
+        .css('visibility', 'hidden')
+        .appendTo($(document.body));
+
+    height += this.headerEl.height();
+
+    this.headerEl
+        .remove()
+        .css('visibility', 'visible');
+        
+    return height;
+  },
   
   getElements: function() {
     var elements = [];
@@ -554,6 +570,14 @@ var AssetGroup = VisibleElementRenderer.extend({
     }
     
     return elements;
+  },
+
+  getEl: function() {
+    if (!this.el) {
+      this._super();
+      this.headerEl.prependTo(this.el);
+    }
+    return this.el;
   },
   
   showElement: function(isShown, assetRow) {
@@ -614,7 +638,8 @@ var AddPictures = VisibleElementRenderer.extend({
           this.assetElementsFromAssets(this.getAssetsForGroup(i),
               this.useFancyPants);
       elements.push(
-        new AssetGroup(assetElementsForGroup, this.pictureDimension));
+          new AssetGroup(this.getGroupHeaderEl(i), assetElementsForGroup,
+              this.pictureDimension));
       this.assetElements = this.assetElements.concat(assetElementsForGroup);
     }
     return elements;
@@ -640,6 +665,13 @@ var AddPictures = VisibleElementRenderer.extend({
   getAssetsForGroup: function(groupIndex) {
     throw 'AddPictures must be subclassed. ' +
         'getAssetsForGroup must be implemented.';
+  },
+
+  /**
+   * Returns the element to be used as the header for the specified group.
+   */
+  getGroupHeaderEl: function(groupIndex) {
+    return null;
   },
 
   /**************************

@@ -16,24 +16,6 @@ var LifeStreamItem = Class.extend({
                     paddingBottom: '5px'
                 });
 
-        var headerEl = $('<div></div>')
-                .css({
-                    margin: '10px 5px',
-                    position: 'relative',
-                    textShadow: 'none'
-                })
-				.appendTo(this.el);
-        this.moment.location = 'Berkeley, California'
-        var locationEl = $('<div></div>')
-				.css({
-				    fontSize: '11px',
-                    left: 0,
-				    lineHeight: '11px',
-				})
-				.text((this.moment.location ?
-                            (this.moment.location + ' \u00B7 ') : '') +
-                            this.moment.getElapsedTime())
-				.appendTo(headerEl);
 /*        var timeEl = $('<div></div>')
 				.css({
 				    fontSize: '11px',
@@ -146,10 +128,10 @@ var LifeStreamItem = Class.extend({
 });
 
 var LifeStreamMomentViewer = AddPictures.extend({
- init: function(width, scroller, moments) {
-   this.moments = moments;
-   this._super(width, scroller, true);
- },
+  init: function(width, scroller, moments) {
+    this.moments = moments;
+    this._super(width, scroller, true);
+  },
  
  /**************************
   *
@@ -157,13 +139,28 @@ var LifeStreamMomentViewer = AddPictures.extend({
   *
   **************************/
  
- getNumGroups: function() {
-   return this.moments.length;
- },
+  getNumGroups: function() {
+    return this.moments.length;
+  },
+
+  getAssetsForGroup: function(groupIndex) {
+    return this.moments[groupIndex].widgets;
+  },
  
- getAssetsForGroup: function(groupIndex) {
-   return this.moments[groupIndex].widgets;
- },
+  getGroupHeaderEl: function(groupIndex) {
+    var moment = this.moments[groupIndex];
+
+    var locationEl = $('<div></div>')
+        .css({
+          fontSize: '11px',
+          lineHeight: '31px',
+          paddingLeft: '2px'
+        })
+        .text((moment.location ? (moment.location + ' \u00B7 ') : '') +
+            moment.getElapsedTime());
+
+    return locationEl;
+  },
 });
 
 var LifeStreamView = {
