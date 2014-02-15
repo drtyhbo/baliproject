@@ -5,25 +5,47 @@ var USE_VARIOUS_SPACING_UI = false;
 // asset element when using fancy pants rendering.
 var FANCY_PANTS_TIME_DELTA_SEC = 15;
 
+/**
+ * This class is used to render arbitrarily long lists of vertical elements
+ * in a way that doesn't bog down the system. It does this by only creating
+ * elements when they are needed, and by only showing those elements when
+ * they are in the viewport.
+ *
+ * This class must be subclassed.
+ */
 var VisibleElementRenderer = Class.extend({
   init: function() {
     this.el = null;
+    // The content above what is currently visible.
+    this.aboveEl = null;
+    // The content that is visible.
+    this.visibleEl = null;
+    // The content below what is currently visible.
+    this.belowEl = null;
+    // The top position for each element.
     this.tops = [];
     this.height = 0;
     this.elements = this.getElements();
   },
-  
+
   /**************************
    *
    * OVERRIDE THESE FUNCTIONS!!!
    *
    **************************/
 
+  /**
+   * Return the list of elements whose rendering should be managed by
+   * VisibleElementRenderer. MUST BE IMPLEMENTED.
+   */
   getElements: function() {
     throw 'VisibleElementRendered must be subclassed. ' +
         'getElements must be implemented.';
   },
 
+  /**
+   * Called when an element is either made visible or made hidden.
+   */
   showElement: function(shown, element) {
     // Implementation of this function is optional.
   },
@@ -33,22 +55,28 @@ var VisibleElementRenderer = Class.extend({
    * END OVERRIDE
    *
    **************************/
-  
+
+  /**
+   * Calculates the height of all the managed elements.
+   */
   calculateHeight: function() {
     var height = 0;
     for (var i = 0, element; element = this.elements[i]; i++) {
       height += element.getHeight();
     }
-    return height;   
+    return height;
   },
-  
+
+  /**
+   * Returns the height of all the managed elements.
+   */
   getHeight: function() {
     if (!this.height) {
       this.height = this.calculateHeight();
     }
     return this.height;
   },
-  
+
   getEl: function() {
     if (this.el) {
       return this.el;
@@ -68,13 +96,10 @@ var VisibleElementRenderer = Class.extend({
       this.tops[i] = top;
       top += element.getHeight();
     }
-    
+
     return this.el;
   },
 
-  /**
-   * Determines which elements are currently within the viewport.
-   */
   determineVisibleElements: function(viewportTop, viewportHeight) {
     // A negative viewportTop means the picture selector is further down on the
     // page, perhaps all the way off the screen.
@@ -82,24 +107,27 @@ var VisibleElementRenderer = Class.extend({
       // Not visible.
       return null;
     }
-    
-    // Do a binary search to find which elements are visible.
+
+    // Do a binary search to find the topmost element that is within the
+    // viewport.
     var low = 0;
     var high = this.elements.length - 1;
     while (low != high) {
       var mid = Math.floor((low + high) / 2);
-      
-      // This group is below the viewport.
+
       var top = this.tops[mid];
+      // This element is above the viewport so none of the elements that come
+      // before it are what we're looking for.
       if (top + this.elements[mid].getHeight() < viewportTop) {
         low = mid + 1;
-      // This element is at least above the viewport, so use it as the
-      // new high.
+      // This element is at least above the viewport so none of the elements
+      // that come after it are what we're looking for.
       } else {
         high = mid;
       }
     }
 
+    // Find the last element that is within the viewport.
     var firstIndex = low;
     var lastIndex = low;
     var viewportBottom = viewportTop + viewportHeight;
@@ -108,16 +136,13 @@ var VisibleElementRenderer = Class.extend({
         lastIndex = i;
       }
     }
-    
+
     return {
       firstIndex: firstIndex,
       lastIndex: lastIndex
     }
   },
 
-  /**
-   * Determines which elements are now hidden and removes them from the DOM.
-   */
   clearHiddenElements: function(visibleElements) {
     for (var i = this.visibleElements.firstIndex;
         i < this.visibleElements.lastIndex; i++) {
@@ -127,20 +152,15 @@ var VisibleElementRenderer = Class.extend({
       }
     }
   },
-  
-  /**
-   * Inserts the visible elements into the DOM.
-   */
+
   insertVisibleElements: function(visibleElements) {
     var insertAfter = null;
     for (var i = visibleElements.firstIndex; i <= visibleElements.lastIndex;
         i++) {
       var element = this.elements[i];
       var elementEl = element.getEl();
-      // A row that already has a parent is already in the DOM so we can safely
-      // skip it.
+      // An element with a parent is already in the DOM so can be ignored.
       if (!elementEl.parent().length) {
-        // First row wont have a previous sibling, so place at the front.
         if (!insertAfter) {
           this.visibleEl.prepend(elementEl);
         } else {
@@ -152,25 +172,12 @@ var VisibleElementRenderer = Class.extend({
       insertAfter = elementEl;
     }
   },
-  
+
   /**
-   * This optimization works by only showing those rows in the DOM that are
-   * currently within the viewport. There are three divs in the following DOM
-   * order:
-   *
-   * - aboveEl
-   * - visibleEl
-   * - belowEl
-   *
-   * The visibleEl element is the only one that contains content. The other two
-   * elements are used to pad the height of the content div to keep the scroll
-   * height the same.
-   *
-   * Each time the page moves, we calculate the current viewport, show/hide rows
-   * as necessary, and update the height of the various viewport sections.
-   *
-   * In addition, this allows us to only create DOM elements and load images as they
-   * come into view, thereby speeding up the initial rendering immensely.
+   * viewportTop is expected to be relative to the top of this element. A value
+   * of 0 assumes this element is at the very top of the viewport. A negative
+   * value means this element is below the top. A positive value means it's
+   * above the top.
    */
   updateVisibleElements: function(viewportTop, viewportHeight) {
     var visibleElements =
@@ -180,21 +187,25 @@ var VisibleElementRenderer = Class.extend({
       this.clearHiddenElements(visibleElements);
     }
 
-    this.aboveEl.css('height', this.tops[visibleElements.firstIndex] + 'px');
-    this.belowEl.css('height',
-        this.height - (this.tops[visibleElements.lastIndex] +
-            this.elements[visibleElements.lastIndex].getHeight()) + 'px');
-
     if (!this.visibleElements ||
         visibleElements.firstIndex != this.visibleElements.firstIndex ||
         visibleElements.lastIndex != this.visibleElements.lastIndex) {
-      this.insertVisibleElements(visibleElements);    
+      // The content inside visibleEl will change so we must update the heights
+      // of the other two divs to remain a constant overall height.
+      this.aboveEl.css('height', this.tops[visibleElements.firstIndex] + 'px');
+      this.belowEl.css('height',
+          this.height - (this.tops[visibleElements.lastIndex] +
+              this.elements[visibleElements.lastIndex].getHeight()) + 'px');
+      this.insertVisibleElements(visibleElements);
+
       this.visibleElements = visibleElements;
     }
 
+    // The child elements may in fact be VisibleElementRenderer subclasses,
+    // so make sure to propagate this update down the tree.
     for (var i = visibleElements.firstIndex; i <= visibleElements.lastIndex;
         i++) {
-      var element = this.elements[i];  
+      var element = this.elements[i];
       if (!('updateVisibleElements' in element)) {
         break;
       }
@@ -207,18 +218,18 @@ var VisibleElementRenderer = Class.extend({
 var AssetElement = Class.extend({
   init: function (addPictures, asset, baseDimension) {
     // We need access to the AddPicture object to check if selections
-    // are enabled, and to fire the onSelectionChanged callback when the 
+    // are enabled, and to fire the onSelectionChanged callback when the
     // selections change.
     this.addPictures = addPictures;
 
     this.assets = [];
     this.addAsset(asset);
-    
+
     // AssetElements are square, so baseDimension specifies both the base width
     // and height of this asset. AssetElements may be rendered as some multiple
     // of baseDimension depending on how special they are.
     this.baseDimension = baseDimension;
-    
+
     this.nextAsset = 1;
 
     this.el = null;
@@ -227,7 +238,7 @@ var AssetElement = Class.extend({
     this.fadedEl = null;
     this.checkedEl = null;
     this.offset = null;
-    
+
     // The current opacity of this element.
     this.opacity = 1;
 
@@ -237,15 +248,15 @@ var AssetElement = Class.extend({
     this.touchStartY;
     // The ending Y position of the touch.
     this.touchEndY;
-    
+
     // True when the images have been loaded for this asset.
-    this.imagesLoaded = false;       
+    this.imagesLoaded = false;
   },
-  
+
   getHeight: function() {
     return this.baseDimension;
   },
-  
+
   getEl: function (dontCreate) {
     if (this.el) {
       return this.el;
@@ -253,7 +264,7 @@ var AssetElement = Class.extend({
     if (!this.el && dontCreate) {
       return null;
     }
-    
+
     this.el = $('<span></span>')
         .css({
             display: 'inline-block',
@@ -271,7 +282,7 @@ var AssetElement = Class.extend({
           .css('opacity', 0)
           .appendTo(this.el);
     }
-    
+
     // Optimization: Only create this DOM element when needed.
     if (this.isSelected) {
       this.createSelectionEl();
@@ -297,22 +308,22 @@ var AssetElement = Class.extend({
           width: '100%'
         });
   },
-  
+
   getOffset: function() {
       if (!this.offset) {
           this.offset = this.el.offset();
       }
       return this.offset;
   },
-  
+
   addAsset: function(asset) {
       this.assets.push(asset);
   },
-  
+
   getAssets: function() {
     return this.assets;
   },
-  
+
   getNumFrames: function() {
       return this.assets.length;
   },
@@ -330,10 +341,10 @@ var AssetElement = Class.extend({
           this.imageEl = this.nextImageEl;
           this.nextImageEl = this.getImageEl(this.assets[this.nextAsset].getSrc())
               .css('opacity', 0)
-              .appendTo(this.el);            
+              .appendTo(this.el);
       }.bind(this))
   },
-  
+
   setOpacity: function(opacity) {
     if (this.el) {
       this.el.css('opacity', opacity);
@@ -341,7 +352,7 @@ var AssetElement = Class.extend({
       this.opacity = opacity;
     }
   },
-  
+
   /**************************
    *
    * Selection
@@ -435,7 +446,7 @@ var AssetElement = Class.extend({
   toggleSelected: function () {
     this.setSelected(!this.isSelected);
   },
-  
+
   loadImages: function() {
     this.imageEl.css('background-image', 'url(' + this.assets[0].getSrc() + ')');
   }
@@ -448,7 +459,7 @@ var AssetRowElement = Class.extend({
    init: function(assetElements) {
      this.el = null;
      this.assetElements = assetElements;
-     
+
      // A boolean specifying whether the images have already been loaded for this
      // row.
      this.imagesLoaded = false;
@@ -457,7 +468,7 @@ var AssetRowElement = Class.extend({
      // The height of this row.
      this.height = 0;
    },
-   
+
    getHeight: function() {
      if (!this.height) {
        for (var i = 0, asset; asset = this.assetElements[i]; i++) {
@@ -468,7 +479,7 @@ var AssetRowElement = Class.extend({
      }
      return this.height;
    },
-      
+
    getEl: function() {
      if (this.el) {
        return this.el;
@@ -494,17 +505,17 @@ var AssetRowElement = Class.extend({
      this.loadImagesTimerId =
          setTimeout(this.loadImages.bind(this), Math.random() * 250 + 250);
    },
-   
+
    /**
     * Should be called when the asset row is hidden.
     */
    hide: function() {
      this.shown = false;
-     
+
      clearTimeout(this.loadImagesTimerId);
      this.loadImagesTimerId = 0;
    },
-   
+
    /**
     * Loads the images for the assets in this row.
     */
@@ -513,7 +524,7 @@ var AssetRowElement = Class.extend({
          assetElement = this.assetElements[i]; i++) {
        assetElement.loadImages();
      }
-     this.imagesLoaded = true;     
+     this.imagesLoaded = true;
    }
 });
 
@@ -530,13 +541,13 @@ var AssetGroup = VisibleElementRenderer.extend({
     // AssetGroup must be initialized before the super class.
     this._super();
   },
-  
+
   /**************************
    *
    * VisibleElementRenderer overrides
    *
    **************************/
-  
+
   calculateHeight: function() {
     var height = this._super();
     // This is GHETTO. Figure out a better way to do this.
@@ -549,10 +560,10 @@ var AssetGroup = VisibleElementRenderer.extend({
     this.headerEl
         .remove()
         .css('visibility', 'visible');
-        
+
     return height;
   },
-  
+
   getElements: function() {
     var elements = [];
 
@@ -568,7 +579,7 @@ var AssetGroup = VisibleElementRenderer.extend({
       elements.push(
           new AssetRowElement(assetElementsForRow));
     }
-    
+
     return elements;
   },
 
@@ -579,7 +590,7 @@ var AssetGroup = VisibleElementRenderer.extend({
     }
     return this.el;
   },
-  
+
   showElement: function(isShown, assetRow) {
     assetRow[isShown ? 'show' : 'hide']();
   }
@@ -607,7 +618,7 @@ var AddPictures = VisibleElementRenderer.extend({
     this.numSelected = 0;
     // The element that contains the select all/select none link.
     this.selectAllEl = null;
-    
+
     // The dimension of an individual picture. This corresponds to the
     // width and height since pictures are square.
     this.pictureDimension = (this.width - (PICTURE_SPACING * 2) -
@@ -616,8 +627,8 @@ var AddPictures = VisibleElementRenderer.extend({
     // The height of an individual row is equal to the height of a picture
     // plus the interrow spacing.
     this.rowHeight = this.pictureDimension + PICTURE_SPACING;
-    
-    // The scroller object that encompasses this set of pictures.  
+
+    // The scroller object that encompasses this set of pictures.
     this.scroller = scroller;
     this.scroller.scroll(this.updateVisibleElements.bind(this));
 
@@ -644,7 +655,7 @@ var AddPictures = VisibleElementRenderer.extend({
     }
     return elements;
   },
-  
+
   /**************************
    *
    * OVERRIDE THESE FUNCTIONS!!!
@@ -658,7 +669,7 @@ var AddPictures = VisibleElementRenderer.extend({
     throw 'AddPictures must be subclassed. ' +
         'getNumGroups must be implemented.';
   },
-  
+
   /**
    * Returns a list of assets for the specified group.
    */
@@ -686,7 +697,7 @@ var AddPictures = VisibleElementRenderer.extend({
    */
   getEl: function() {
     this._super();
-  
+
     this.selectAllContainerEl = $('<div></div>')
   			.css({
             display: this.showSelectAll ? 'block' : 'none',
@@ -703,7 +714,7 @@ var AddPictures = VisibleElementRenderer.extend({
   			.text('Select all')
   			.on(TOUCHEND, this.toggleSelectAll.bind(this))
   			.appendTo(this.selectAllContainerEl);
-        
+
     this.updateVisibleElements();
 
     return this.el;
@@ -718,7 +729,7 @@ var AddPictures = VisibleElementRenderer.extend({
 
     var assetElements = [];
     for (var i = 0, asset; asset = assets[i]; i++) {
-      // Combine assets that are within 
+      // Combine assets that are within
       if (useFancyPants && lastAsset &&
           asset.timestamp - lastAsset.timestamp < FANCY_PANTS_TIME_DELTA_SEC) {
         assetElements[assetElements.length - 1].addAsset(asset);
@@ -728,10 +739,10 @@ var AddPictures = VisibleElementRenderer.extend({
       }
       lastAsset = asset;
     }
-    
+
     return assetElements;
   },
-  
+
   /**
    * Returns the number of pictures being displayed.
    */
@@ -758,11 +769,11 @@ var AddPictures = VisibleElementRenderer.extend({
     }
 
     this.selectionChangedCallback = selectionChangedCallback;
-  }, 
+  },
 
   /**
    * Called when the user taps one of the asset elements.
-   */  
+   */
   onSelectionChanged: function(isSelected) {
     this.numSelected += isSelected ? 1 : -1;
     if (this.selectionChangedCallback) {
@@ -834,7 +845,7 @@ var AddPictures = VisibleElementRenderer.extend({
     // Create a temporare element to use for animations. We just want access to the
     // step function.
     var elementToAnimate = $('<span></span>');
-    elementToAnimate.animate({      
+    elementToAnimate.animate({
       opacity: 0
     }, {
       duration: 500,
@@ -853,12 +864,12 @@ var AddPictures = VisibleElementRenderer.extend({
             if (el) {
               el.remove();
             }
-            this.assetElements.splice(i, 1);        
+            this.assetElements.splice(i, 1);
           }
         }
 
         // TODO: Removing elements doesn't work.
-        
+
         callback();
       }.bind(this)
     });
