@@ -71,6 +71,10 @@ Util.getServerBaseUrl = function () {
 
 }
 
+Util.alert = function (msg) {
+    alert(msg);
+}
+
 var Images = {};
 
 Images.getPath = function(subpath) {

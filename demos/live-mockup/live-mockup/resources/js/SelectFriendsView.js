@@ -1,7 +1,8 @@
 var FriendItem = Class.extend({
-    init: function (friend) {
+    init: function (friend, onSelectionCallback) {
         this.friend = friend;
         this.isSelected = false;
+        this.onSelectionCallback = onSelectionCallback || null;
     },
 
     /**
@@ -73,6 +74,8 @@ var FriendItem = Class.extend({
                     backgroundColor: '#fff'
                 });
 
+            if (this.onSelectionCallback)
+                this.onSelectionCallback();
         }
     }
 
@@ -118,8 +121,59 @@ SelectFriendsView.beforeTransition = function (event, ui) {
     //save current view
     localStorage.setItem('current-view', SELECT_FRIEND_VIEW_IDX);
 
+    //wire buttons
+    var backBtn = SelectFriendsView.ui.toPage.find('#back-button')
+        .on(TOUCHSTART, function () {
+            LifeStreamShareView.show(SelectFriendsView.lifeStream, false);
+        });
+
+    var shareBtn = SelectFriendsView.ui.toPage.find('#share-btn')
+        .on(TOUCHSTART, function () {
+            SelectFriendsView.createShare();
+        });
+
     var friends = Users.getAllUsers();
+    SelectFriendsView.items = [];
     for (var i = 0, friend; friend = friends[i]; i++) {
-        new FriendItem(friend).getEl().appendTo(friendsEl);
+        var item = new FriendItem(friend, SelectFriendsView.friendSelectionChanged.bind(SelectFriendsView));
+        item.getEl().appendTo(friendsEl);
+        SelectFriendsView.items.push(item);
     }    
 };
+
+SelectFriendsView.friendSelectionChanged = function () {
+    var count = 0;
+    for (var i = 0, item; item = SelectFriendsView.items[i]; i++) {
+        count += item.isSelected ? 1: 0;
+    }
+
+    var shareBtn = SelectFriendsView.ui.toPage.find('#share-btn')
+        .text(count == 0 ? 'Share' : 'Share With ' + count);
+}
+
+SelectFriendsView.createShare = function () {
+    //get selected friend ids
+    var friendIds = [];
+    for (var i = 0, item; item = SelectFriendsView.items[i]; i++) {
+        if (item.isSelected)
+            friendIds.push(item.friend.id);
+    }
+
+    //get selected asset ids
+    var selectedAssetIds = [];
+    var selectedAssets = LifeStreamShareView.getAssetsSelected();
+    for (var i = 0, asset; asset = selectedAssets[i]; i++)
+        selectedAssetIds.push(asset.id);
+
+    //save share
+    Shares.ajaxCreateShare(selectedAssetIds, friendIds, SelectFriendsView.createShareCallback.bind(SelectFriendsView))
+}
+
+SelectFriendsView.createShareCallback = function (newShareId) {
+    if (newShareId)
+        FeedView.show(false, newShareId);
+    else
+        Util.alert("oops, couldn't share. please try again!");
+
+
+}

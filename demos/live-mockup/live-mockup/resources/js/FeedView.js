@@ -340,13 +340,15 @@ var FeedItem = Class.extend({
 })
 
 var FeedView = {
+    newShareId: null,
     isShown: false
 };
 
 /**
  * Makes the feed view the current view.
  */
-FeedView.show = function (animate) {
+FeedView.show = function (animate, newShareId) {
+    this.newShareId = newShareId;
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
               FeedView.beforeTransition);
     $.mobile.pageContainer.pagecontainer('change', '#feed-view', {
