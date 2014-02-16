@@ -21,16 +21,27 @@ var LifeStreamMomentViewer = AddPictures.extend({
   getGroupHeaderEl: function(groupIndex) {
     var moment = this.moments[groupIndex];
 
-    var locationEl = $('<div></div>')
+    var headerEl = $('<div></div>')
         .css({
           fontSize: '11px',
-          lineHeight: '31px',
-          paddingLeft: '2px'
+          height: '35px',
+          lineHeight: '35px',
+          padding: '0 5px'
         })
-        .text((moment.location ? (moment.location + ' \u00B7 ') : '') +
-            moment.getElapsedTime());
+    // Location
+    if (moment.location) {
+      $('<span></span>')
+          .css('float', 'left')
+          .text(moment.location)
+          .appendTo(headerEl);
+    }
+    // Time
+    $('<span></span>')
+        .css('float', 'right')
+        .text(moment.getElapsedTime())
+        .appendTo(headerEl);
 
-    return locationEl;
+    return headerEl;
   },
 });
 

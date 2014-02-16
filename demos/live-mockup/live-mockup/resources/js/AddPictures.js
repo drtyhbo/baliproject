@@ -279,6 +279,8 @@ var AssetElement = Class.extend({
 
     // True when the images have been loaded for this asset.
     this.imagesLoaded = false;
+    // The time when the next animation should fire.
+    this.nextAnimationTime = 0;
   },
 
   getType: function() {
@@ -382,12 +384,25 @@ var AssetElement = Class.extend({
   stepAnimation: function() {
     if (!this.nextImageEl)
       return;
+      
+    // This animation is not ready to fire.
+    if (this.nextAnimationTime &&
+        new Date().getTime() < this.nextAnimationTime) {
+      return;
+    }
 
+    var currentAssetTimestamp = this.assets[this.nextAsset].timestamp;
     this.nextAsset = (this.nextAsset + 1) % this.assets.length;
+    var deltaAssetTimeSec = Math.abs(this.assets[this.nextAsset].timestamp -
+        currentAssetTimestamp);
+    var timeToNextAnimationMs =
+        Math.max(Math.min(3000,
+              deltaAssetTimeSec / FANCY_PANTS_TIME_DELTA_SEC * 3000), 2000);
+    this.nextAnimationTime = new Date().getTime() + timeToNextAnimationMs;
 
     this.nextImageEl.animate({
       opacity: 1
-    }, 1000, function() {
+    }, timeToNextAnimationMs / 2, function() {
       this.imageEl.remove();
       this.imageEl = this.nextImageEl;
       this.nextImageEl = this.getImageEl(this.assets[this.nextAsset].getSrc())
@@ -537,6 +552,7 @@ var AssetRowElement = Class.extend({
           this.height = asset.getHeight();
         }
       }
+      this.height += PICTURE_SPACING;
     }
     return this.height;
   },
@@ -559,7 +575,6 @@ var AssetRowElement = Class.extend({
     this.el = $('<div></div>')
       .css({
         height: this.getHeight() + 'px',
-        marginBottom: PICTURE_SPACING + 'px',
         position: 'relative'
       });
 
@@ -658,7 +673,10 @@ var AssetGroup = VisibleElementRenderer.extend({
     this.headerEl
         .remove()
         .css('visibility', 'visible');
-
+        
+    // The last row has some extra padding. Remove it.
+    height -= PICTURE_SPACING;
+        
     return height;
   },
 
@@ -843,7 +861,7 @@ var AddPictures = VisibleElementRenderer.extend({
     this.updateVisibleElements();
     
     if (this.useFancyPants) {
-      setInterval(this.onStepAnimation.bind(this), 2000);
+      setInterval(this.onStepAnimation.bind(this), 250);
     }
 
     return this.el;
