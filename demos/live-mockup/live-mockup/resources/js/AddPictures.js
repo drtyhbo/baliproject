@@ -19,8 +19,12 @@ var EXTRA_LARGE_PICTURE = 4;
  * This class must be subclassed.
  */
 var VisibleElementRenderer = Class.extend({
-  init: function() {
+  init: function(headerEl) {
     this.el = null;
+
+    this.headerEl = headerEl;
+    this.headerHeight = 0;
+    
     // The content above what is currently visible.
     this.aboveEl = null;
     // The content that is visible.
@@ -55,7 +59,7 @@ var VisibleElementRenderer = Class.extend({
   showElement: function(shown, element) {
     // Implementation of this function is optional.
   },
-
+  
   /**************************
    *
    * END OVERRIDE
@@ -86,6 +90,23 @@ var VisibleElementRenderer = Class.extend({
     for (var i = 0, element; element = this.elements[i]; i++) {
       height += element.getHeight();
     }
+
+    if (!this.headerEl) {
+      return height;
+    }
+    
+    // This is GHETTO. Figure out a better way to do this.
+    this.headerEl
+        .css('visibility', 'hidden')
+        .appendTo($(document.body));
+
+    this.headerHeight = this.headerEl.height();
+    height += this.headerHeight;
+
+    this.headerEl
+        .remove()
+        .css('visibility', 'visible');
+
     return height;
   },
 
@@ -103,9 +124,12 @@ var VisibleElementRenderer = Class.extend({
     if (this.el) {
       return this.el;
     }
-    
+        
     this.el = $('<div></div>')
         .css('height', this.getHeight() + 'px');
+    if (this.headerEl) {
+      this.headerEl.appendTo(this.el);
+    }
     this.aboveEl = $('<div></div>')
         .appendTo(this.el);
     this.visibleEl = $('<div></div>')
@@ -123,6 +147,8 @@ var VisibleElementRenderer = Class.extend({
   },
 
   determineVisibleRange: function(viewportTop, viewportHeight) {
+    viewportTop -= this.headerHeight;
+    
     // A negative viewportTop means the picture selector is further down on the
     // page, perhaps all the way off the screen.
     if (viewportTop < 0 && viewportTop < -viewportHeight) {
@@ -152,7 +178,7 @@ var VisibleElementRenderer = Class.extend({
     // Find the last element that is within the viewport.
     var firstIndex = low;
     var lastIndex = low;
-    var viewportBottom = viewportTop + viewportHeight;
+    var viewportBottom = viewportTop + this.headerHeight + viewportHeight;
     for (var i = firstIndex + 1, element; element = this.elements[i]; i++) {
       if (this.tops[i] < viewportBottom) {
         lastIndex = i;
@@ -643,12 +669,11 @@ var AssetRowElement = Class.extend({
  */
 var AssetGroup = VisibleElementRenderer.extend({
   init: function(headerEl, assetElements, pictureDimension) {
-    this.headerEl = headerEl;
     this.assetElements = assetElements;
     this.pictureDimension = pictureDimension;
 
     // AssetGroup must be initialized before the super class.
-    this._super();
+    this._super(headerEl);
   },
 
   /**************************
@@ -656,29 +681,6 @@ var AssetGroup = VisibleElementRenderer.extend({
    * VisibleElementRenderer overrides
    *
    **************************/
-
-  calculateHeight: function() {
-    var height = this._super();
-    if (!this.headerEl) {
-      return height;
-    }
-    
-    // This is GHETTO. Figure out a better way to do this.
-    this.headerEl
-        .css('visibility', 'hidden')
-        .appendTo($(document.body));
-
-    height += this.headerEl.height();
-
-    this.headerEl
-        .remove()
-        .css('visibility', 'visible');
-        
-    // The last row has some extra padding. Remove it.
-    height -= PICTURE_SPACING;
-        
-    return height;
-  },
 
   getElements: function() {
     var elements = [];
@@ -733,16 +735,6 @@ var AssetGroup = VisibleElementRenderer.extend({
 
   showElement: function(isShown, assetRow) {
     assetRow[isShown ? 'show' : 'hide']();
-  },
-  
-  getEl: function() {
-    if (!this.el) {
-      this._super();
-      if (this.headerEl) {
-        this.headerEl.prependTo(this.el);
-      }
-    }
-    return this.el;
   }
 });
 
