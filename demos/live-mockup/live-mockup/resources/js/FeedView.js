@@ -6,7 +6,7 @@ var SHOW_THUMBNAIL_IN_COMMENTS = false;
 var FeedItem = Class.extend({
     init: function (share) {
         this.share = share;
-        this.currentPicture = 0;
+        this.currentIdx = 0;
         this.commentsEl = null;
         this.newCommentEl = null;
         this.isCommenting = false;
@@ -27,7 +27,7 @@ var FeedItem = Class.extend({
 				.appendTo(this.el);
         var thumbnailEl = $('<span></span>')
 				.css({
-				    backgroundImage: 'url(' + this.share.user.thumbnailSrc + ')',
+				    backgroundImage: 'url(' + this.share.sharedBy.thumbnailSrc + ')',
 				    backgroundSize: 'cover',
 				    borderRadius: '36px',
 				    display: 'inline-block',
@@ -54,9 +54,9 @@ var FeedItem = Class.extend({
 				    position: 'absolute',
 				    top: 0
 				})
-				.text(this.share.user.name)
+				.text(this.share.sharedBy.name)
 				.appendTo(nameContainerEl);
-        var locationEl = $('<div></div>')
+        /*var locationEl = $('<div></div>')
 				.css({
 				    bottom: 0,
 				    fontSize: '11px',
@@ -65,7 +65,7 @@ var FeedItem = Class.extend({
 				    position: 'absolute'
 				})
 				.text(this.share.location)
-				.appendTo(nameContainerEl);
+				.appendTo(nameContainerEl); */
         var timeEl = $('<div></div>')
 				.css({
 				    bottom: 0,
@@ -74,11 +74,13 @@ var FeedItem = Class.extend({
 				    lineHeight: '11px',
 				    position: 'absolute'
 				})
-				.text(this.getElapsedTimeString())
+				.text(this.share.getElapsedTime())
 				.appendTo(nameContainerEl);
 
+        //set pics
         this.createPicturesEl();
-
+    
+        //add description
         this.commentsEl = $('<div></div>')
 				.css({
 				    margin: '10px 10px 0 10px'
@@ -89,12 +91,17 @@ var FeedItem = Class.extend({
 					.appendTo(this.commentsEl);
         }
 
+        /*
+        //add comments
         for (var i = 0, comment; comment = this.share.comments[i]; i++) {
             this.getCommentEl(comment.user, comment.comment)
 					.appendTo(this.commentsEl);
         }
+
+        //add new comment element
         this.createNewCommentEl();
 
+        //add buttons
         var buttonsEl = $('<div></div>')
 				.css({
 				    margin: '10px 10px 0 0',
@@ -119,7 +126,9 @@ var FeedItem = Class.extend({
 				.on(TOUCHEND, this.onTouchShareButton.bind(this))
 				.appendTo(buttonsEl);
 
+                */
         return this.el;
+        
     },
 
     /**
@@ -138,7 +147,7 @@ var FeedItem = Class.extend({
         this.pictureEl = $('<div></div>')
 				.css({
 				    backgroundImage:
-						'url(' + this.share.pictures[0].getSrc() + ')',
+						'url(' + this.share.sharedAssets[0].url + ')',
 				    backgroundSize: 'cover',
 				    bottom: 0,
 				    left: 0,
@@ -235,25 +244,6 @@ var FeedItem = Class.extend({
     },
 
     /**
-     * Returns a string which contains the time that's elapsed since this feed
-     * item was created.
-     */
-    getElapsedTimeString: function () {
-        var elapsedMs = new Date().getTime() - this.share.timestampMs;
-
-        // seconds...
-        if (elapsedMs < 60 * 1000) {
-            return Math.floor(elapsedMs / 1000) + 's';
-            // minutes...
-        } else if (elapsedMs < 60 * 60 * 1000) {
-            return Math.floor(elapsedMs / 60 / 1000) + 'm';
-            // hours...
-        } else if (elapsedMs < 24 * 60 * 60 * 1000) {
-            return Math.floor(elapsedMs / (60 * 60) / 1000) + 'h';
-        }
-    },
-
-    /**
      * Shows the new comment element.
      */
     showNewCommentEl: function () {
@@ -303,18 +293,18 @@ var FeedItem = Class.extend({
 
         // Next picture...
         if (pageX > this.pictureEl.width() / 2) {
-            this.currentPicture = (this.currentPicture + 1) % this.share.pictures.length;
+            this.currentIdx = (this.currentIdx + 1) % this.share.sharedAssets.length;
         } else {
-            this.currentPicture--;
-            if (this.currentPicture < 0) {
-                this.currentPicture = this.share.pictures.length - 1;
+            this.currentIdx--;
+            if (this.currentIdx < 0) {
+                this.currentIdx = this.share.sharedAssets.length - 1;
             }
         }
 
         this.pictureEl
 				.css({
 				    backgroundImage:
-						'url(' + this.share.pictures[this.currentPicture].getSrc() + ')'
+						'url(' + this.share.sharedAssets[this.currentIdx].url + ')'
 				});
     },
 
@@ -380,14 +370,20 @@ FeedView.beforeTransition = function (event, ui) {
 			    LifeStreamView.show();
 			});
 
-    var sharesEl = ui.toPage.find('#shares');
-    sharesEl.empty();
+    FeedView.sharesEl = ui.toPage.find('#shares');
+    FeedView.sharesEl.empty();
 
-    var feed = Feed.getFeed();
-    for (var i = 0, feedItem; feedItem = feed[i]; i++) {
-        new FeedItem(feedItem).getEl()
-            .appendTo(sharesEl);
-    }
-
+    var feed = Shares.ajaxGetAll(FeedView.LoadShares.bind(FeedView));
+    
     localStorage.setItem('current-view', FEED_VIEW_PAGE_IDX);
+}
+
+FeedView.LoadShares = function (shares) {
+    if (!shares)
+        Util.alert('no shares were returned');
+
+    for (var i = 0, share; share = shares[i]; i++) {
+        new FeedItem(share).getEl()
+            .appendTo(FeedView.sharesEl);
+    }
 }

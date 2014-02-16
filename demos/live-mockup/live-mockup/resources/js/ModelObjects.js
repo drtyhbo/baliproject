@@ -1,60 +1,72 @@
 var User = Class.extend({
+
     init: function (props) {
         this.id = props.id || '';
         this.name = props.name || '';
+        this.email = props.email || '';
         this.thumbnailSrc = props.thumbnailSrc || '';
         this.firstName = this.name.split(' ')[0];
         this.lastName = this.name.split(' ')[1];
+        
+        //TODO: remove once all thumbnail are in the server
+        if (!this.thumbnailSrc) {
+            if (this.id == 1)
+                this.thumbnailSrc = Images.getPath('users/') + 'amine.jpg';
+            else if (this.id == 2)
+                this.thumbnailSrc = Images.getPath('users/') + 'vernoica.jpg';
+            else if (this.id == 3)
+                this.thumbnailSrc = Images.getPath('users/') + 'marcello.jpg';
+            else if (this.id == 4)
+                this.thumbnailSrc = Images.getPath('users/') + 'andreas.jpg';
+        }
+
     }
+
 });
 
 var Share = Class.extend({
-    init: function (id, sharedBy, sharedWith, sharedOn, sharedWidgetIds, comments) {
-        this.id = id || null;
-        this.sharedBy = sharedBy || null;
-        this.sharedWith = sharedWith || [];
-        this.sharedOn = sharedOn || null;
-        this.sharedWidgetsIds = sharedWidgetIds || [];
-        this.comments = comments || [];
+
+    init: function (props) {
+        this.id = props.id || null;
+        this.dateShared = props.dateShared || null;
+        this.sharedBy = (props.sharedBy)? (new User(props.sharedBy)) : null
+        this.sharedAssets = props.sharedAssets || [];
+
+        this.sharedWith = []
+        for (var i = 0, sharedWithProps; sharedWithProps = props.sharedWith[i]; i++)
+            this.sharedWith.push(new User(sharedWithProps));
+
+        this.comments = props.comments || [];
     },
 
     getElapsedTime: function () {
-        Util.getElapsedTime(this.sharedOn);
+        Util.getElapsedTime(this.dateShared * 1000);
     },
-
-    /*
-     * Return all widgets that belong to this share
-     */ 
-    getWidgets: function () {
-        return PictureWidgets.getPictureWidgets(this.sharedWidgetsIds);
-    },
-
-    /*
-     * Return all users that received this share
-     */ 
-    getSharedWithUsers: function () {
-        return Users.getUsers(this.sharedWith);
-    }
 
 });
 
 var Widget = Class.extend({
+
     init: function (id, createdBy, timestamp, momentIds) {
         this.id = id || null;
         this.createdBy = createdBy || null;    //created by user: User ID
         this.timestamp = timestamp || null;    //created on date: date
         this.momentIds = momentIds || [];      //list of all moment IDs that this widget belons to: int[]
     }
+
 });
 
 var CommentWidget = Widget.extend({
+
     init: function (id, commentText, createdBy, timestamp) {
         this._super(id, createdBy, timestamp, null);
         commentText = commentText || null;          //comment text: string
     }
+
 });
 
 var PictureWidget = Widget.extend({
+
     init: function (props) {
         this._super(props.id, props.createdBy, props.timestamp, props.momentIds);
         this.pictureSrc = props.pictureSrc || null;
@@ -67,7 +79,6 @@ var PictureWidget = Widget.extend({
     }
 });
 
-//moment class: top level class used to represent a moment
 var Moment = Class.extend({
 
     init: function (props) {
@@ -105,9 +116,6 @@ var Moment = Class.extend({
         return commentCount;
     },
 
-    /*
-     * Returns all shares associated with this moment (shares that contain pictures that are part of this moment)
-     */
     getMomentShares: function () {
         var shareDict = {};
         for (var i = 0, picture; picture = this.widgets[i]; i++) {
@@ -123,9 +131,6 @@ var Moment = Class.extend({
         return uniqueShares;
     },
 
-    /*
-     * Returns all users that created the widgets contained in this moment
-     */
     getWidgetOwners: function () {
         if (!this.widgets)
             return null;
@@ -144,8 +149,8 @@ var Moment = Class.extend({
 });
 
 
-//life stream class: top level class used to represent the life stream
 var LifeStream = Class.extend({
+
     init: function () {
         this.userProfile = null;       //logged in user profile: User
         this.moments = [];      //all moments= Moment[]
