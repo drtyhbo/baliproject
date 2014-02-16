@@ -16,12 +16,7 @@ var Scroller = Class.extend({
         .bind(TOUCHSTART, this.mouseDown.bind(this))
         .bind(TOUCHMOVE, this.mouseMove.bind(this))
         .bind(TOUCHEND, this.mouseUp.bind(this))
-        .bind('mousewheel', function(e) {
-          e.preventDefault();
-          this.scrollVelocity =
-              new Point2d(0, -e.originalEvent.wheelDeltaY * 10);
-          this.updateLoop();
-        }.bind(this));
+        .bind('mousewheel', this.mouseWheel.bind(this));
 
     // When true, the user is touching the scroller, so no need to move it on
     // our own.
@@ -30,7 +25,7 @@ var Scroller = Class.extend({
     // The timestamp when the user began scrolling.
     this.startScrollTime = null;
     // The timestamp of the last animation frame.
-    this.lastAnimationFrameTime = null;
+    this.lastAnimationFrameTime = 0;
 
     // The previous position of the mouse.
     this.prevMousePosition = null;
@@ -90,6 +85,17 @@ var Scroller = Class.extend({
     return new Point2d(
         e.pageX !== undefined ? e.pageX : e.originalEvent.touches[0].pageX,
         e.pageY !== undefined ? e.pageY : e.originalEvent.touches[0].pageY);
+  },
+  
+  mouseWheel: function(e) {
+    e.preventDefault();
+    
+    if (!this.lastAnimationFrameTime) {
+      this.lastAnimationFrameTime = new Date().getTime();            
+    }
+    this.scrollVelocity =
+        new Point2d(0, -e.originalEvent.wheelDeltaY * 10);
+    this.updateLoop();
   },
   
   mouseDown: function(e) {
@@ -168,6 +174,8 @@ var Scroller = Class.extend({
     if (Math.abs(this.scrollVelocity.x) >= MIN_VELOCITY ||
         Math.abs(this.scrollVelocity.y) >= MIN_VELOCITY) {
       window.requestAnimationFrame(this.updateLoop.bind(this));
+    } else {
+      this.lastAnimationFrameTime = 0;
     }
   },
   

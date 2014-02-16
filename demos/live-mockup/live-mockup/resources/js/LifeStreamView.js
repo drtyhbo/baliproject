@@ -97,7 +97,7 @@ LifeStreamView.onShow = function(event) {
       });
   var bottomShareBtn = pageEl.find('#bottom-share-btn')
       .on(TOUCHSTART, function() {
-        LifeStreamShareView.show(LifeStreamView.lifeStream, false);
+        SelectFriendsView.show(false);
       });
 
   pageEl.find('#lifestream-user-name')
