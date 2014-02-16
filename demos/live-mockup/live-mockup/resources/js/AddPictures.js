@@ -234,6 +234,10 @@ var VisibleElementRenderer = Class.extend({
     if (this.visibleRange) {
       this.clearHiddenElements(visibleRange);
     }
+    
+    if (!visibleRange) {
+      return;
+    }
 
     if (!this.visibleRange ||
         visibleRange.firstIndex != this.visibleRange.firstIndex ||
@@ -288,10 +292,19 @@ var AssetElement = Class.extend({
 
     this.el = null;
     this.imageEl = null;
+    // We preload the next image in the animation to improve the loading speed
+    // of the images.
     this.nextImageEl = null;
+
+    // Being selectable is different from being selected. Selectable means this
+    // element has the potential to be selected, but may or may not be. Selected
+    // means this element is both selectable AND selected.
+    this.isSelectable = false;
+    this.isSelected = false;
+    
     this.fadedEl = null;
+    this.gradientEl = null;
     this.checkedEl = null;
-    this.offset = null;
 
     // The current opacity of this element.
     this.opacity = 1;
@@ -336,6 +349,10 @@ var AssetElement = Class.extend({
     if (!this.el && dontCreate) {
       return null;
     }
+    
+    if (this.isSelectable) {
+      this.createSelectionEl();
+    }
 
     this.el = $('<span></span>')
         .css({
@@ -379,13 +396,6 @@ var AssetElement = Class.extend({
           top: 0,
           width: '100%'
         });
-  },
-
-  getOffset: function() {
-      if (!this.offset) {
-          this.offset = this.el.offset();
-      }
-      return this.offset;
   },
 
   addAsset: function(asset) {
@@ -451,6 +461,25 @@ var AssetElement = Class.extend({
    *
    **************************/
 
+  setSelectable: function(isSelectable) {
+    if (this.el && isSelectable) {
+      this.createSelectionEl();
+    } else if (this.fadedEl) {
+      this.isSelected = false;
+
+      // Simplify the DOM once we're no longer selectable.
+      this.fadedEl.remove();
+      this.fadedEl = null;
+
+      this.gradientEl.remove();
+      this.gradientEl = null;
+      
+      this.checkedEl.remove();
+      this.checkedEl = null;
+    }
+    this.isSelectable = isSelectable;
+  },
+
   /**
    * Creates the selection elements if they don't already exist.
    */
@@ -459,29 +488,42 @@ var AssetElement = Class.extend({
       return;
     }
     this.fadedEl = $('<span></span>')
-		.css({
-	    background: '#ffffff',
-	    display: this.isSelected ? 'block' : none,
-	    height: '100%',
-	    left: 0,
-	    opacity: 0.35,
-	    position: 'absolute',
-	    top: 0,
-	    width: '100%',
-	    zIndex: 1
-		})
-		.appendTo(this.el);
+    		.css({
+    	    background: '#ffffff',
+    	    display: this.isSelected ? 'block' : 'none',
+    	    height: '100%',
+    	    left: 0,
+    	    opacity: 0.35,
+    	    position: 'absolute',
+    	    top: 0,
+    	    width: '100%',
+    	    zIndex: 1
+    		})
+    		.appendTo(this.el);
+
+    this.gradientEl = $('<img></img>')
+    		.css({
+    	    bottom: 0,
+          height: '50px',
+          left: 0,
+          opacity: 0.5,
+    	    position: 'absolute',
+          width: '100%',
+    	    zIndex: 2
+    		})
+    		.attr('src', Images.getPath() + 'share-gradient.png')
+    		.appendTo(this.el);
 
     this.checkedEl = $('<img></img>')
-		.css({
-	    bottom: 5,
-	    display: this.isSelected ? 'block' : none,
-	    position: 'absolute',
-	    right: 5,
-	    zIndex: 2
-		})
-		.attr('src', Images.getPath() + 'check.png')
-		.appendTo(this.el);
+    		.css({
+    	    bottom: 5,
+          opacity: 0.25,
+    	    position: 'absolute',
+    	    right: 5,
+    	    zIndex: 3
+    		})
+    		.attr('src', Images.getPath() + 'check-checked-32.png')
+    		.appendTo(this.el);
   },
 
   /**
@@ -522,13 +564,11 @@ var AssetElement = Class.extend({
       return;
     }
 
-    if (isSelected) {
-      this.createSelectionEl();
-    }
+    this.createSelectionEl();
 
     if (this.fadedEl) {
       this.fadedEl[isSelected ? 'show' : 'hide']();
-      this.checkedEl[isSelected ? 'show' : 'hide']();
+      this.checkedEl.css('opacity', isSelected ? 1 : 0.25);
     }
   },
 
@@ -914,11 +954,13 @@ var AddPictures = VisibleElementRenderer.extend({
    * Enables/disables selection.
    */
   setSelectable: function (isSelectable, showSelectAll, selectionChangedCallback) {
-    this.isSelectable = isSelectable;
-    
-    if (!isSelectable) {
-      this.setSelectStatus(false);
+    if (isSelectable != this.isSelectable) {
+      for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+        assetElement.setSelectable(isSelectable);
+      }
     }
+
+    this.isSelectable = isSelectable;
 
     this.showSelectAll = showSelectAll;
     if (this.selectAllContainerEl) {
