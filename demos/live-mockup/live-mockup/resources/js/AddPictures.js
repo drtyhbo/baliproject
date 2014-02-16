@@ -923,6 +923,10 @@ var AddPictures = VisibleElementRenderer.extend({
    */
   setSelectable: function (isSelectable, showSelectAll, selectionChangedCallback) {
     this.isSelectable = isSelectable;
+    
+    if (!isSelectable) {
+      this.setSelectStatus(false);
+    }
 
     this.showSelectAll = showSelectAll;
     if (this.selectAllContainerEl) {
@@ -981,21 +985,27 @@ var AddPictures = VisibleElementRenderer.extend({
   },
 
   /**
+   * Sets the select status of all pictures.
+   */
+  setSelectStatus: function(selectAll) {
+    for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
+      assetElement.setSelected(selectAll);
+    }
+    this.setSelectAllText(!selectAll);
+    this.numSelected = selectAll ? this.assetElements.length : 0;
+
+    if (this.selectionChangedCallback) {
+      this.selectionChangedCallback(this.numSelected);
+    }    
+  },
+
+  /**
    * Toggles the selected status of the images. When:
    *   All are already selected: Unselects all of them.
    *   Some are unselected: Selects all of them.
    */
   toggleSelectAll: function (e) {
-    var shouldSelectAll = this.numSelected != this.assetElements.length;
-    for (var i = 0, assetElement; assetElement = this.assetElements[i]; i++) {
-      assetElement.setSelected(shouldSelectAll);
-    }
-    this.setSelectAllText(!shouldSelectAll);
-    this.numSelected = shouldSelectAll ? this.assetElements.length : 0;
-
-    if (this.selectionChangedCallback) {
-      this.selectionChangedCallback(this.numSelected);
-    }
+    this.setSelectStatus(this.numSelected != this.assetElements.length);
   },
 
   /**

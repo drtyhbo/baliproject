@@ -15,7 +15,13 @@ var Scroller = Class.extend({
     el
         .bind(TOUCHSTART, this.mouseDown.bind(this))
         .bind(TOUCHMOVE, this.mouseMove.bind(this))
-        .bind(TOUCHEND, this.mouseUp.bind(this));
+        .bind(TOUCHEND, this.mouseUp.bind(this))
+        .bind('mousewheel', function(e) {
+          e.preventDefault();
+          this.scrollVelocity =
+              new Point2d(0, -e.originalEvent.wheelDeltaY * 10);
+          this.updateLoop();
+        }.bind(this));
 
     // When true, the user is touching the scroller, so no need to move it on
     // our own.
@@ -32,7 +38,7 @@ var Scroller = Class.extend({
     this.prevMouseTime = null;
 
     // The velocity of the scroller.
-    this.scrollVelocity = null;
+    this.scrollVelocity = new Point2d(0, 0);
     // The last position of the scroller.
     this.lastScrollPosition = null;
     // The position of the scroller.
@@ -40,6 +46,8 @@ var Scroller = Class.extend({
     
     // A list of callbacks to fire on scroll.
     this.callbacks = [];
+    
+    this.updateLoop();
   },
   
   /**
