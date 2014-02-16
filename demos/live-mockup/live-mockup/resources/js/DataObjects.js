@@ -83,9 +83,14 @@ Users.getUsers = function (userIds) {
 };
 
 Users.ajaxGetCurrentUser = function(callback) {
-  Util.makeRequest('api/user/get/', {
-      uid: Util.GET['uid'],
-  }, Users.ajaxCallback.bind(this, callback));
+    Util.makeRequest('api/user/get/', {
+        uid: Util.GET['uid']
+    }, function (data) {
+        if (data) {
+            Users.currentUser = new User(data);
+        }
+        callback();
+    });
 };
 
 Users.ajaxCreateUser = function(name, email, password, callback) {
@@ -93,17 +98,13 @@ Users.ajaxCreateUser = function(name, email, password, callback) {
       uid: Util.GET['uid'],
       name: name,
       email: email
-  }, Users.ajaxCallback.bind(this, callback));
-};
-
-Users.ajaxCallback = function(callback, data) {
-    if (data) {
-        // For now hardcode this. Take this out once all users have
-        // thumbnails.
-        data.thumbnailSrc = Images.getPath('users/') + 'amine.jpg';
-        Users.currentUser = new User(data);
-    }
-    callback();
+  }, function(data){
+      if (data) {
+          Users.currentUser = new User(data);
+      }
+      if (callback)
+        callback();
+  });
 };
 
 /*******************************************
@@ -249,6 +250,17 @@ Shares.ajaxCreateShare = function (assetIds, friendIds, callback) {
         callback(data ? data.id : false);
     });
 };
+
+Shares.ajaxAddComment = function (shareId, comment, user, callback){
+    Util.makeRequest('api/share/add/comment/', {
+        userId : user.id,
+        shareId: shareId,
+        comment: comment
+    }, function (data) {
+        if (callback)
+            callback(data ? data.id : false);
+    });
+}
 
 Shares.ajaxGetAll = function (callback) {
     Util.makeRequest('api/share/get/all/', {
