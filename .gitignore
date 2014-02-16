@@ -26,6 +26,7 @@ obj/
 [Dd]ebug*/
 [Rr]elease*/
 Ankh.NoLoad
+DesignTimeResolveAssemblyReferencesInput.cache
 
 # Xcode
 .DS_Store
