@@ -20,6 +20,7 @@
 *.sdf
 *.cache
 *.dll
+*.sln
 ipch/
 obj/
 [Bb]in
