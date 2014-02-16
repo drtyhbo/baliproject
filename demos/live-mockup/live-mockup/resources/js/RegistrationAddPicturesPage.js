@@ -1,5 +1,26 @@
+var RegistrationPictureSelector = AddPictures.extend({
+ init: function(width, scroller, assets) {
+   this.assets = assets;
+   this._super(width, scroller, false);
+ },
+ 
+ /**************************
+  *
+  * AddPictures overrides
+  *
+  **************************/
+ 
+ getNumGroups: function() {
+   return 1
+ },
+ 
+ getAssetsForGroup: function(groupIndex) {
+   return this.assets;
+ },
+});
+
 var RegistrationAddPicturesPage = {
-	addPictures: null,
+	pictureSelector: null,
 	footerEl: null
 };
 
@@ -7,8 +28,8 @@ var RegistrationAddPicturesPage = {
  * Makes the add pictures registration page the current page.
  */
 RegistrationAddPicturesPage.show = function(animate) {
-  $.mobile.pageContainer.on('pagecontainerbeforetransition',
-			RegistrationAddPicturesPage.beforeTransition);
+  $.mobile.pageContainer.on('pagecontainershow',
+			RegistrationAddPicturesPage.onShow);
 	$.mobile.pageContainer.pagecontainer('change', '#registration-add-pictures', {
 		changeHash: false,
 		showLoadMsg: false,
@@ -17,33 +38,31 @@ RegistrationAddPicturesPage.show = function(animate) {
 };
 
 /**
- * Event handler. Called before the add pictures registration page is made
- * visible.
+ * Event handler. Called once the RegistrationAddPicturesPage is made visible.
  */
-RegistrationAddPicturesPage.beforeTransition = function(event, ui) {
-    if (ui.absUrl.indexOf('#registration-add-pictures') == -1) {
-        $.mobile.pageContainer.off('pagecontainerbeforetransition',
-		        arguments.callee);
-        return;
-    }
+RegistrationAddPicturesPage.onShow = function(event, ui) {
+  $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
 
-	RegistrationAddPicturesPage.footerEl = ui.toPage
+  var pageEl = $('#registration-add-pictures');
+
+	RegistrationAddPicturesPage.footerEl = pageEl
 			.find('#add-pictures-footer')
 			.on(TOUCHSTART, RegistrationAddPicturesPage.touchFooterButton);
 
-	var viewProfileBtn = ui.toPage.find('#profile-btn')
-        .on(TOUCHSTART, function () {
-            LifeStreamView.show();
-        });
+	var viewProfileBtn = pageEl.find('#profile-btn')
+      .on(TOUCHSTART, function () {
+        LifeStreamView.show();
+      });
         
-  new Scroller($('#scrollable'));
-
-	var cameraRoll = CameraRoll.getCameraRoll();
-	RegistrationAddPicturesPage.addPictures = new AddPictures(ui.toPage.width(),
-            true, true, RegistrationAddPicturesPage.onSelectionChanged,
-            cameraRoll);
-	RegistrationAddPicturesPage.addPictures.getEl()
-			.appendTo(ui.toPage.find('#pictures'));
+  var scroller = new Scroller($('#scrollable'));
+  var pictureSelector =
+      new RegistrationPictureSelector(pageEl.width(), scroller,
+          CameraRoll.getCameraRoll());
+  pictureSelector.setSelectable(true, true,
+      RegistrationAddPicturesPage.onSelectionChanged);
+  pictureSelector.getEl()
+			.appendTo(pageEl.find('#pictures'));
+	RegistrationAddPicturesPage.pictureSelector = pictureSelector;
 };
 
 /**
@@ -63,15 +82,13 @@ RegistrationAddPicturesPage.onSelectionChanged = function(numSelected) {
 RegistrationAddPicturesPage.touchFooterButton = function(e) {
   e.preventDefault();
   
-  var assets = RegistrationAddPicturesPage.addPictures.getSelected();
-
-	// "Upload" those pictures which are selected.
+  var assets = RegistrationAddPicturesPage.pictureSelector.getSelected();
 	PersonalLibrary.add(assets);
-    PictureWidgets.ajaxAdd(assets, function() {
-        if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
-            RegistrationCreateUserPage.show(true);
-        } else {
-            FeedView.show(true);
-        }
-    });
+  PictureWidgets.ajaxAdd(assets, function() {
+    if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
+      RegistrationCreateUserPage.show(true);
+    } else {
+      FeedView.show(true);
+    }
+  });
 };

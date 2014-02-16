@@ -172,17 +172,35 @@ PictureWidgets.ajaxAdd = function (assets, callback) {
     Util.makeRequest('api/picture/add/', {
         uid: Util.GET['uid'],
         id: assetIds
-    }, PictureWidgets.ajaxCallback.bind(this, callback));
+    }, PictureWidgets.ajaxAddCallback.bind(this, callback));
 };
 
 PictureWidgets.ajaxGetAll = function(callback) {
     Util.makeRequest('api/picture/get/all/', {
         uid: Util.GET['uid'],
         ts: localStorage.getItem('pictures-timestamp') || 0
-    }, PictureWidgets.ajaxCallback.bind(this, callback));
+    }, PictureWidgets.ajaxGetCallback.bind(this, callback));
 };
 
-PictureWidgets.ajaxCallback = function(callback, data) {
+/**
+ * This callback function handles the return data from ajaxAdd. DOES NOT CACHE
+ * THE PICTURE DATA. We should probably combine this function with
+ * ajaxGetCallback.
+ */
+PictureWidgets.ajaxAddCallback = function(callback, data) {
+    if (data) {
+      PictureWidgets.loadFromPictureProps(data);
+    }
+    if (callback) {
+      callback();
+    }
+};
+
+/**
+ * This callback function handles the return data from ajaxGetAll. Caches
+ * the picture data into local storage.
+ */
+PictureWidgets.ajaxGetCallback = function(callback, data) {
     if (data) {
         PictureWidgets.loadFromPictureProps(data.pictures);
 
