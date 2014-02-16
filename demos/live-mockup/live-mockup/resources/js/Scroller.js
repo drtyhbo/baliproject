@@ -11,17 +11,12 @@ var Point2d = Class.extend({
 
 var Scroller = Class.extend({
   init: function(el) {
-    // Chrome should use browser scrolling.
-    if (!isIOS) {
-      el.parent().css('overflow', 'auto');
-      return;
-    }
-
     this.el = el;
     el
         .bind(TOUCHSTART, this.mouseDown.bind(this))
         .bind(TOUCHMOVE, this.mouseMove.bind(this))
-        .bind(TOUCHEND, this.mouseUp.bind(this));
+        .bind(TOUCHEND, this.mouseUp.bind(this))
+        .bind('mousewheel', this.mouseWheel.bind(this));
 
     // When true, the user is touching the scroller, so no need to move it on
     // our own.
@@ -30,7 +25,7 @@ var Scroller = Class.extend({
     // The timestamp when the user began scrolling.
     this.startScrollTime = null;
     // The timestamp of the last animation frame.
-    this.lastAnimationFrameTime = null;
+    this.lastAnimationFrameTime = 0;
 
     // The previous position of the mouse.
     this.prevMousePosition = null;
@@ -38,15 +33,69 @@ var Scroller = Class.extend({
     this.prevMouseTime = null;
 
     // The velocity of the scroller.
-    this.scrollVelocity = null;
+    this.scrollVelocity = new Point2d(0, 0);
+    // The last position of the scroller.
+    this.lastScrollPosition = null;
     // The position of the scroller.
     this.scrollPosition = new Point2d(0, 0);
+    
+    // A list of callbacks to fire on scroll.
+    this.callbacks = [];
+    
+    this.updateLoop();
+  },
+  
+  /**
+   * Returns the scrollable element.
+   */
+  getEl: function() {
+    return this.el;
+  },
+  
+  /**
+   * Returns the height of the container element.
+   */
+  getContainerHeight: function() {
+    return this.el.parent().height();
+  },
+
+  /**
+   * Returns the current scroll position.
+   */
+  getScrollPosition: function() {
+    return this.scrollPosition;
+  },
+  
+  /**
+   * Call this when the height of the content has changed.
+   */  
+  updateHeight: function() {
+    this.lastScrollPosition = null;
+    this.render();
+  },
+  
+  /**
+   * Use the jQuery scroll() function to bind a scroll callback.
+   */
+  scroll: function(callback) {
+    this.callbacks.push(callback);
   },
 
   getTouchPoint: function(e) {
     return new Point2d(
         e.pageX !== undefined ? e.pageX : e.originalEvent.touches[0].pageX,
         e.pageY !== undefined ? e.pageY : e.originalEvent.touches[0].pageY);
+  },
+  
+  mouseWheel: function(e) {
+    e.preventDefault();
+    
+    if (!this.lastAnimationFrameTime) {
+      this.lastAnimationFrameTime = new Date().getTime();            
+    }
+    this.scrollVelocity =
+        new Point2d(0, -e.originalEvent.wheelDeltaY * 10);
+    this.updateLoop();
   },
   
   mouseDown: function(e) {
@@ -125,18 +174,32 @@ var Scroller = Class.extend({
     if (Math.abs(this.scrollVelocity.x) >= MIN_VELOCITY ||
         Math.abs(this.scrollVelocity.y) >= MIN_VELOCITY) {
       window.requestAnimationFrame(this.updateLoop.bind(this));
+    } else {
+      this.lastAnimationFrameTime = 0;
     }
   },
   
   render: function() {
+    if (this.lastScrollPosition &&
+        this.scrollPosition.x == this.lastScrollPosition.x &&
+        this.scrollPosition.y == this.lastScrollPosition.y) {
+      return;
+    }
     var contentHeight = this.el.height();
-    var parentHeight = this.el.parent().height();
+    var containerHeight = this.getContainerHeight();
 
+    if (this.scrollPosition.y > contentHeight - containerHeight) {
+      this.scrollPosition.y = contentHeight - containerHeight;
+    }
     if (this.scrollPosition.y < 0) {
       this.scrollPosition.y = 0;
     }
-    if (this.scrollPosition.y > contentHeight - parentHeight) {
-      this.scrollPosition.y = contentHeight - parentHeight;
+    
+    this.lastScrollPosition =
+        new Point2d(this.scrollPosition.x, this.scrollPosition.y);
+
+    for (var i = 0, callback; callback = this.callbacks[i]; i++) {
+      callback();
     }
 
     this.el.css('transform', 'translate3d(0, ' + -this.scrollPosition.y + 'px, 0)');

@@ -48,12 +48,8 @@ Util.getElapsedTime = function (timeStamp) {
         // hours...
     } else if (elapsedMs < 24 * 60 * 60 * 1000) {
         return Math.floor(elapsedMs / (60 * 60) / 1000) + 'h';
-    } else if (elapsedMs < 7 * 24 * 60 * 60 * 1000){
-        return Math.floor(elapsedMs / (24 * 60 * 60) / 1000) + 'd';        
     } else {
-        var date = new Date(timeStamp);
-        return (date.getMonth() + 1) + '/' + date.getDate() +
-                '/' + date.getFullYear();
+        return Math.floor(elapsedMs / (24 * 60 * 60) / 1000) + 'd';        
     }
 }
 
