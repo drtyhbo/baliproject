@@ -165,7 +165,7 @@ LifeStreamShareView.loadMoments = function (moments) {
     //wire buttons
     var backBtn = LifeStreamShareView.ui.toPage.find('#back-button')
         .on(TOUCHSTART, function () {
-            LifeStreamShareView.show(LifeStreamShareView.lifeStream, false);
+            LifeStreamView.show(LifeStreamShareView.lifeStream, false);
         });
 
     var shareBtn = LifeStreamShareView.ui.toPage.find('#share-btn')

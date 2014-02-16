@@ -171,7 +171,7 @@ SelectFriendsView.createShare = function () {
 
 SelectFriendsView.createShareCallback = function (newShareId) {
     if (newShareId)
-        FeedView.show(false, newShareId);
+        FeedView.show(false, newShareId, true);
     else
         Util.alert("oops, couldn't share. please try again!");
 

@@ -22,9 +22,12 @@ var FeedItem = Class.extend({
 				    marginBottom: '10px'
 				});
 
+        //header
         var headerEl = $('<div></div>')
 				.addClass('header')
 				.appendTo(this.el);
+
+        //header - tumbnail: 
         var thumbnailEl = $('<span></span>')
 				.css({
 				    backgroundImage: 'url(' + this.share.sharedBy.thumbnailSrc + ')',
@@ -38,6 +41,7 @@ var FeedItem = Class.extend({
 				})
 				.appendTo(headerEl);
 
+        //hearder - nameContainer
         var nameContainerEl = $('<div></div>')
 				.css({
 				    height: '32px',
@@ -45,34 +49,40 @@ var FeedItem = Class.extend({
 				    position: 'relative'
 				})
 				.appendTo(headerEl);
+
+        //header - nameContainer - name
         var nameEl = $('<div></div>')
 				.css({
 				    fontSize: '18px',
 				    fontWeight: 'bold',
-				    left: 0,
 				    lineHeight: '18px',
 				    position: 'absolute',
+				    left: 0,
 				    top: 0
 				})
 				.text(this.share.sharedBy.name)
 				.appendTo(nameContainerEl);
-        /*var locationEl = $('<div></div>')
+
+        //header - nameContainer - location
+        var locationEl = $('<div></div>')
 				.css({
-				    bottom: 0,
 				    fontSize: '11px',
-				    left: 0,
 				    lineHeight: '11px',
-				    position: 'absolute'
+				    position: 'absolute',
+				    left: 0,
+				    bottom: 0
 				})
 				.text(this.share.location)
-				.appendTo(nameContainerEl); */
+				.appendTo(nameContainerEl);
+
+        //header - nameContainer - time
         var timeEl = $('<div></div>')
 				.css({
-				    bottom: 0,
 				    fontSize: '11px',
-				    right: 0,
 				    lineHeight: '11px',
-				    position: 'absolute'
+				    position: 'absolute',
+				    top: 0,
+				    right: 0
 				})
 				.text(this.share.getElapsedTime())
 				.appendTo(nameContainerEl);
@@ -337,8 +347,10 @@ var FeedView = {
 /**
  * Makes the feed view the current view.
  */
-FeedView.show = function (animate, newShareId) {
-    this.newShareId = newShareId;
+FeedView.show = function (animate, newShareId, reload) {
+    FeedView.reload = reload || false;
+    FeedView.newShareId = newShareId || null;
+
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
               FeedView.beforeTransition);
     $.mobile.pageContainer.pagecontainer('change', '#feed-view', {
@@ -354,27 +366,31 @@ FeedView.show = function (animate, newShareId) {
 FeedView.beforeTransition = function (event, ui) {
     $.mobile.pageContainer.off('pagecontainerbeforetransition',
               arguments.callee);
+    if (FeedView.reload)
+        FeedView.isShown = false;
 
-    if (FeedView.isShown) {
+    if (FeedView.isShown) 
         return;
-    }
     FeedView.isShown = true;
 
+    //bind click events
     var addPicturesBtn = ui.toPage.find('#add-pictures-btn')
-			.on(TOUCHSTART, function () {
+            .off(TOUCHSTART);
+    addPicturesBtn.on(TOUCHSTART, function () {
 			    AddPicturesView.show();
 			});
 
-    var viewProfileBtn= ui.toPage.find('#profile-btn')
-			.on(TOUCHSTART, function () {
+    var viewProfileBtn = ui.toPage.find('#profile-btn')
+            .off(TOUCHSTART);
+    viewProfileBtn.on(TOUCHSTART, function () {
 			    LifeStreamView.show();
 			});
 
+    //load shares
     FeedView.sharesEl = ui.toPage.find('#shares');
     FeedView.sharesEl.empty();
-
     var feed = Shares.ajaxGetAll(FeedView.LoadShares.bind(FeedView));
-    
+
     localStorage.setItem('current-view', FEED_VIEW_PAGE_IDX);
 }
 

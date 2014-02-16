@@ -40,7 +40,7 @@ var Share = Class.extend({
     },
 
     getElapsedTime: function () {
-        Util.getElapsedTime(this.dateShared * 1000);
+        return Util.getElapsedTime(this.dateShared * 1000);
     },
 
 });

@@ -37,6 +37,9 @@ Util.getElapsedTime = function (timeStamp) {
     var elapsedMs = new Date().getTime() - timeStamp;
 
     // seconds...
+    if (elapsedMs < 1000) {
+        return "now";
+    }
     if (elapsedMs < 60 * 1000) {
         return Math.floor(elapsedMs / 1000) + 's';
         // minutes...
