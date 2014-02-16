@@ -1,6 +1,9 @@
 var LifeStreamMomentViewer = AddPictures.extend({
   init: function(width, scroller, moments) {
     this.moments = moments;
+    this.headerEls = [];
+    this.infoLineEls = [];
+    this.checkMarkEls = [];
     this._super(width, scroller, true);
   },
  
@@ -19,30 +22,68 @@ var LifeStreamMomentViewer = AddPictures.extend({
   },
  
   getGroupHeaderEl: function(groupIndex) {
+    if (this.headerEls[groupIndex]) {
+      return this.headerEls[groupIndex];
+    }
+
     var moment = this.moments[groupIndex];
 
     var headerEl = $('<div></div>')
         .css({
           fontSize: '11px',
           height: '35px',
-          lineHeight: '35px',
           padding: '0 5px'
         })
+    this.headerEls[groupIndex] = headerEl;
+
+    var infoLineEl = $('<div></div>')
+        .css('line-height', '35px')
+        .appendTo(headerEl);
+    this.infoLineEls[groupIndex] = infoLineEl;
     // Location
     if (moment.location) {
       $('<span></span>')
           .css('float', 'left')
           .text(moment.location)
-          .appendTo(headerEl);
+          .appendTo(infoLineEl);
     }
     // Time
     $('<span></span>')
         .css('float', 'right')
         .text(moment.getElapsedTime())
+        .appendTo(infoLineEl);
+        
+    var checkMarkEl = $('<div></div>')
+        .css({
+          backgroundImage: 'url(' + Images.getPath() + 'check-24.png' + ')',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          cursor: 'pointer',
+          display: 'none',
+          float: 'right',
+          height: '32px',
+          marginTop: '2px',
+          width: '32px'
+        })
+        .on(TOUCHSTART, this.toggleSelectGroup.bind(this, groupIndex))
         .appendTo(headerEl);
+    this.checkMarkEls[groupIndex] = checkMarkEl;
 
     return headerEl;
   },
+  
+  setSelectable: function (isSelectable, showSelectAll,
+      selectionChangedCallback) {
+    this._super(isSelectable, showSelectAll, selectionChangedCallback);
+
+    for (var i = 0; i < this.headerEls.length; i++) {
+      if (!this.headerEls[i]) {
+        continue;
+      }
+      this.infoLineEls[i].css('display', isSelectable ? 'none' : 'block');
+      this.checkMarkEls[i].css('display', isSelectable ? 'block' : 'none');
+    }
+  }
 });
 
 var LifeStreamView = {

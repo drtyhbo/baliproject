@@ -104,7 +104,7 @@ var VisibleElementRenderer = Class.extend({
     height += this.headerHeight;
 
     this.headerEl
-        .remove()
+        .detach()
         .css('visibility', 'visible');
 
     return height;
@@ -350,10 +350,6 @@ var AssetElement = Class.extend({
       return null;
     }
     
-    if (this.isSelectable) {
-      this.createSelectionEl();
-    }
-
     this.el = $('<span></span>')
         .css({
             display: 'inline-block',
@@ -362,6 +358,10 @@ var AssetElement = Class.extend({
             position: 'relative',
             width: this.getHeight() + 'px'
         });
+
+    if (this.isSelectable) {
+      this.createSelectionEl();
+    }
 
     this.imageEl = this.getImageEl()
           .appendTo(this.el);
@@ -517,7 +517,7 @@ var AssetElement = Class.extend({
     this.checkedEl = $('<img></img>')
     		.css({
     	    bottom: 5,
-          opacity: 0.25,
+          opacity: this.isSelected ? 1 : 0.25,
     	    position: 'absolute',
     	    right: 5,
     	    zIndex: 3
@@ -550,6 +550,10 @@ var AssetElement = Class.extend({
       this.toggleSelected();
       this.addPictures.onSelectionChanged(this.isSelected)
     }
+  },
+
+  getSelected: function() {
+    return this.isSelected;
   },
 
   /**
@@ -789,6 +793,8 @@ var AddPictures = VisibleElementRenderer.extend({
     this.useFancyPants = useFancyPants;
     // The list of all AssetElements.
     this.assetElements = [];
+    // The list of all AssetElements per group.
+    this.assetElementsPerGroup = [];
 
     // If true, the asset elements become selectable.
     this.isSelectable = false;
@@ -862,6 +868,7 @@ var AddPictures = VisibleElementRenderer.extend({
           new AssetGroup(this.getGroupHeaderEl(i), assetElementsForGroup,
               this.pictureDimension));
       this.assetElements = this.assetElements.concat(assetElementsForGroup);
+      this.assetElementsPerGroup[i] = assetElementsForGroup.slice();
     }
     return elements;
   },
@@ -970,7 +977,7 @@ var AddPictures = VisibleElementRenderer.extend({
 
     this.selectionChangedCallback = selectionChangedCallback;
   },
-
+  
   /**
    * Called when the user taps one of the asset elements.
    */
@@ -1040,6 +1047,34 @@ var AddPictures = VisibleElementRenderer.extend({
    */
   toggleSelectAll: function (e) {
     this.setSelectStatus(this.numSelected != this.assetElements.length);
+  },
+  
+  /**
+   * Selects all items in a specific group.
+   */
+  toggleSelectGroup: function(groupIndex) {
+    var assetElements = this.assetElementsPerGroup[groupIndex];
+    // First pass, check if any are unselected. If so, select them.
+    var allSelected = true;
+    for (var i = 0, assetElement; assetElement = assetElements[i]; i++) {
+      if (!assetElement.getSelected()) {
+        this.numSelected++;
+        assetElement.setSelected(true);
+        allSelected = false;
+      }
+    }
+    
+    // First pass found that they are all selected. Unselect them.
+    if (allSelected) {
+      for (var i = 0, assetElement; assetElement = assetElements[i]; i++) {
+        assetElement.setSelected(false);
+      }
+      this.numSelected -= assetElements.length;
+    }
+    
+    if (this.selectionChangedCallback) {
+      this.selectionChangedCallback(this.numSelected);
+    }    
   },
 
   /**
