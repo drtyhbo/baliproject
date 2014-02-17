@@ -124,7 +124,7 @@ SelectFriendsView.beforeTransition = function (event, ui) {
     //wire buttons
     var backBtn = SelectFriendsView.ui.toPage.find('#back-button')
         .on(TOUCHSTART, function () {
-            LifeStreamShareView.show(SelectFriendsView.lifeStream, false);
+            LifeStreamView.show(SelectFriendsView.lifeStream, false);
         });
 
     var shareBtn = SelectFriendsView.ui.toPage.find('#share-btn')
@@ -161,7 +161,7 @@ SelectFriendsView.createShare = function () {
 
     //get selected asset ids
     var selectedAssetIds = [];
-    var selectedAssets = LifeStreamShareView.getAssetsSelected();
+    var selectedAssets = LifeStreamView.momentViewer.getSelected();
     for (var i = 0, asset; asset = selectedAssets[i]; i++)
         selectedAssetIds.push(asset.id);
 
