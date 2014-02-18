@@ -75,6 +75,14 @@ Users.getAllUsers = function () {
     return Users.userDB;
 }
 
+Users.getFriends = function () {
+  var currentUser = Users.getCurrentUser();
+  var friends = Users.userDB.filter(function (user) {
+    return user.id !=  currentUser.id;
+  });
+  return friends;
+}
+
 Users.getUsers = function (userIds) {
     var users = Users.userDB.filter(function (user) {
             return ($.inArray(user.id, userIds) != -1);
@@ -323,17 +331,6 @@ Moments.getMomentsByOwnderId = function (userId) {
 }
 
 Moments.init = function () {
-    var moment = new Moment(100, 'Kuala, Lumpur', Util.getPastDate(6), 1);
-    moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
-    Moments.momentDB.push(moment);
-
-    var moment = new Moment(101, 'Koh Lanta, Thailand', Util.getPastDate(60), 1);
-    moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
-    Moments.momentDB.push(moment);
-
-    var moment = new Moment(103, 'Phucket, Thailand', Util.getPastDate(120), 1);
-    moment.widgets = PictureWidgets.getPictureWidgetsByMomentId(moment.id);
-    Moments.momentDB.push(moment);
 }
 
 Moments.ajaxGetAll = function(callback) {

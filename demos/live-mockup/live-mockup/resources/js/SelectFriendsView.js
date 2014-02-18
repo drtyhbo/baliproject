@@ -132,7 +132,7 @@ SelectFriendsView.beforeTransition = function (event, ui) {
             SelectFriendsView.createShare();
         });
 
-    var friends = Users.getAllUsers();
+    var friends = Users.getFriends();
     SelectFriendsView.items = [];
     for (var i = 0, friend; friend = friends[i]; i++) {
         var item = new FriendItem(friend, SelectFriendsView.friendSelectionChanged.bind(SelectFriendsView));

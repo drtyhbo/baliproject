@@ -105,7 +105,7 @@ var FeedItem = Class.extend({
         //add comments
         for (var i = 0, comment; comment = this.share.comments[i]; i++) {
             this.getCommentEl(comment.commenter, comment.comment)
-					.appendTo(this.commentsEl);
+					    .appendTo(this.commentsEl);
         }
 
         //add new comment element
@@ -113,28 +113,32 @@ var FeedItem = Class.extend({
 
         //add buttons
         var buttonsEl = $('<div></div>')
-				.css({
-				    margin: '10px 10px 0 0',
-				    textAlign: 'right'
-				})
-				.appendTo(this.el)
+				  .css({
+				      margin: '10px 10px 0 0',
+				      textAlign: 'right'
+				  })
+				  .appendTo(this.el)
+
+        //add comment button
         this.commentButtonEl = $('<button></button>')
-				.addClass('ui-btn ui-btn-inline')
-				.css({
-				    fontSize: '11px',
-				})
-				.text('Comment')
-				.on(TOUCHEND, this.onTouchCommentButton.bind(this))
-				.appendTo(buttonsEl);
+				  .addClass('ui-btn ui-btn-inline')
+				  .css({
+				      fontSize: '11px',
+				  })
+				  .text('Comment')
+				  .on(TOUCHEND, this.onTouchCommentButton.bind(this))
+				  .appendTo(buttonsEl);
+
+        //add share button
         this.shareButtonEl = $('<button></button>')
-				.addClass('ui-btn ui-btn-inline')
-				.css({
-				    fontSize: '11px',
-				    marginRight: 0
-				})
-				.text('Share')
-				.on(TOUCHEND, this.onTouchShareButton.bind(this))
-				.appendTo(buttonsEl);
+				  .addClass('ui-btn ui-btn-inline')
+				  .css({
+				      fontSize: '11px',
+				      marginRight: 0
+				  })
+				  .text('Share')
+				  .on(TOUCHEND, this.onTouchShareButton.bind(this))
+				  .appendTo(buttonsEl);
 
         return this.el;
         
@@ -328,6 +332,8 @@ var FeedItem = Class.extend({
         if (this.isCommenting) {
             this.hideNewCommentEl();
         }
+
+        ReshareView.show(false, this.share.sharedAssets);
     },
 
     /**

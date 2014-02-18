@@ -32,6 +32,8 @@
     <script type="text/javascript" src="js/FeedView.js"></script>
     <script type="text/javascript" src="js/AddPicturesView.js"></script>
     <script type="text/javascript" src="js/SelectFriendsView.js"></script>
+    <script type="text/javascript" src="js/ReshareView.js"></script>
+
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -233,6 +235,39 @@
                     <li><a href="#" id="profile-btn" class="ui-btn-active" data-icon="user"></a></li>
                 </ul>
             </div>
+            <h2 id="bottom-share-btn" style="display:none">Share</h2>
+        </div>
+    </div>
+
+    <!-- reshare view-->
+    <div data-role="page" id="reshare-view">
+      <style type="text/css">
+        .container {
+          bottom: 40px;
+          left: 0;
+          overflow: hidden;
+          position: absolute;
+          top: 45px;
+          width: 100%;
+        }
+      </style>
+      
+        <div data-role="header" data-position="fixed" data-tap-toggle="false"
+            id="header">
+            <h2 id="reshare-user-name"></h2>
+            <button class="ui-btn-left ui-btn ui-btn-left ui-mini ui-corner-all ui-btn-icon-left"
+                id="top-share-btn">
+                Back</button>
+        </div>
+
+        <div class="container">
+          <div id="scrollable">
+            <div id="picture-viewer" style="background: #eee"></div>
+          </div>
+        </div>
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false"
+            id="footer" data-id="main-footer">
             <h2 id="bottom-share-btn" style="display:none">Share</h2>
         </div>
     </div>
