@@ -77,11 +77,9 @@ AddPicturesView.onShow = function (event, ui) {
 
   AddPicturesView.addEl = pageEl.find('#add-button')
   		.on(TOUCHEND, AddPicturesView.onAddPictures);
-
   var assets = CameraRoll.getCameraRoll().filter(function(asset) {
-    return !PictureWidgets.getPictureByAssetId(asset.id);
+    return !asset.isUploaded;
   });
-
 
   if (assets.length) {
     var scroller = new Scroller(pageEl.find('#scrollable'));

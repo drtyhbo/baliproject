@@ -1,11 +1,8 @@
 var Asset = Class.extend({
 	init: function(props) {
         this.id = props.id;
-        // The date from the server is in seconds.
-        this.dateTaken = new Date(props.dateTaken * 1000);
+        this.timestamp = props.timestamp;
         this.url = props.url;
-        this.latitude = props.latitude;
-        this.longitude = props.longitude;
 	},
 	
 	getThumbSrc: function() {
@@ -18,7 +15,8 @@ var Asset = Class.extend({
 });
 
 var CameraRoll = {
-	cameraRoll: []
+	cameraRoll: [],
+  assetsById: {}
 };
 
 /*
@@ -58,7 +56,12 @@ CameraRoll.load = function(callback, data) {
  */
 CameraRoll.loadFromAssetProps = function(assetProps) {
     for (var i = 0, props; props = assetProps[i]; i++) {
-        CameraRoll.cameraRoll.push(new Asset(props));
+      if (props.id in CameraRoll.assetsById) {
+        continue;
+      }
+      var asset = new Asset(props);
+      CameraRoll.cameraRoll.push(asset);
+      CameraRoll.assetsById[asset.id] = asset;
     }
 };
 
@@ -68,4 +71,12 @@ CameraRoll.loadFromAssetProps = function(assetProps) {
  */
 CameraRoll.getCameraRoll = function() {
   return CameraRoll.cameraRoll;
+};
+
+/*
+ * Returns the list of camera roll assets. Will not be ready until the callback
+ * from CameraRoll.init() has been called.
+ */
+CameraRoll.getAssetById = function(id) {
+  return CameraRoll.assetsById[id];
 };

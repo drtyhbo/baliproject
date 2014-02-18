@@ -7,14 +7,13 @@ Db.init = function(callback) {
     function onInit() {
         if (!--numExpected) {
             Shares.init();
-            Moments.init();
 
             callback();
         }
     }
     
     Users.init(onInit);
-    PictureWidgets.init(onInit);
+    Moments.init(onInit);
 }
 
 /*******************************************
@@ -317,21 +316,19 @@ Shares.getShares = function (shareIds) {
  *
  *******************************************/
 var Moments = {
-    momentDB: []
+    moments: [],
 }
 
-Moments.getAllMoments = function () {
-    return momentDB;
-}
+Moments.getMoments = function() {
+  return Moments.moments;
+};
 
-Moments.getMomentsByOwnderId = function (userId) {
-    return Moments.momentDB.filter(function (moment) {
-        return (moment.ownedBy == userId);
-    });
-}
-
-Moments.init = function () {
-}
+Moments.init = function (callback) {
+  Moments.ajaxGetAll(function(moments) {
+    Moments.moments = moments;
+    callback();
+  });
+};
 
 Moments.ajaxGetAll = function(callback) {
     Util.makeRequest('api/moment/get/all/', {

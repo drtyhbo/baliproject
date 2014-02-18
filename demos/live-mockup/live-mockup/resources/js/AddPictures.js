@@ -70,6 +70,10 @@ var VisibleElementRenderer = Class.extend({
     if (this.visibleElements) {
       return this.visibleElements;
     }
+    
+    if (!this.visibleRange) {
+      return [];
+    }
 
     this.visibleElements = [];
     for (var i = this.visibleRange.firstIndex; i <= this.visibleRange.lastIndex;
@@ -1222,9 +1226,9 @@ var AddPictures = VisibleElementRenderer.extend({
    */
   onTouchAssetElement: function(assetElementIdx) {
     if (this.isSelectable) {
+      var assetElement = this.assetElements[assetElementIdx];
       assetElement.toggleSelected();
-      this.onSelectionChanged(this.assetElements[assetElementIdx],
-          assetElement.getSelected())
+      this.onSelectionChanged(assetElement, assetElement.getSelected())
     } else {
       this.pictureViewer =
           new ExpandedPictureViewer(this.assetElements, assetElementIdx);

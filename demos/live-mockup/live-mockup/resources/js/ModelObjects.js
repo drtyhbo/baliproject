@@ -60,20 +60,6 @@ var PictureWidget = Widget.extend({
     }
 });
 
-
-
-var Asset = Widget.extend({
-  init: function (props) {
-    this._super(props.id, props.createdBy, props.timestamp, props.momentIds);
-    this.url = props.url;
-  },
-
-  getSrc: function() {
-    return this.url;
-  }
-});
-
-
 var Share = Class.extend({
 
   init: function (props) {
@@ -109,8 +95,11 @@ var Moment = Class.extend({
         this.ownedBy = props.ownedBy || null;
         
         if (props.assets) {
-          for (var j = 0, assetProps ; assetProps = props.assets[j]; j++) 
-            this.assets.push(new Asset(assetProps));
+          for (var j = 0, assetProps; assetProps = props.assets[j]; j++) {
+            var asset = CameraRoll.getAssetById(assetProps.id);
+            asset.isUploaded = true;
+            this.assets.push(asset);
+          }
         }
     },
 

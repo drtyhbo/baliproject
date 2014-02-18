@@ -151,11 +151,7 @@ LifeStreamView.onShow = function(event) {
   pageEl.find('#lifestream-user-name')
       .text(Users.getCurrentUser().firstName);
 
-  if (!LifeStreamView.lifeStream) {
-    Moments.ajaxGetAll(LifeStreamView.loadMoments);
-  } else {
-    LifeStreamView.loadMoments(LifeStreamView.lifeStream.moments);
-  }
+  LifeStreamView.loadMoments(Moments.getMoments());
 
   localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
 };

@@ -21,7 +21,7 @@ function initApp() {
     Db.init(function() {
         PersonalLibrary.init();
         //if user has no uploaded pictures, show him photo sleection page
-        if (!PictureWidgets.getPictures().length) {
+        if (!Moments.getMoments().length) {
             RegistrationAddPicturesPage.show(false);
         } else if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
             RegistrationCreateUserPage.show(false);
