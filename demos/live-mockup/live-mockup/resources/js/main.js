@@ -19,7 +19,6 @@ $(document).ready(function () {
 
 function initApp() {
     Db.init(function() {
-        PersonalLibrary.init();
         //if user has no uploaded pictures, show him photo sleection page
         if (!Moments.getMoments().length) {
             RegistrationAddPicturesPage.show(false);

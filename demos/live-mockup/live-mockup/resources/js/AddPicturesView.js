@@ -135,8 +135,6 @@ AddPicturesView.showEmptyUi = function (e) {
 AddPicturesView.onAddPictures = function (e) {
   var assets = AddPicturesView.addPictures.getSelected();
 
-  // "Upload" those pictures which are selected.
-  PersonalLibrary.add(assets);
   PictureWidgets.ajaxAdd(assets);
 
   AddPicturesView.addPictures.removeSelected(function () {

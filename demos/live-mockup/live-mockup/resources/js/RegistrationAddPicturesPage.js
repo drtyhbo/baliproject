@@ -83,7 +83,6 @@ RegistrationAddPicturesPage.touchFooterButton = function(e) {
   e.preventDefault();
   
   var assets = RegistrationAddPicturesPage.pictureSelector.getSelected();
-	PersonalLibrary.add(assets);
   PictureWidgets.ajaxAdd(assets, function() {
     if (!Users.getCurrentUser() || !Users.getCurrentUser().name) {
       RegistrationCreateUserPage.show(true);
