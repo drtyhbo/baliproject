@@ -67,6 +67,10 @@ var VisibleElementRenderer = Class.extend({
    **************************/
 
   getVisibleElements: function() {
+    if (!this.visibleRange) {
+      return [];
+    }
+
     if (this.visibleElements) {
       return this.visibleElements;
     }
