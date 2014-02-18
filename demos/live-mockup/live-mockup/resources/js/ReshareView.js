@@ -98,21 +98,38 @@ ReshareView.onShow = function (event) {
   ReshareView.pageEl = pageEl;
   
   //wire up buttons
-  var bottomShareBtn = pageEl.find('#profile-btn')
+  var bottomShareBtn = pageEl.find('#bottom-share-btn')
             .off(TOUCHSTART);
-  bottomShareBtn.on(TOUCHSTART, function() {
-        SelectFriendsView.show(false);
-      });
+  bottomShareBtn.on(TOUCHSTART, function () {
+      
+        //get selected asset ids
+        var selectedAssetIds = [];
+        var selectedAssets = ReshareView.assetViewer.getSelected();
+        for (var i = 0, asset; asset = selectedAssets[i]; i++)
+          selectedAssetIds.push(asset.id);
+
+        SelectFriendsView.show(false, selectedAssetIds);
+  });
+
+  var backBatn = pageEl.find('#top-share-btn')
+            .off(TOUCHSTART);
+  backBatn.on(TOUCHSTART, function () {
+    FeedView.show(false, null, false);
+  });
 
   //set name header
   pageEl.find('#reshare-user-name')
       .text(Users.getCurrentUser().firstName);
+
+  //clear page
+  ReshareView.pageEl.find('#picture-viewer').empty();
 
   //load asset viewer
   var scroller = new Scroller(pageEl.find('#scrollable'));
   var assetViewer =
       new AssetViewer(ReshareView.pageEl.width(), scroller,
           ReshareView.assets);
+
   assetViewer.getEl()
       .appendTo(ReshareView.pageEl.find('#picture-viewer'));
   ReshareView.assetViewer = assetViewer;

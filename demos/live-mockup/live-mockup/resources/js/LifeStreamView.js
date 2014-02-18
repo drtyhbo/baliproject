@@ -137,8 +137,15 @@ LifeStreamView.onShow = function(event) {
             LifeStreamView.onSelectionChanged);
       });
   var bottomShareBtn = pageEl.find('#bottom-share-btn')
-      .on(TOUCHSTART, function() {
-        SelectFriendsView.show(false);
+      .on(TOUCHSTART, function () {
+
+        //get selected asset ids
+        var selectedAssetIds = [];
+        var selectedAssets = LifeStreamView.momentViewer.getSelected();
+        for (var i = 0, asset; asset = selectedAssets[i]; i++)
+          selectedAssetIds.push(asset.id);
+
+        SelectFriendsView.show(false, selectedAssetIds);
       });
 
   pageEl.find('#lifestream-user-name')

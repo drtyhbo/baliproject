@@ -90,7 +90,8 @@ var SelectFriendsView = {
     ui: null,
 };
 
-SelectFriendsView.show = function (animate) {
+SelectFriendsView.show = function (animate, assetIds) {
+    SelectFriendsView.assetIds = assetIds;
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
                             SelectFriendsView.beforeTransition);
     $.mobile.pageContainer.pagecontainer('change', '#select-friends-view', {
@@ -159,14 +160,8 @@ SelectFriendsView.createShare = function () {
             friendIds.push(item.friend.id);
     }
 
-    //get selected asset ids
-    var selectedAssetIds = [];
-    var selectedAssets = LifeStreamView.momentViewer.getSelected();
-    for (var i = 0, asset; asset = selectedAssets[i]; i++)
-        selectedAssetIds.push(asset.id);
-
     //save share
-    Shares.ajaxCreateShare(selectedAssetIds, friendIds, SelectFriendsView.createShareCallback.bind(SelectFriendsView))
+    Shares.ajaxCreateShare(SelectFriendsView.assetIds, friendIds, SelectFriendsView.createShareCallback.bind(SelectFriendsView))
 }
 
 SelectFriendsView.createShareCallback = function (newShareId) {
