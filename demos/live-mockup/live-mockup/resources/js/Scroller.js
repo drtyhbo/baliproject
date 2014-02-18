@@ -51,6 +51,13 @@ var Scroller = Class.extend({
   getEl: function() {
     return this.el;
   },
+
+  /**
+   * Returns the offset of the container element.
+   */
+  getContainerOffset: function() {
+    return this.el.parent().offset();
+  },
   
   /**
    * Returns the height of the container element.

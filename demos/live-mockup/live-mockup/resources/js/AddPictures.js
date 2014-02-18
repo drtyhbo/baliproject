@@ -272,23 +272,29 @@ var VisibleElementRenderer = Class.extend({
   }
 });
 
-var AssetElement = Class.extend({
-  init: function (addPictures, asset, baseDimension) {
-    // We need access to the AddPicture object to check if selections
-    // are enabled, and to fire the onSelectionChanged callback when the
-    // selections change.
-    this.addPictures = addPictures;
+var AssetRenderer = Class.extend({
+  init: function (asset) {
+    // Create an AssetRenderer from another AssetRenderer. Copy constructor
+    // mofo!
+    if (asset instanceof AssetRenderer) {
+      var assetRenderer = asset;
+      this.assets = assetRenderer.assets;
+      this.nextAsset = assetRenderer.nextAsset;
+      this.nextAnimationTime = assetRenderer.nextAnimationTime;
+    } else {
+      this.assets = [];
+    
+      if (!(asset instanceof Array)) {
+        asset = [asset];
+      }
+      for (var i = 0; i < asset.length; i++) {
+        this.addAsset(asset[i]);
+      }
 
-    this.type;
-    this.assets = [];
-    this.addAsset(asset);
-
-    // AssetElements are square, so baseDimension specifies both the base width
-    // and height of this asset. AssetElements may be rendered as some multiple
-    // of baseDimension depending on how special they are.
-    this.baseDimension = baseDimension;
-
-    this.nextAsset = 1;
+      this.nextAsset = 1;
+      // The time when the next animation should fire.
+      this.nextAnimationTime = 0;
+    }
 
     this.el = null;
     this.imageEl = null;
@@ -296,73 +302,20 @@ var AssetElement = Class.extend({
     // of the images.
     this.nextImageEl = null;
 
-    // Being selectable is different from being selected. Selectable means this
-    // element has the potential to be selected, but may or may not be. Selected
-    // means this element is both selectable AND selected.
-    this.isSelectable = false;
-    this.isSelected = false;
-    
-    this.fadedEl = null;
-    this.gradientEl = null;
-    this.checkedEl = null;
-
-    // The current opacity of this element.
-    this.opacity = 1;
-
-    // True when this element is selected.
-    this.isSelected = false;
-    // The starting Y position of the touch.
-    this.touchStartY;
-    // The ending Y position of the touch.
-    this.touchEndY;
-
     // True when the images have been loaded for this asset.
     this.imagesLoaded = false;
-    // The time when the next animation should fire.
-    this.nextAnimationTime = 0;
   },
 
-  getType: function() {
-    return this.type;
-  },
-  
-  setType: function(type) {
-    this.type = type;
-  },
-
-  getHeight: function() {
-    if (this.type == SMALL_PICTURE) {
-      return this.baseDimension;
-    } else if (this.type == MEDIUM_PICTURE) {
-      return this.baseDimension + this.baseDimension / 2 + PICTURE_SPACING / 2;
-    } else if (this.type == LARGE_PICTURE) {
-      return this.baseDimension * 2 + PICTURE_SPACING;
-    } else {
-      return this.baseDimension * 3 + PICTURE_SPACING * 2;
-    }
-  },
-  
-  getEl: function (dontCreate) {
+  getEl: function () {
     if (this.el) {
       return this.el;
-    }
-    if (!this.el && dontCreate) {
-      return null;
-    }
-    
+    }    
     this.el = $('<span></span>')
         .css({
             display: 'inline-block',
-            height: this.getHeight() + 'px',
-            opacity: this.opacity,
-            position: 'relative',
-            width: this.getHeight() + 'px'
+            position: 'relative'
         });
-
-    if (this.isSelectable) {
-      this.createSelectionEl();
-    }
-
+        
     this.imageEl = this.getImageEl()
           .appendTo(this.el);
     if (this.assets.length > 1) {
@@ -370,15 +323,6 @@ var AssetElement = Class.extend({
           .css('opacity', 0)
           .appendTo(this.el);
     }
-
-    // Optimization: Only create this DOM element when needed.
-    if (this.isSelected) {
-      this.createSelectionEl();
-    }
-
-    this.el.on(TOUCHSTART, this.touchStart.bind(this));
-    this.el.on(TOUCHMOVE, this.touchMove.bind(this));
-    this.el.on(TOUCHEND, this.touchEnd.bind(this));
 
     return this.el;
   },
@@ -400,13 +344,6 @@ var AssetElement = Class.extend({
 
   addAsset: function(asset) {
     this.assets.push(asset);
-    if (this.assets.length > 5) {
-      this.type = EXTRA_LARGE_PICTURE;
-    } else if (this.assets.length > 2) {
-      this.type = LARGE_PICTURE;
-    } else {
-      this.type = SMALL_PICTURE;
-    }
   },
 
   getAssets: function() {
@@ -447,11 +384,146 @@ var AssetElement = Class.extend({
     }.bind(this))
   },
 
+  loadImages: function() {
+    var currentAsset = this.nextAsset - 1 < 0 ?
+        this.assets.length - 1 : this.nextAsset - 1;
+    this.imageEl.css('background-image', 'url(' +
+        this.assets[currentAsset].getSrc() + ')');
+    if (this.nextImageEl) {
+      this.nextImageEl.css('background-image',
+          'url(' + this.assets[this.nextAsset].getSrc() + ')');
+    }
+  }
+});
+
+var AssetElement = AssetRenderer.extend({
+  init: function (asset, baseDimension, onTouch) {
+    this._super(asset, onTouch);
+    
+    this.type;
+
+    // AssetElements are square, so baseDimension specifies both the base width
+    // and height of this asset. AssetElements may be rendered as some multiple
+    // of baseDimension depending on how special they are.
+    this.baseDimension = baseDimension;
+
+    // Being selectable is different from being selected. Selectable means this
+    // element has the potential to be selected, but may or may not be. Selected
+    // means this element is both selectable AND selected.
+    this.isSelectable = false;
+    this.isSelected = false;
+    
+    this.fadedEl = null;
+    this.gradientEl = null;
+    this.checkedEl = null;
+
+    // The current opacity of this element.
+    this.opacity = 1;
+
+    // True when this element is selected.
+    this.isSelected = false;
+    
+    // The starting Y position of the touch.
+    this.touchStartY;
+    // The ending Y position of the touch.
+    this.touchEndY;
+
+    // Called when the user touches this asset.
+    this.onTouch = onTouch;
+  },
+
+  getType: function() {
+    return this.type;
+  },
+  
+  setType: function(type) {
+    this.type = type;
+  },
+
+  getHeight: function() {
+    if (this.type == SMALL_PICTURE) {
+      return this.baseDimension;
+    } else if (this.type == MEDIUM_PICTURE) {
+      return this.baseDimension + this.baseDimension / 2 + PICTURE_SPACING / 2;
+    } else if (this.type == LARGE_PICTURE) {
+      return this.baseDimension * 2 + PICTURE_SPACING;
+    } else {
+      return this.baseDimension * 3 + PICTURE_SPACING * 2;
+    }
+  },
+  
+  getEl: function (dontCreate) {
+    if (this.el) {
+      return this.el;
+    }
+    if (!this.el && dontCreate) {
+      return null;
+    }
+    
+    this._super();
+    
+    this.el
+        .css({
+          height: this.getHeight() + 'px',
+          opacity: this.opacity,
+          width: this.getHeight() + 'px'
+        })
+        .on(TOUCHSTART, this.touchStart.bind(this))
+        .on(TOUCHMOVE, this.touchMove.bind(this))
+        .on(TOUCHEND, this.touchEnd.bind(this));
+
+    if (this.isSelectable) {
+      this.createSelectionEl();
+    }
+
+    // Optimization: Only create this DOM element when needed.
+    if (this.isSelected) {
+      this.createSelectionEl();
+    }
+
+    return this.el;
+  },
+
+  addAsset: function(asset) {
+    this._super(asset);
+    if (this.assets.length > 5) {
+      this.type = EXTRA_LARGE_PICTURE;
+    } else if (this.assets.length > 2) {
+      this.type = LARGE_PICTURE;
+    } else {
+      this.type = SMALL_PICTURE;
+    }
+  },
+
   setOpacity: function(opacity) {
     if (this.el) {
       this.el.css('opacity', opacity);
     } else {
       this.opacity = opacity;
+    }
+  },
+
+  /**
+   * Called when the user initiates a touch.
+   */
+  touchStart: function (e) {
+    this.touchStartY = this.touchEndY = e.originalEvent.pageY;
+  },
+
+  /**
+   * Called when the user moves her finger while touching.
+   */
+  touchMove: function (e) {
+    this.touchEndY = e.originalEvent.pageY;
+  },
+
+  /**
+   * Called when the user lifts her finger.
+   */
+  touchEnd: function (picture) {
+    // Only trigger the selection when the user has barely moved her finger.
+    if (Math.abs(this.touchEndY - this.touchStartY) < 5) {
+      this.onTouch();
     }
   },
 
@@ -526,32 +598,6 @@ var AssetElement = Class.extend({
     		.appendTo(this.el);
   },
 
-  /**
-   * Called when the user initiates a touch.
-   */
-  touchStart: function (e) {
-    this.touchStartY = this.touchEndY = e.originalEvent.pageY;
-  },
-
-  /**
-   * Called when the user moves her finger while touching.
-   */
-  touchMove: function (e) {
-    this.touchEndY = e.originalEvent.pageY;
-  },
-
-  /**
-   * Called when the user lifts her finger.
-   */
-  touchEnd: function (picture) {
-    // Only trigger the selection when the user has barely moved her finger.
-    if (Math.abs(this.touchEndY - this.touchStartY) < 5 &&
-        this.addPictures.isSelectable) {
-      this.toggleSelected();
-      this.addPictures.onSelectionChanged(this.isSelected)
-    }
-  },
-
   getSelected: function() {
     return this.isSelected;
   },
@@ -581,14 +627,6 @@ var AssetElement = Class.extend({
    */
   toggleSelected: function () {
     this.setSelected(!this.isSelected);
-  },
-
-  loadImages: function() {
-    this.imageEl.css('background-image', 'url(' + this.assets[0].getSrc() + ')');
-    if (this.nextImageEl) {
-      this.nextImageEl.css('background-image',
-          'url(' + this.assets[1].getSrc() + ')');
-    }
   }
 });
 
@@ -782,6 +820,232 @@ var AssetGroup = VisibleElementRenderer.extend({
   }
 });
 
+var ExpandedPictureViewer = Class.extend({
+  init: function(assets, assetIdx) {
+    this.assets = assets;
+    this.assetIdx = assetIdx;
+
+    // The previous asset.
+    this.prev = null;
+    // The current asset.
+    this.curr = null;
+    // The next asset.
+    this.next = null;
+    
+    this.isTouching = false;
+    // The starting position of the touch.
+    this.touchStartX = 0;
+    // The final position of the touch.
+    this.touchEndX = 0;
+    
+    this.screenWidth = $(window).width();
+    this.screenHeight = $(window).height();    
+    this.dimension =
+        Math.min(this.screenWidth - PICTURE_SPACING * 2,
+            this.screenHeight - PICTURE_SPACING * 2);
+    this.startLeft = (this.screenWidth - this.dimension) / 2;
+    this.startTop = (this.screenHeight - this.dimension) / 2;
+
+    this.createBackground();
+    this.createExpandedAssets();
+  },
+  
+  createBackground: function() {
+    this.backgroundEl = $('<div></div>')
+        .css({
+          background: 'black',
+          bottom: 0,
+          left: 0,
+          opacity: 0.75,
+          position: 'fixed',
+          right: 0,
+          top: 0,
+          zIndex: 1000
+        })
+        .appendTo($(document.body))
+        .on(TOUCHSTART, this.hide.bind(this));
+  },
+  
+  hide: function() {
+    this.backgroundEl.remove();
+    if (this.prev) {
+      this.prev.getEl().remove();
+    }
+    if (this.next) {
+      this.next.getEl().remove();
+    }
+    this.curr.getEl().remove();
+    $(document.body)
+        .off(TOUCHSTART)
+        .off(TOUCHMOVE)
+        .off(TOUCHEND);
+  },
+  
+  createExpandedAsset: function(assetElement) {
+    var assetRenderer = new AssetRenderer(assetElement);
+    assetRenderer.getEl()
+        .css({
+          height: this.dimension,
+          position: 'absolute',
+          top: this.startTop,
+          width: this.dimension,
+          zIndex: 1002
+        }).appendTo($(document.body));
+    assetRenderer.loadImages();
+    
+    return assetRenderer;
+  },
+  
+  createPreviousAsset: function() {
+    this.prev = null;
+    if (!this.assetIdx) {
+      return;
+    }
+    this.prev = this.createExpandedAsset(this.assets[this.assetIdx - 1]);
+    this.prev.getEl()
+        .css('left', -this.dimension);
+  },
+  
+  createNextAsset: function() {
+    this.next = null;
+    if (this.assetIdx >= this.assets.length) {
+      return;
+    }
+    this.next = this.createExpandedAsset(this.assets[this.assetIdx + 1]);
+    this.next.getEl()
+        .css('left', this.screenWidth);    
+  },
+  
+  createExpandedAssets: function() {
+    this.createPreviousAsset();
+    this.createNextAsset();
+
+    var assetElement = this.assets[this.assetIdx];
+    var offset = assetElement.getEl().offset();
+    this.curr = this.createExpandedAsset(assetElement);
+    this.curr.getEl()
+        .css({
+          height: this.dimension,
+          left: this.startLeft,
+          top: this.startTop,
+          width: this.dimension
+        });
+
+    this.attachTouchEvents();
+  },
+  
+  attachTouchEvents: function() {
+    $(document.body)
+        .on(TOUCHSTART, this.touchStart.bind(this))
+        .on(TOUCHMOVE, this.touchMove.bind(this))
+        .on(TOUCHEND, this.touchEnd.bind(this));
+  },
+  
+  touchStart: function(e) {
+    e.preventDefault();
+    
+    if (e.originalEvent.pageY < this.startTop ||
+        e.originalEvent.pageY > this.startTop + this.dimension) {
+      this.hide();
+      return;
+    }
+
+    this.isTouching = true;
+    this.touchStartX = e.originalEvent.pageX;
+  },
+  
+  touchMove: function(e) {
+    if (!this.isTouching) {
+      return;
+    }
+    
+    e.preventDefault();
+    
+    this.touchEndX = e.originalEvent.pageX;
+
+    var deltaX = this.touchEndX - this.touchStartX;
+    if (deltaX > 0 && !this.prev || 
+        deltaX < 0 && !this.next) {
+      this.touchEndX = this.touchStartX;
+      return;
+    }
+
+    this.curr.getEl().css('left', this.startLeft + deltaX);
+    if (this.prev) {
+      this.prev.getEl().css('left', -this.dimension + deltaX);
+    }
+    if (this.next) {
+      this.next.getEl().css('left', this.screenWidth + deltaX);
+    }
+  },
+  
+  touchEnd: function(e) {
+    e.preventDefault();
+    this.isTouching = false;
+    
+    var deltaX = this.touchEndX - this.touchStartX;
+    if (Math.abs(deltaX) > this.screenWidth / 5) {
+      // Moving left.
+      if (deltaX < 0) {
+        var destLeft = -this.dimension;
+      // Moving right.
+      } else {
+        var destLeft = this.screenWidth;
+      }
+    } else {
+      var destLeft = this.startLeft;
+    }
+    this.curr.getEl().animate({
+          left: destLeft,
+        }, {
+          complete: function() {
+            if (deltaX < 0) {
+              if (this.prev) {
+                this.prev.getEl().remove();
+              }
+              this.prev = this.curr;
+              this.curr = this.next;
+              this.assetIdx++;
+              this.createNextAsset();
+            } else if (deltaX > 0) {
+              if (this.next) {
+                this.next.getEl().remove();
+              }
+              this.next = this.curr;
+              this.curr = this.prev;
+              this.assetIdx--;
+              this.createPreviousAsset();
+            }
+          }.bind(this),
+          duration: 100,
+          step: function(now, tween) {
+            var t = (tween.now - tween.start) / (tween.end - tween.start);
+            if (deltaX < 0) {
+              var distanceRemaining = ((this.screenWidth + deltaX) -
+                  this.startLeft);
+              this.next.getEl().css('left', this.screenWidth + deltaX -
+                  distanceRemaining * t);
+            } else if (deltaX > 0) {
+              var distanceRemaining = ((-this.dimension + deltaX) -
+                  this.startLeft);
+              this.prev.getEl().css('left', -this.dimension + deltaX -
+                  distanceRemaining * t);                
+            }
+          }.bind(this)
+        });
+  },
+  
+  stepAnimation: function() {
+    if (this.prev) {
+      this.prev.stepAnimation();
+    }
+    this.curr.stepAnimation();
+    if (this.next) {
+      this.next.stepAnimation();
+    }
+  }
+});
+
 /**
  * Encapulates the logic for a picture selector based around the camera roll.
  */
@@ -936,7 +1200,9 @@ var AddPictures = VisibleElementRenderer.extend({
         assetElements[assetElements.length - 1].addAsset(asset);
       } else {
         assetElements.push(
-            new AssetElement(this, asset, this.pictureDimension));
+            new AssetElement(asset, this.pictureDimension,
+                this.onTouchAssetElement.bind(this,
+                    this.assetElements.length + assetElements.length)));
       }
       lastAsset = asset;
     }
@@ -949,6 +1215,20 @@ var AddPictures = VisibleElementRenderer.extend({
    */
   getNumPictures: function () {
     return this.assetElements.length;
+  },
+
+  /**
+   * Called when the user touches an AssetElement.
+   */
+  onTouchAssetElement: function(assetElementIdx) {
+    if (this.isSelectable) {
+      assetElement.toggleSelected();
+      this.onSelectionChanged(this.assetElements[assetElementIdx],
+          assetElement.getSelected())
+    } else {
+      this.pictureViewer =
+          new ExpandedPictureViewer(this.assetElements, assetElementIdx);
+    }
   },
 
   /**************************
@@ -1124,6 +1404,9 @@ var AddPictures = VisibleElementRenderer.extend({
     for (var i = 0, assetElement;
                 assetElement = this.visibleElements[i]; i++) {
       assetElement.stepAnimation();
+    }
+    if (this.pictureViewer) {
+      this.pictureViewer.stepAnimation();
     }
   }
 });

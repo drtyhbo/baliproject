@@ -144,7 +144,7 @@
 
   UIImage *fullSizeImage = [UIImage imageWithCGImage:[rep fullResolutionImage] scale:1 orientation:[rep orientation]];
 
-  CGSize newImageSize = CGSizeMake(fullSizeImage.size.width / 8, fullSizeImage.size.height / 8);
+  CGSize newImageSize = CGSizeMake(fullSizeImage.size.width / 4, fullSizeImage.size.height / 4);
   UIGraphicsBeginImageContext(newImageSize);
   [fullSizeImage drawInRect:CGRectMake(0, 0, newImageSize.width, newImageSize.height)];
   NSData *fileData = UIImageJPEGRepresentation(UIGraphicsGetImageFromCurrentImageContext(), 0.5);
