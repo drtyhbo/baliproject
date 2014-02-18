@@ -18,7 +18,7 @@ var LifeStreamMomentViewer = AddPictures.extend({
   },
 
   getAssetsForGroup: function(groupIndex) {
-    return this.moments[groupIndex].widgets;
+    return this.moments[groupIndex].assets;
   },
  
   getGroupHeaderEl: function(groupIndex) {

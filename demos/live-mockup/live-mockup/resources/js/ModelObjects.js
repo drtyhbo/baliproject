@@ -24,26 +24,7 @@ var User = Class.extend({
 
 });
 
-var Share = Class.extend({
 
-    init: function (props) {
-        this.id = props.id || null;
-        this.dateShared = props.dateShared || null;
-        this.sharedBy = (props.sharedBy)? (new User(props.sharedBy)) : null
-        this.sharedAssets = props.sharedAssets || [];
-
-        this.sharedWith = []
-        for (var i = 0, sharedWithProps; sharedWithProps = props.sharedWith[i]; i++)
-            this.sharedWith.push(new User(sharedWithProps));
-
-        this.comments = props.comments || [];
-    },
-
-    getElapsedTime: function () {
-        return Util.getElapsedTime(this.dateShared * 1000);
-    },
-
-});
 
 var Widget = Class.extend({
 
@@ -79,73 +60,64 @@ var PictureWidget = Widget.extend({
     }
 });
 
+
+
+var Asset = Widget.extend({
+  init: function (props) {
+    this._super(props.id, props.createdBy, props.timestamp, props.momentIds);
+    this.url = props.url;
+  },
+
+  getSrc: function() {
+    return this.url;
+  }
+});
+
+
+var Share = Class.extend({
+
+  init: function (props) {
+    this.id = props.id || null;
+    this.dateShared = props.dateShared || null;
+    this.sharedBy = (props.sharedBy) ? (new User(props.sharedBy)) : null
+    this.sharedAssets = [];
+
+
+    this.sharedWith = []
+    for (var i = 0, sharedWithProps; sharedWithProps = props.sharedWith[i]; i++)
+      this.sharedWith.push(new User(sharedWithProps));
+
+    for (var j = 0, assetProps ; assetProps = props.sharedAssets[j]; j++)
+      this.sharedAssets.push(new Asset(assetProps));
+
+    this.comments = props.comments || [];
+  },
+
+  getElapsedTime: function () {
+    return Util.getElapsedTime(this.dateShared * 1000);
+  },
+
+});
+
 var Moment = Class.extend({
 
     init: function (props) {
         this.id = props.id || null;                           //moment ID
         this.location = props.location || null;               //location of the moment: string
-        this.timestamp = props.timestamp * 1000 || null;             //when the moment occured: date
-        this.widgets = [];                              //all widgets in a moment (pictures, videos, checkins...): Widget[]
+        this.timestamp = props.timestamp * 1000 || null;      //when the moment occured: date
+        this.assets = [];                                     //all widgets in a moment (pictures, videos, checkins...): Widget[]
         this.ownedBy = props.ownedBy || null;
         
-        if (props.pictures) {
-            for (var j = 0, pictureProps; pictureProps = props.pictures[j]; j++) {
-                this.widgets.push(new PictureWidget(pictureProps));
-            }
+        if (props.assets) {
+          for (var j = 0, assetProps ; assetProps = props.assets[j]; j++) 
+            this.assets.push(new Asset(assetProps));
         }
-    },
-
-    addPictureWidget: function (pictureSrc, thumbnailPictureSrc, comments, createdBy, createdOn) {
-        this.widgets.push(new PictureWidget(pictureSrc, thumbnailPictureSrc, comments, createdBy, createdOn));
     },
 
     getElapsedTime: function () {
         return Util.getElapsedTime(this.timestamp);
-    },
-
-    getShareCount: function () {
-        return this.getMomentShares().length;
-    },
-
-    getCommentCount: function () {
-        var commentCount = 0;
-        var shares = this.getMomentShares();
-        for (var j = 0, share; share = shares[j]; j++)
-            commentCount += share.comments.length;
-        
-        return commentCount;
-    },
-
-    getMomentShares: function () {
-        var shareDict = {};
-        for (var i = 0, picture; picture = this.widgets[i]; i++) {
-            var shares = Shares.getWidgetShares(picture.id);
-
-            //use dictionary to keep only uniques
-            for (var j = 0, share; share = shares[j]; j++)
-                shareDict[share.id] = share;
-        }
-        var uniqueShares = [];
-        for (var shareid in shareDict)
-            uniqueShares.push(shareDict[shareid]);
-        return uniqueShares;
-    },
-
-    getWidgetOwners: function () {
-        if (!this.widgets)
-            return null;
-
-        var usersDic = {};
-        for (var idx = 0, widget; widget = this.widgets[idx]; idx++) {
-            user = Users.getUserById(widget.createdBy)
-            if (user && !(user.id in usersDic))
-                usersDic[user.id] = user;
-        }
-        var uniqueUsers = [];
-        for (var userid in usersDic)
-            uniqueUsers.push(usersDic[userid]);
-        return uniqueUsers;
     }
+
 });
 
 
