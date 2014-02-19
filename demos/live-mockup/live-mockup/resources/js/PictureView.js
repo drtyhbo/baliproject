@@ -27,10 +27,12 @@ var PictureView = Class.extend({
         Math.min(this.screenWidth, this.screenHeight);
     this.startLeft = (this.screenWidth - this.dimension) / 2;
 
+    Util.addAnimationHandler('picture-view', this.stepAnimation.bind(this));
+
     this.initUi();
   },
   
-  createPictureEl: function(assetElement) {
+  createPicture: function(assetElement) {
     var el = $('<div></div>')
         .css({
           position: 'absolute',
@@ -66,7 +68,10 @@ var PictureView = Class.extend({
         .appendTo(el);
     assetRenderer.loadImages();
     
-    return el;
+    return {
+      el: el,
+      assetRenderer: assetRenderer
+    };
   },
   
   createPreviousAsset: function() {
@@ -74,7 +79,9 @@ var PictureView = Class.extend({
     if (!this.assetIdx) {
       return;
     }
-    this.prevEl = this.createPictureEl(this.assets[this.assetIdx - 1])
+    var prev = this.createPicture(this.assets[this.assetIdx - 1]);
+    this.prev = prev.assetRenderer;
+    this.prevEl = prev.el
         .css('left', -this.dimension)
         .appendTo(this.pictureEl);
   },
@@ -84,7 +91,9 @@ var PictureView = Class.extend({
     if (this.assetIdx >= this.assets.length) {
       return;
     }
-    this.nextEl = this.createPictureEl(this.assets[this.assetIdx + 1])
+    var next = this.createPicture(this.assets[this.assetIdx + 1]);
+    this.next = next.assetRenderer;
+    this.nextEl = next.el
         .css('left', this.screenWidth)
         .appendTo(this.pictureEl);
   },
@@ -93,20 +102,11 @@ var PictureView = Class.extend({
     this.createPreviousAsset();
     this.createNextAsset();
 
-    this.currEl = this.createPictureEl(this.assets[this.assetIdx])
+    var curr = this.createPicture(this.assets[this.assetIdx]);
+    this.curr = curr.assetRenderer;
+    this.currEl = curr.el
         .css('left', 0)
         .appendTo(this.pictureEl);
-
-/*    var assetElement = this.assets[this.assetIdx];
-    var offset = assetElement.getEl().offset();
-    this.curr = this.createExpandedAsset(assetElement);
-    this.curr.getEl()
-        .css({
-          height: this.dimension,
-          left: this.startLeft,
-          top: this.startTop,
-          width: this.dimension
-        });*/
 
     this.attachTouchEvents();
   },
@@ -179,7 +179,9 @@ var PictureView = Class.extend({
               if (this.prevEl) {
                 this.prevEl.remove();
               }
+              this.prev = this.curr;
               this.prevEl = this.currEl;
+              this.curr = this.next;
               this.currEl = this.nextEl;
               this.assetIdx++;
               this.createNextAsset();
@@ -187,7 +189,9 @@ var PictureView = Class.extend({
               if (this.nextEl) {
                 this.nextEl.remove();
               }
+              this.next = this.curr;
               this.nextEl = this.currEl;
+              this.curr = this.prev;
               this.currEl = this.prevEl;
               this.assetIdx--;
               this.createPreviousAsset();
@@ -211,7 +215,7 @@ var PictureView = Class.extend({
           }.bind(this)
         });
   },
-  /*
+
   stepAnimation: function() {
     if (this.prev) {
       this.prev.stepAnimation();
@@ -220,7 +224,7 @@ var PictureView = Class.extend({
     if (this.next) {
       this.next.stepAnimation();
     }
-  }*/
+  }
 });
 
 PictureView.show = function (assets, assetIdx) {

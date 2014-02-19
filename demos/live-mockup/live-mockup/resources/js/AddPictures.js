@@ -338,15 +338,15 @@ var AssetRenderer = Class.extend({
         .css({
           background: '#eee',
           display: 'inline-block',
+          left: 0,
+          position: 'absolute',
+          top: 0,
           width: '100%'
         });
     if (!this.useImage) {
       imageEl.css({
         backgroundSize: 'cover',
-        height: '100%',
-        left: 0,
-        position: 'absolute',
-        top: 0
+        height: '100%'
       });
     }
     if (url) {
@@ -876,6 +876,8 @@ var AddPictures = VisibleElementRenderer.extend({
     // The scroller object that encompasses this set of pictures.
     this.scroller = scroller;
     this.scroller.scroll(this.updateVisibleElements.bind(this));
+    
+    Util.addAnimationHandler('add-pictures', this.onStepAnimation.bind(this));
 
     // AddPictures must be initialized before the super class.
     this._super();
@@ -956,10 +958,6 @@ var AddPictures = VisibleElementRenderer.extend({
   			.appendTo(this.selectAllContainerEl);
 
     this.updateVisibleElements();
-    
-    if (this.useFancyPants) {
-      setInterval(this.onStepAnimation.bind(this), 250);
-    }
 
     return this.el;
   },

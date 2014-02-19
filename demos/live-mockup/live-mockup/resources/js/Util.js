@@ -1,12 +1,15 @@
 var Util = {
   GET: {},
-  baseUrl: null
+  baseUrl: null,
+  animationHandlers: {}
 }
 
 /*
  * Initializes the utilities.
  */
 Util.init = function(host) {
+  window.location.hash = '';
+
   var keyValuePairs = window.location.search.substr(1).split('&');
   for (var i = 0, pair; pair = keyValuePairs[i]; i++) {
     var keyValue = pair.split('=');
@@ -18,6 +21,8 @@ Util.init = function(host) {
   } else {
       Util.baseUrl = host || 'http://drtyhbo.net';
   }
+  
+  setInterval(Util.stepAnimation, 250);
 };
 
 /*
@@ -148,13 +153,14 @@ Util.makeRequest = function(path, data, success) {
     });  
 };
 
+Util.addAnimationHandler = function(id, handler) {
+  Util.animationHandlers[id] = handler;
+};
 
-Util.getServerBaseUrl = function () {
-
-}
-
-Util.alert = function (msg) {
-    alert(msg);
+Util.stepAnimation = function() {
+  for (var handlerId in Util.animationHandlers) {
+    Util.animationHandlers[handlerId]();
+  }
 }
 
 var Images = {};
