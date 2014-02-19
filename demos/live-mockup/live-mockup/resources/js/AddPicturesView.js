@@ -32,7 +32,7 @@ AddPicturesView.show = function () {
   $.mobile.pageContainer.on('pagecontainershow',
       AddPicturesView.onShow);
   $.mobile.pageContainer.pagecontainer('change', '#add-pictures-view', {
-    changeHash: false,
+    changeHash: true,
     showLoadMsg: false,
     transition: 'none'
   });
@@ -135,13 +135,20 @@ AddPicturesView.showEmptyUi = function (e) {
 AddPicturesView.onAddPictures = function (e) {
   var assets = AddPicturesView.addPictures.getSelected();
 
-  PictureWidgets.ajaxAdd(assets);
+  var uploadingNotification =
+      AddPicturesView.pageEl.find('#uploading-notification');
+  uploadingNotification.popup('open', {
+    transition: 'pop'
+  });
 
-  AddPicturesView.addPictures.removeSelected(function () {
-    AddPicturesView.onSelectionChanged(0);
-    if (!AddPicturesView.addPictures.getNumPictures()) {
-      AddPicturesView.showEmptyUi();
-    }
+  PictureWidgets.ajaxAdd(assets, function() {
+    uploadingNotification.popup('close');
+    AddPicturesView.addPictures.removeSelected(function () {
+      AddPicturesView.onSelectionChanged(0);
+      if (!AddPicturesView.addPictures.getNumPictures()) {
+        AddPicturesView.showEmptyUi();
+      }
+    });
   });
 };
 
