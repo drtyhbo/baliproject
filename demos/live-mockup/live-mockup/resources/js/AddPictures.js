@@ -3,7 +3,7 @@ var USE_VARIOUS_SPACING_UI = false;
 var LOAD_IMAGES_DELAY_MS = 250;
 // Assets with timestamps smaller than this will be combined into a single
 // asset element when using fancy pants rendering.
-var FANCY_PANTS_TIME_DELTA_SEC = 15;
+var FANCY_PANTS_TIME_DELTA_MSEC = 15 * 1000;
 
 var SMALL_PICTURE = 1;
 var MEDIUM_PICTURE = 2;
@@ -277,7 +277,9 @@ var VisibleElementRenderer = Class.extend({
 });
 
 var AssetRenderer = Class.extend({
-  init: function (asset) {
+  init: function (asset, useImage) {
+    this.useImage = useImage;
+
     // Create an AssetRenderer from another AssetRenderer. Copy constructor
     // mofo!
     if (asset instanceof AssetRenderer) {
@@ -332,18 +334,26 @@ var AssetRenderer = Class.extend({
   },
 
   getImageEl: function(url) {
-    return $('<span></span>')
+    var imageEl = $(this.useImage ? '<img></img>' : '<span></span>')
         .css({
           background: '#eee',
-          backgroundSize: 'cover',
-          backgroundImage: url ? 'url(' + url + ')' : 'none',
           display: 'inline-block',
-          height: '100%',
-          left: 0,
-          position: 'absolute',
-          top: 0,
           width: '100%'
         });
+    if (!this.useImage) {
+      imageEl.css({
+        backgroundSize: 'cover',
+        height: '100%',
+        left: 0,
+        position: 'absolute',
+        top: 0
+      });
+    }
+    if (url) {
+      this.setImageSrc(imageEl, url);
+    }
+    
+    return imageEl;
   },
 
   addAsset: function(asset) {
@@ -374,7 +384,7 @@ var AssetRenderer = Class.extend({
         currentAssetTimestamp);
     var timeToNextAnimationMs =
         Math.max(Math.min(3000,
-              deltaAssetTimeSec / FANCY_PANTS_TIME_DELTA_SEC * 3000), 2000);
+              deltaAssetTimeSec / FANCY_PANTS_TIME_DELTA_MSEC * 3000), 2000);
     this.nextAnimationTime = new Date().getTime() + timeToNextAnimationMs;
 
     this.nextImageEl.animate({
@@ -387,22 +397,28 @@ var AssetRenderer = Class.extend({
           .appendTo(this.el);
     }.bind(this))
   },
+  
+  setImageSrc: function(imageEl, url) {
+    if (this.useImage) {
+      imageEl.attr('src', url);
+    } else {
+      imageEl.css('background-image', 'url(' + url + ')');
+    }
+  },
 
   loadImages: function() {
     var currentAsset = this.nextAsset - 1 < 0 ?
         this.assets.length - 1 : this.nextAsset - 1;
-    this.imageEl.css('background-image', 'url(' +
-        this.assets[currentAsset].getSrc() + ')');
+    this.setImageSrc(this.imageEl, this.assets[currentAsset].getSrc());
     if (this.nextImageEl) {
-      this.nextImageEl.css('background-image',
-          'url(' + this.assets[this.nextAsset].getSrc() + ')');
+      this.setImageSrc(this.nextImageEl, this.assets[this.nextAsset].getSrc());
     }
   }
 });
 
 var AssetElement = AssetRenderer.extend({
   init: function (asset, baseDimension, onTouch) {
-    this._super(asset, onTouch);
+    this._super(asset);
     
     this.type;
 
@@ -824,232 +840,6 @@ var AssetGroup = VisibleElementRenderer.extend({
   }
 });
 
-var ExpandedPictureViewer = Class.extend({
-  init: function(assets, assetIdx) {
-    this.assets = assets;
-    this.assetIdx = assetIdx;
-
-    // The previous asset.
-    this.prev = null;
-    // The current asset.
-    this.curr = null;
-    // The next asset.
-    this.next = null;
-    
-    this.isTouching = false;
-    // The starting position of the touch.
-    this.touchStartX = 0;
-    // The final position of the touch.
-    this.touchEndX = 0;
-    
-    this.screenWidth = $(window).width();
-    this.screenHeight = $(window).height();    
-    this.dimension =
-        Math.min(this.screenWidth - PICTURE_SPACING * 2,
-            this.screenHeight - PICTURE_SPACING * 2);
-    this.startLeft = (this.screenWidth - this.dimension) / 2;
-    this.startTop = (this.screenHeight - this.dimension) / 2;
-
-    this.createBackground();
-    this.createExpandedAssets();
-  },
-  
-  createBackground: function() {
-    this.backgroundEl = $('<div></div>')
-        .css({
-          background: 'black',
-          bottom: 0,
-          left: 0,
-          opacity: 0.75,
-          position: 'fixed',
-          right: 0,
-          top: 0,
-          zIndex: 1000
-        })
-        .appendTo($(document.body))
-        .on(TOUCHSTART, this.hide.bind(this));
-  },
-  
-  hide: function() {
-    this.backgroundEl.remove();
-    if (this.prev) {
-      this.prev.getEl().remove();
-    }
-    if (this.next) {
-      this.next.getEl().remove();
-    }
-    this.curr.getEl().remove();
-    $(document.body)
-        .off(TOUCHSTART)
-        .off(TOUCHMOVE)
-        .off(TOUCHEND);
-  },
-  
-  createExpandedAsset: function(assetElement) {
-    var assetRenderer = new AssetRenderer(assetElement);
-    assetRenderer.getEl()
-        .css({
-          height: this.dimension,
-          position: 'absolute',
-          top: this.startTop,
-          width: this.dimension,
-          zIndex: 1002
-        }).appendTo($(document.body));
-    assetRenderer.loadImages();
-    
-    return assetRenderer;
-  },
-  
-  createPreviousAsset: function() {
-    this.prev = null;
-    if (!this.assetIdx) {
-      return;
-    }
-    this.prev = this.createExpandedAsset(this.assets[this.assetIdx - 1]);
-    this.prev.getEl()
-        .css('left', -this.dimension);
-  },
-  
-  createNextAsset: function() {
-    this.next = null;
-    if (this.assetIdx >= this.assets.length) {
-      return;
-    }
-    this.next = this.createExpandedAsset(this.assets[this.assetIdx + 1]);
-    this.next.getEl()
-        .css('left', this.screenWidth);    
-  },
-  
-  createExpandedAssets: function() {
-    this.createPreviousAsset();
-    this.createNextAsset();
-
-    var assetElement = this.assets[this.assetIdx];
-    var offset = assetElement.getEl().offset();
-    this.curr = this.createExpandedAsset(assetElement);
-    this.curr.getEl()
-        .css({
-          height: this.dimension,
-          left: this.startLeft,
-          top: this.startTop,
-          width: this.dimension
-        });
-
-    this.attachTouchEvents();
-  },
-  
-  attachTouchEvents: function() {
-    $(document.body)
-        .on(TOUCHSTART, this.touchStart.bind(this))
-        .on(TOUCHMOVE, this.touchMove.bind(this))
-        .on(TOUCHEND, this.touchEnd.bind(this));
-  },
-  
-  touchStart: function(e) {
-    e.preventDefault();
-    
-    if (e.originalEvent.pageY < this.startTop ||
-        e.originalEvent.pageY > this.startTop + this.dimension) {
-      this.hide();
-      return;
-    }
-
-    this.isTouching = true;
-    this.touchStartX = e.originalEvent.pageX;
-  },
-  
-  touchMove: function(e) {
-    if (!this.isTouching) {
-      return;
-    }
-    
-    e.preventDefault();
-    
-    this.touchEndX = e.originalEvent.pageX;
-
-    var deltaX = this.touchEndX - this.touchStartX;
-    if (deltaX > 0 && !this.prev || 
-        deltaX < 0 && !this.next) {
-      this.touchEndX = this.touchStartX;
-      return;
-    }
-
-    this.curr.getEl().css('left', this.startLeft + deltaX);
-    if (this.prev) {
-      this.prev.getEl().css('left', -this.dimension + deltaX);
-    }
-    if (this.next) {
-      this.next.getEl().css('left', this.screenWidth + deltaX);
-    }
-  },
-  
-  touchEnd: function(e) {
-    e.preventDefault();
-    this.isTouching = false;
-    
-    var deltaX = this.touchEndX - this.touchStartX;
-    if (Math.abs(deltaX) > this.screenWidth / 5) {
-      // Moving left.
-      if (deltaX < 0) {
-        var destLeft = -this.dimension;
-      // Moving right.
-      } else {
-        var destLeft = this.screenWidth;
-      }
-    } else {
-      var destLeft = this.startLeft;
-    }
-    this.curr.getEl().animate({
-          left: destLeft,
-        }, {
-          complete: function() {
-            if (deltaX < 0) {
-              if (this.prev) {
-                this.prev.getEl().remove();
-              }
-              this.prev = this.curr;
-              this.curr = this.next;
-              this.assetIdx++;
-              this.createNextAsset();
-            } else if (deltaX > 0) {
-              if (this.next) {
-                this.next.getEl().remove();
-              }
-              this.next = this.curr;
-              this.curr = this.prev;
-              this.assetIdx--;
-              this.createPreviousAsset();
-            }
-          }.bind(this),
-          duration: 100,
-          step: function(now, tween) {
-            var t = (tween.now - tween.start) / (tween.end - tween.start);
-            if (deltaX < 0) {
-              var distanceRemaining = ((this.screenWidth + deltaX) -
-                  this.startLeft);
-              this.next.getEl().css('left', this.screenWidth + deltaX -
-                  distanceRemaining * t);
-            } else if (deltaX > 0) {
-              var distanceRemaining = ((-this.dimension + deltaX) -
-                  this.startLeft);
-              this.prev.getEl().css('left', -this.dimension + deltaX -
-                  distanceRemaining * t);                
-            }
-          }.bind(this)
-        });
-  },
-  
-  stepAnimation: function() {
-    if (this.prev) {
-      this.prev.stepAnimation();
-    }
-    this.curr.stepAnimation();
-    if (this.next) {
-      this.next.stepAnimation();
-    }
-  }
-});
-
 /**
  * Encapulates the logic for a picture selector based around the camera roll.
  */
@@ -1200,7 +990,7 @@ var AddPictures = VisibleElementRenderer.extend({
     for (var i = 0, asset; asset = assets[i]; i++) {
       // Combine assets that are within
       if (useFancyPants && lastAsset &&
-          asset.timestamp - lastAsset.timestamp < FANCY_PANTS_TIME_DELTA_SEC) {
+          asset.timestamp - lastAsset.timestamp < FANCY_PANTS_TIME_DELTA_MSEC) {
         assetElements[assetElements.length - 1].addAsset(asset);
       } else {
         assetElements.push(
@@ -1230,8 +1020,7 @@ var AddPictures = VisibleElementRenderer.extend({
       assetElement.toggleSelected();
       this.onSelectionChanged(assetElement, assetElement.getSelected())
     } else {
-      this.pictureViewer =
-          new ExpandedPictureViewer(this.assetElements, assetElementIdx);
+      PictureView.show(this.assetElements, assetElementIdx);
     }
   },
 

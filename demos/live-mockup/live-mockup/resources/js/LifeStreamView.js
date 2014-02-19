@@ -97,7 +97,7 @@ var LifeStreamView = {
 LifeStreamView.show = function (animate) {
   $.mobile.pageContainer.on('pagecontainershow', LifeStreamView.onShow);
   $.mobile.pageContainer.pagecontainer('change', '#life-stream-load-view', {
-    changeHash: false,
+    changeHash: true,
     showLoadMsg: false,
     transition: animate ? 'slide' : 'none'
   });

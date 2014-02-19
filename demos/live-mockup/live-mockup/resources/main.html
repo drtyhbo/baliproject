@@ -32,7 +32,7 @@
     <script type="text/javascript" src="js/AddPicturesView.js"></script>
     <script type="text/javascript" src="js/SelectFriendsView.js"></script>
     <script type="text/javascript" src="js/ReshareView.js"></script>
-
+    <script type="text/javascript" src="js/PictureView.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -289,6 +289,23 @@
             id="footer" data-id="main-footer">
             <h2 id="share-btn">Share</h2>
         </div>
+    </div>
+
+    <!-- picture viewer -->
+    <div data-role="page" id="picture-view">
+      <div data-role="header" data-position="fixed" data-tap-toggle="false"
+           id="header">
+        <h2>Andreas</h2>
+        <a class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left" data-rel="back">
+            Back</a>
+      </div>
+      <div id="picture"
+           style="bottom: 0;
+                  left: 0;
+                  overflow: hidden;
+                  position: absolute;
+                  right: 0;
+                  top: 45px"></div>
     </div>
 </body>
 
