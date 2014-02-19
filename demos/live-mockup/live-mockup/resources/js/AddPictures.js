@@ -826,6 +826,12 @@ var AssetGroup = VisibleElementRenderer.extend({
       
       // Finished row, or nothing left.
       if (assetElementsForRow.length == 3 || !elementsToAdd.length) {
+        if (assetElementsForRow.length == 1) {
+          assetElementsForRow[0].setType(EXTRA_LARGE_PICTURE);
+        } else if (assetElementsForRow.length == 2) {
+          assetElementsForRow[0].setType(MEDIUM_PICTURE);
+          assetElementsForRow[1].setType(MEDIUM_PICTURE);
+        }
         elements.push(
             new AssetRowElement(assetElementsForRow));
         assetElementsForRow = [];
