@@ -266,6 +266,9 @@ Shares.ajaxGetAll = function (callback) {
         var shares = [];
         if (data) {
             for (var i = 0, shareProp; shareProp = data[i]; i++) {
+                if (!shareProp.sharedAssets.length) {
+                  continue;
+                }
                 var share = new Share(shareProp)
                 shares.push(share)
             }
