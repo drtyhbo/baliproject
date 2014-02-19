@@ -98,6 +98,7 @@ var Moment = Class.extend({
           for (var j = 0, assetProps; assetProps = props.assets[j]; j++) {
             var asset = CameraRoll.getAssetById(assetProps.id);
             asset.isUploaded = true;
+            asset.location = this.location;
             this.assets.push(asset);
           }
         }

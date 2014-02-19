@@ -49,7 +49,7 @@ var PictureView = Class.extend({
 
     $('<div></div>')
         .css('float', 'left')
-        .text('San Mateo, California')
+        .text(assetElement.getAssets()[0].location || '')
         .appendTo(infoEl);
 
     $('<div></div>')

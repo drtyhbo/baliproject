@@ -1,8 +1,10 @@
 var Asset = Class.extend({
 	init: function(props) {
-        this.id = props.id;
-        this.timestamp = props.timestamp * 1000;
-        this.url = props.url;
+    this.id = props.id;
+    this.timestamp = props.timestamp * 1000;
+    this.url = props.url;
+    this.isUploaded = false;
+    this.location = '';
 	},
 	
 	getThumbSrc: function() {
