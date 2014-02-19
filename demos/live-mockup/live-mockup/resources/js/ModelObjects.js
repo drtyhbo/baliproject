@@ -2,6 +2,7 @@ var User = Class.extend({
 
     init: function (props) {
         this.id = props.id || '';
+        this.uid = props.uid || '';
         this.name = props.name || '';
         this.email = props.email || '';
         this.thumbnailSrc = props.thumbnailSrc || '';

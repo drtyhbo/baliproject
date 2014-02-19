@@ -28,34 +28,7 @@ var Users = {
 };
 
 Users.init = function (callback) {
-    Users.ajaxGetCurrentUser(callback);
-
-    // Leave these in for now so the app can continue to function, but delete
-    // once everything is coming from the server.
-    Users.userDB.push(
-        new User({
-            id: 1,
-            name: 'Amine Zejli',
-            thumbnailSrc: Images.getPath('users/') + 'amine.jpg'
-        }));
-    Users.userDB.push(
-        new User({
-            id: 2,
-            name: 'Veronica Marian',
-            thumbnailSrc: Images.getPath('users/') + 'veronica.jpg'
-        }));
-    Users.userDB.push(
-        new User({
-            id: 3,
-            name: 'Marcello Chermak',
-            thumbnailSrc: Images.getPath('users/') + 'marcello.jpg'
-        }));
-    Users.userDB.push(
-        new User({
-            id: 4,
-            name: 'Andreas Binnewies',
-            thumbnailSrc: Images.getPath('users/') + 'andreas.jpg'
-        }));
+  Users.ajaxGetAllUser(callback);
 }
 
 Users.getCurrentUser = function() {
@@ -111,6 +84,23 @@ Users.ajaxCreateUser = function(name, email, password, callback) {
       }
       if (callback)
         callback();
+  });
+};
+
+Users.ajaxGetAllUser = function (callback) {
+  Util.makeRequest('api/user/get/all/', {
+    uid: Util.GET['uid']
+  }, function (data) {
+    if (data) {
+      for (var i = 0, userProps; userProps = data[i]; i++) {
+        Users.userDB.push(new User(userProps));
+        if (Users.userDB[Users.userDB.length - 1].uid == Util.GET['uid']) {
+          Users.currentUser = Users.userDB[Users.userDB.length - 1];
+        }
+      }
+    }
+    if (callback)
+      callback();
   });
 };
 
