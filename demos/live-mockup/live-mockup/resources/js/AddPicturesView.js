@@ -41,58 +41,65 @@ AddPicturesView.show = function () {
 /**
  * Event handler. Called once the AddPicturesView is made visible.
  */
-AddPicturesView.onShow = function (event, ui) {
+AddPicturesView.onShow = function (event, ui) {  
   $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
 
-  if (AddPicturesView.shown) {
-      return;
+  if (!AddPicturesView.shown) {
+    var pageEl = $('#add-pictures-view');
+    AddPicturesView.pageEl = pageEl;
+
+    var homeBtn = pageEl.find('#home-btn')
+  			.on(TOUCHSTART, function () {
+  		    FeedView.show();
+  			});
+    var viewProfileBtn = pageEl.find('#profile-btn')
+  			.on(TOUCHSTART, function () {
+  		    LifeStreamView.show();
+  			});
+
+    var headerEl = pageEl.find('#header');
+    $('<img></img>')
+    		.css({
+    	    left: '5px',
+    	    position: 'absolute',
+    	    top: '5px'
+    		})
+    		.attr({
+    	    height: 32,
+    	    src: Images.getPath('icons/') + 'camera.png',
+    	    width: 32
+    		})
+    		.appendTo(headerEl);
+
+    AddPicturesView.addEl = pageEl.find('#add-button')
+    		.on(TOUCHEND, AddPicturesView.onAddPictures);
+
+    AddPicturesView.scroller = new Scroller(pageEl.find('#scrollable'));
   }
   AddPicturesView.shown = true;
 
-  var pageEl = $('#add-pictures-view');
-  
-  AddPicturesView.pageEl = pageEl;
-  var homeBtn = pageEl.find('#home-btn')
-			.on(TOUCHSTART, function () {
-		    FeedView.show();
-			});
-  var viewProfileBtn = pageEl.find('#profile-btn')
-			.on(TOUCHSTART, function () {
-		    LifeStreamView.show();
-			});
+  CameraRoll.load(function() {
+    var assets = CameraRoll.getCameraRoll().filter(function(asset) {
+      return !asset.isUploaded;
+    });
+    if (assets.length) {
+      if (AddPicturesView.emptyUiContainer) {
+        AddPicturesView.emptyUiContainer.remove();
+      }
+      var picturesEl = AddPicturesView.pageEl.find('#pictures').empty();
 
-  var headerEl = pageEl.find('#header');
-  $('<img></img>')
-  		.css({
-  	    left: '5px',
-  	    position: 'absolute',
-  	    top: '5px'
-  		})
-  		.attr({
-  	    height: 32,
-  	    src: Images.getPath('icons/') + 'camera.png',
-  	    width: 32
-  		})
-  		.appendTo(headerEl);
-
-  AddPicturesView.addEl = pageEl.find('#add-button')
-  		.on(TOUCHEND, AddPicturesView.onAddPictures);
-  var assets = CameraRoll.getCameraRoll().filter(function(asset) {
-    return !asset.isUploaded;
+      var addPictures =
+          new AddPicturesSelector(AddPicturesView.pageEl.width(),
+            AddPicturesView.scroller, assets);
+      addPictures.setSelectable(true, false,
+          AddPicturesView.onSelectionChanged);
+      addPictures.getEl().appendTo(picturesEl);
+      addPictures.toggleSelectAll();
+      AddPicturesView.addPictures = addPictures;
+    } else {
+      AddPicturesView.showEmptyUi();
+    }
   });
-
-  if (assets.length) {
-    var scroller = new Scroller(pageEl.find('#scrollable'));
-    var addPictures =
-        new AddPicturesSelector(pageEl.width(), scroller, assets);
-    addPictures.setSelectable(true, false, AddPicturesView.onSelectionChanged);
-    addPictures.getEl()
-        .appendTo(pageEl.find('#pictures'));
-    addPictures.toggleSelectAll();
-    AddPicturesView.addPictures = addPictures;
-  } else {
-    AddPicturesView.showEmptyUi();
-  }
 
   localStorage.setItem('current-view', ADD_PICTURES_VIEW_PAGE_IDX);
 };
@@ -126,6 +133,8 @@ AddPicturesView.showEmptyUi = function (e) {
   $('<div></div>')
       .text('Take a new one :)')
       .appendTo(emptyUiContainer);
+
+  AddPicturesView.emptyUiContainer = emptyUiContainer;
 };
 
 
@@ -142,12 +151,14 @@ AddPicturesView.onAddPictures = function (e) {
   });
 
   PictureWidgets.ajaxAdd(assets, function() {
-    uploadingNotification.popup('close');
-    AddPicturesView.addPictures.removeSelected(function () {
-      AddPicturesView.onSelectionChanged(0);
-      if (!AddPicturesView.addPictures.getNumPictures()) {
-        AddPicturesView.showEmptyUi();
-      }
+    Moments.load(function() {
+      uploadingNotification.popup('close');
+      AddPicturesView.addPictures.removeSelected(function () {
+        AddPicturesView.onSelectionChanged(0);
+        if (!AddPicturesView.addPictures.getNumPictures()) {
+          AddPicturesView.showEmptyUi();
+        }
+      });
     });
   });
 };

@@ -382,10 +382,7 @@ FeedView.show = function (animate, newShareId, reload) {
 FeedView.beforeTransition = function (event, ui) {
     $.mobile.pageContainer.off('pagecontainerbeforetransition',
               arguments.callee);
-    if (FeedView.reload)
-        FeedView.isShown = false;
-
-    if (FeedView.isShown) 
+    if (FeedView.isShown && !FeedView.reload)
         return;
     FeedView.isShown = true;
 

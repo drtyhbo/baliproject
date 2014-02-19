@@ -13,7 +13,7 @@ Db.init = function(callback) {
     }
     
     Users.init(onInit);
-    Moments.init(onInit);
+    Moments.load(onInit);
 }
 
 /*******************************************
@@ -316,7 +316,7 @@ Moments.getMoments = function() {
   return Moments.moments;
 };
 
-Moments.init = function (callback) {
+Moments.load = function (callback) {
   Moments.ajaxGetAll(function(moments) {
     Moments.moments = moments;
     callback();

@@ -13,7 +13,7 @@ $(document).ready(function () {
     setTimeout(function () {
         //Util.init(CENTRALDEV_SERVER);
         Util.init(LOCALDEV_SERVER);
-        CameraRoll.init(initApp);
+        CameraRoll.load(initApp);
     }, 400);
 });
 

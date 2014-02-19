@@ -1053,7 +1053,7 @@ var AddPictures = VisibleElementRenderer.extend({
    * Called when the user taps one of the asset elements.
    */
   onSelectionChanged: function(isSelected) {
-    this.numSelected += isSelected ? 1 : -1;
+    this.numSelected += !isSelected ? 1 : -1;
     if (this.selectionChangedCallback) {
       this.selectionChangedCallback(this.numSelected);
     }

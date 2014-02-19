@@ -181,6 +181,8 @@
   _collectionView.dataSource = self;
   [_collectionView registerClass:[AssetCell class] forCellWithReuseIdentifier:@"Asset"];
   [self.view addSubview:_collectionView];
+
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadAssets) name:UIApplicationWillEnterForegroundNotification object:nil];
   
   [self loadAssets];
 }

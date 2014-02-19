@@ -109,48 +109,46 @@ LifeStreamView.show = function (animate) {
 LifeStreamView.onShow = function(event) {
   $.mobile.pageContainer.off('pagecontainershow', arguments.callee);
 
-  if (LifeStreamView.shown) {
-    return;
+  if (!LifeStreamView.shown) {
+    var pageEl = $('#life-stream-load-view');
+    LifeStreamView.pageEl = pageEl;
+
+    var homeBtn = pageEl.find('#home-btn')
+        .on(TOUCHSTART, function () {
+          FeedView.show();
+        });
+    var addPictureBtn = pageEl.find('#add-pictures-btn')
+      	.on(TOUCHSTART, function () {
+          AddPicturesView.show();
+      	});
+      
+    var shareMode = false;
+    var topShareBtn = pageEl.find('#top-share-btn')
+        .on(TOUCHSTART, function() {
+          shareMode = !shareMode;
+          pageEl.find('#navbar')[shareMode ? 'hide' : 'show']();
+          bottomShareBtn[shareMode ? 'show' : 'hide']();
+          topShareBtn.text(shareMode ? 'Cancel' : 'Share');
+          LifeStreamView.momentViewer.setSelectable(shareMode, false,
+              LifeStreamView.onSelectionChanged);
+        });
+    var bottomShareBtn = pageEl.find('#bottom-share-btn')
+        .on(TOUCHSTART, function () {
+
+          //get selected asset ids
+          var selectedAssetIds = [];
+          var selectedAssets = LifeStreamView.momentViewer.getSelected();
+          for (var i = 0, asset; asset = selectedAssets[i]; i++)
+            selectedAssetIds.push(asset.id);
+
+          SelectFriendsView.show(false, selectedAssetIds);
+        });
+
+    pageEl.find('#lifestream-user-name')
+        .text(Users.getCurrentUser().firstName);
   }
   LifeStreamView.shown = true;
-
-  var pageEl = $('#life-stream-load-view');
-  LifeStreamView.pageEl = pageEl;
-
-  var homeBtn = pageEl.find('#home-btn')
-      .on(TOUCHSTART, function () {
-        FeedView.show();
-      });
-  var addPictureBtn = pageEl.find('#add-pictures-btn')
-    	.on(TOUCHSTART, function () {
-        AddPicturesView.show();
-    	});
       
-  var shareMode = false;
-  var topShareBtn = pageEl.find('#top-share-btn')
-      .on(TOUCHSTART, function() {
-        shareMode = !shareMode;
-        pageEl.find('#navbar')[shareMode ? 'hide' : 'show']();
-        bottomShareBtn[shareMode ? 'show' : 'hide']();
-        topShareBtn.text(shareMode ? 'Cancel' : 'Share');
-        LifeStreamView.momentViewer.setSelectable(shareMode, false,
-            LifeStreamView.onSelectionChanged);
-      });
-  var bottomShareBtn = pageEl.find('#bottom-share-btn')
-      .on(TOUCHSTART, function () {
-
-        //get selected asset ids
-        var selectedAssetIds = [];
-        var selectedAssets = LifeStreamView.momentViewer.getSelected();
-        for (var i = 0, asset; asset = selectedAssets[i]; i++)
-          selectedAssetIds.push(asset.id);
-
-        SelectFriendsView.show(false, selectedAssetIds);
-      });
-
-  pageEl.find('#lifestream-user-name')
-      .text(Users.getCurrentUser().firstName);
-
   LifeStreamView.loadMoments(Moments.getMoments());
 
   localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
@@ -158,12 +156,16 @@ LifeStreamView.onShow = function(event) {
 
 
 LifeStreamView.loadMoments = function (moments) {
-  var scroller = new Scroller(LifeStreamView.pageEl.find('#scrollable'));
+  if (!LifeStreamView.scroller) {
+    LifeStreamView.scroller =
+        new Scroller(LifeStreamView.pageEl.find('#scrollable'));
+  }
+  var pictureViewEl = LifeStreamView.pageEl.find('#picture-viewer').empty();
+  
   var momentViewer =
-      new LifeStreamMomentViewer(LifeStreamView.pageEl.width(), scroller,
-          moments);
-  momentViewer.getEl()
-      .appendTo(LifeStreamView.pageEl.find('#picture-viewer'));
+      new LifeStreamMomentViewer(LifeStreamView.pageEl.width(),
+          LifeStreamView.scroller, moments);
+  momentViewer.getEl().appendTo(pictureViewEl);
   LifeStreamView.momentViewer = momentViewer;
 };
 
