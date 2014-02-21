@@ -1,27 +1,27 @@
 var User = Class.extend({
 
-    init: function (props) {
-        this.id = props.id || '';
-        this.uid = props.uid || '';
-        this.name = props.name || '';
-        this.email = props.email || '';
-        this.thumbnailSrc = props.thumbnailSrc || '';
-        this.firstName = this.name.split(' ')[0];
-        this.lastName = this.name.split(' ')[1];
+  init: function (props) {
+    this.id = props.id || '';
+    this.uid = props.uid || '';
+    this.name = props.name || '';
+    this.email = props.email || '';
+    this.thumbnailSrc = props.thumbnailSrc || '';
+    this.firstName = this.name.split(' ')[0];
+    this.lastName = this.name.split(' ')[1];
         
-        //TODO: remove once all thumbnail are in the server
-        if (!this.thumbnailSrc) {
-            if (this.id == 1)
-                this.thumbnailSrc = Images.getPath('users/') + 'amine.jpg';
-            else if (this.id == 2)
-                this.thumbnailSrc = Images.getPath('users/') + 'vernoica.jpg';
-            else if (this.id == 3)
-                this.thumbnailSrc = Images.getPath('users/') + 'marcello.jpg';
-            else if (this.id == 4)
-                this.thumbnailSrc = Images.getPath('users/') + 'andreas.jpg';
-        }
+    //TODO: remove once all thumbnail are in the server
+    if (!this.thumbnailSrc) {
+      if (this.id == 1)
+        this.thumbnailSrc = Images.getPath('users/') + 'amine.jpg';
+      else if (this.id == 3)
+        this.thumbnailSrc = Images.getPath('users/') + 'marcello.jpg';
+      else if (this.id == 4)
+        this.thumbnailSrc = Images.getPath('users/') + 'andreas.jpg';
+      else 
+        this.thumbnailSrc = Images.getPath('users/') + 'default-profile.jpg';
+      }
 
-    }
+  }
 
 });
 
@@ -29,36 +29,36 @@ var User = Class.extend({
 
 var Widget = Class.extend({
 
-    init: function (id, createdBy, timestamp, momentIds) {
-        this.id = id || null;
-        this.createdBy = createdBy || null;    //created by user: User ID
-        this.timestamp = timestamp || null;    //created on date: date
-        this.momentIds = momentIds || [];      //list of all moment IDs that this widget belons to: int[]
-    }
+  init: function (id, createdBy, timestamp, momentIds) {
+    this.id = id || null;
+    this.createdBy = createdBy || null;    //created by user: User ID
+    this.timestamp = timestamp || null;    //created on date: date
+    this.momentIds = momentIds || [];      //list of all moment IDs that this widget belons to: int[]
+  }
 
 });
 
 var CommentWidget = Widget.extend({
 
-    init: function (id, commentText, createdBy, timestamp) {
-        this._super(id, createdBy, timestamp, null);
-        commentText = commentText || null;          //comment text: string
-    }
+  init: function (id, commentText, createdBy, timestamp) {
+    this._super(id, createdBy, timestamp, null);
+    commentText = commentText || null;          //comment text: string
+  }
 
 });
 
 var PictureWidget = Widget.extend({
 
-    init: function (props) {
-        this._super(props.id, props.createdBy, props.timestamp, props.momentIds);
-        this.pictureSrc = props.pictureSrc || null;
-        this.thumbnailPictureSrc = props.thumbnailPictureSrc || null;
-        this.comments = props.comments || [];
-    },
+  init: function (props) {
+    this._super(props.id, props.createdBy, props.timestamp, props.momentIds);
+    this.pictureSrc = props.pictureSrc || null;
+    this.thumbnailPictureSrc = props.thumbnailPictureSrc || null;
+    this.comments = props.comments || [];
+  },
     
-    getSrc: function() {
-        return this.pictureSrc;
-    }
+  getSrc: function() {
+    return this.pictureSrc;
+  }
 });
 
 var Share = Class.extend({
@@ -88,26 +88,26 @@ var Share = Class.extend({
 
 var Moment = Class.extend({
 
-    init: function (props) {
-        this.id = props.id || null;                           //moment ID
-        this.location = props.location || null;               //location of the moment: string
-        this.timestamp = props.timestamp * 1000 || null;      //when the moment occured: date
-        this.assets = [];                                     //all widgets in a moment (pictures, videos, checkins...): Widget[]
-        this.ownedBy = props.ownedBy || null;
+  init: function (props) {
+    this.id = props.id || null;                           //moment ID
+    this.location = props.location || null;               //location of the moment: string
+    this.timestamp = props.timestamp * 1000 || null;      //when the moment occured: date
+    this.assets = [];                                     //all widgets in a moment (pictures, videos, checkins...): Widget[]
+    this.ownedBy = props.ownedBy || null;
         
-        if (props.assets) {
-          for (var j = 0, assetProps; assetProps = props.assets[j]; j++) {
-            var asset = CameraRoll.getAssetById(assetProps.id);
-            asset.isUploaded = true;
-            asset.location = this.location;
-            this.assets.push(asset);
-          }
-        }
-    },
-
-    getElapsedTime: function () {
-        return Util.getElapsedTime(this.timestamp);
+    if (props.assets) {
+      for (var j = 0, assetProps; assetProps = props.assets[j]; j++) {
+        var asset = CameraRoll.getAssetById(assetProps.id);
+        asset.isUploaded = true;
+        asset.location = this.location;
+        this.assets.push(asset);
+      }
     }
+  },
+
+  getElapsedTime: function () {
+    return Util.getElapsedTime(this.timestamp);
+  }
 
 });
 
