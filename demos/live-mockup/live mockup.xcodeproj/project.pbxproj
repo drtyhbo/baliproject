@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9611F21018B80014006115EB /* default-profile.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9611F20F18B80014006115EB /* default-profile.jpg */; };
 		9635E15818998BD800C23BD1 /* iphone-sources.js in Resources */ = {isa = PBXBuildFile; fileRef = 9635E15718998BD800C23BD1 /* iphone-sources.js */; };
 		963FD43618B10F9D0042E67B /* share-gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 963FD43418B10F9D0042E67B /* share-gradient.png */; };
 		963FD43718B10F9D0042E67B /* check-checked-32.png in Resources */ = {isa = PBXBuildFile; fileRef = 963FD43518B10F9D0042E67B /* check-checked-32.png */; };
@@ -119,6 +120,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9611F20F18B80014006115EB /* default-profile.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "default-profile.jpg"; path = "resources/img/users/default-profile.jpg"; sourceTree = "<group>"; };
 		9635E15718998BD800C23BD1 /* iphone-sources.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "iphone-sources.js"; path = "resources/js/iphone-sources.js"; sourceTree = "<group>"; };
 		963FD43418B10F9D0042E67B /* share-gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "share-gradient.png"; path = "resources/img/share-gradient.png"; sourceTree = "<group>"; };
 		963FD43518B10F9D0042E67B /* check-checked-32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "check-checked-32.png"; path = "resources/img/check-checked-32.png"; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 		9666BD0D18999EFF003C1AB4 /* users */ = {
 			isa = PBXGroup;
 			children = (
+				9611F20F18B80014006115EB /* default-profile.jpg */,
 				9666BD0E1899CB46003C1AB4 /* andreas.jpg */,
 				9666BD0F1899CB46003C1AB4 /* veronica.jpg */,
 				9666BD0918999EEB003C1AB4 /* amine.jpg */,
@@ -553,6 +556,7 @@
 				96C3DB0A189579340090B7C1 /* IMG_0314.jpg in Resources */,
 				96D3279018942CB9001E9F40 /* InfoPlist.strings in Resources */,
 				96C3DB17189579340090B7C1 /* IMG_0229.jpg in Resources */,
+				9611F21018B80014006115EB /* default-profile.jpg in Resources */,
 				96C70D09189C1D6C00EA2A6E /* camera.png in Resources */,
 				96C3DB7818959AA70090B7C1 /* check.png in Resources */,
 				96C3DB72189597210090B7C1 /* IMG_0166_thumb.jpg in Resources */,

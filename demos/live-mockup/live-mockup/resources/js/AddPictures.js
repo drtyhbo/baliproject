@@ -151,6 +151,13 @@ var VisibleElementRenderer = Class.extend({
   },
 
   determineVisibleRange: function(viewportTop, viewportHeight) {
+    if (viewportTop === undefined) {
+      return {
+        firstIndex: 0,
+        lastIndex: this.elements.length - 1
+      }
+    }
+
     viewportTop -= this.headerHeight;
     
     // A negative viewportTop means the picture selector is further down on the
@@ -270,8 +277,12 @@ var VisibleElementRenderer = Class.extend({
       // We must recalculate all visible elements if any children are
       // VisibleElementRenderers.
       this.visibleElements = null;
-      element.updateVisibleElements(
-          viewportTop - this.tops[i], viewportHeight);
+      if (viewportTop === undefined) {
+        element.updateVisibleElements();
+      } else {
+        element.updateVisibleElements(
+            viewportTop - this.tops[i], viewportHeight);
+      }
     }
   }
 });
@@ -881,9 +892,9 @@ var AddPictures = VisibleElementRenderer.extend({
 
     // The scroller object that encompasses this set of pictures.
     this.scroller = scroller;
-    this.scroller.scroll(this.updateVisibleElements.bind(this));
-    
-    Util.addAnimationHandler('add-pictures', this.onStepAnimation.bind(this));
+    if (scroller) {
+      this.scroller.scroll(this.updateVisibleElements.bind(this));
+    }
 
     // AddPictures must be initialized before the super class.
     this._super();
@@ -969,12 +980,16 @@ var AddPictures = VisibleElementRenderer.extend({
   },
   
   updateVisibleElements: function() {
-    var scrollPosition = this.scroller.getScrollPosition();
-    // Use the aboveEl to calculate the top of the picture viewer in case the
-    // select all/select none element is visible.
-    var scrollTop = scrollPosition.y -
-        (this.aboveEl.offset().top - this.scroller.getEl().offset().top);
-    this._super(scrollTop, this.scroller.getContainerHeight());
+    if (this.scroller) {
+      var scrollPosition = this.scroller.getScrollPosition();
+      // Use the aboveEl to calculate the top of the picture viewer in case the
+      // select all/select none element is visible.
+      var scrollTop = scrollPosition.y -
+          (this.aboveEl.offset().top - this.scroller.getEl().offset().top);
+      this._super(scrollTop, this.scroller.getContainerHeight());
+    } else {
+      this._super();
+    }
   },
   
   /**************************
@@ -1206,7 +1221,7 @@ var AddPictures = VisibleElementRenderer.extend({
   /**
    * Animate the pictures
    */
-  onStepAnimation: function() {
+  stepAnimation: function() {
     var visibleElements = this.getVisibleElements();
     for (var i = 0, assetElement;
                 assetElement = this.visibleElements[i]; i++) {

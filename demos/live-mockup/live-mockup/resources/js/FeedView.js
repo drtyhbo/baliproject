@@ -1,10 +1,26 @@
 var SHOW_THUMBNAIL_IN_COMMENTS = false;
 
+var FeedPictureViewer = AddPictures.extend({
+  init: function(width, assets) {
+    this.assets = assets;
+    this._super(width, null, true);
+  },
+  
+  getNumGroups: function() {
+    return 1;
+  },
+
+  getAssetsForGroup: function(groupIndex) {
+    return this.assets;
+  }
+});
+
 /**
  * Encapsulates all the logic behind an item in the feed.
  */
 var FeedItem = Class.extend({
-    init: function (share) {
+    init: function (width, share) {
+        this.width = width;
         this.share = share;
         this.currentIdx = 0;
         this.commentsEl = null;
@@ -18,14 +34,12 @@ var FeedItem = Class.extend({
      */
     getEl: function () {
         this.el = $('<div></div>')
-				.css({
-				    marginBottom: '10px'
-				});
+            .css('margin-bottom', 10);
 
         //header
         var headerEl = $('<div></div>')
-				.addClass('header')
-				.appendTo(this.el);
+    				.addClass('header')
+    				.appendTo(this.el);
 
         //header - tumbnail: 
         var thumbnailEl = $('<span></span>')
@@ -52,16 +66,29 @@ var FeedItem = Class.extend({
 
         //header - nameContainer - name
         var nameEl = $('<div></div>')
-				.css({
-				    fontSize: '18px',
-				    fontWeight: 'bold',
-				    lineHeight: '18px',
-				    position: 'absolute',
-				    left: 0,
-				    top: 0
-				})
-				.text(this.share.sharedBy.name)
-				.appendTo(nameContainerEl);
+    				.css({
+    				    fontSize: '15px',
+    				    fontWeight: 'bold',
+    				    lineHeight: '15px',
+    				    position: 'absolute',
+    				    left: 0,
+    				    top: 0
+    				})
+    				.text(this.share.sharedBy.name == Users.getCurrentUser().name ?
+                'Me' : this.share.sharedBy.firstName)
+    				.appendTo(nameContainerEl);
+
+        //header - nameContainer - name
+        var sharedWithEl = $('<div></div>')
+    				.css({
+    				    fontSize: '12px',
+    				    lineHeight: '12px',
+    				    position: 'absolute',
+    				    left: 0,
+    				    bottom: 0
+    				})
+    				.text('Amine, Erica, Natalia, and 3 others')
+    				.appendTo(nameContainerEl);
 
         //header - nameContainer - location
         var locationEl = $('<div></div>')
@@ -78,10 +105,10 @@ var FeedItem = Class.extend({
         //header - nameContainer - time
         var timeEl = $('<div></div>')
 				.css({
+				    bottom: 0,
 				    fontSize: '11px',
 				    lineHeight: '11px',
 				    position: 'absolute',
-				    top: 0,
 				    right: 0
 				})
 				.text(this.share.getElapsedTime())
@@ -89,90 +116,24 @@ var FeedItem = Class.extend({
 
         //set pics
         this.createPicturesEl();
-    
-        //add description
-        this.commentsEl = $('<div></div>')
-				.css({
-				    margin: '10px 10px 0 10px'
-				})
-				.appendTo(this.el);
-        if (this.share.description) {
-            this.getCommentEl(this.share.user, this.share.description)
-					.appendTo(this.commentsEl);
-        }
 
-       
-        //add comments
-        for (var i = 0, comment; comment = this.share.comments[i]; i++) {
-            this.getCommentEl(comment.commenter, comment.comment)
-					    .appendTo(this.commentsEl);
-        }
-
-        //add new comment element
-        this.createNewCommentEl();
-
-        //add buttons
-        var buttonsEl = $('<div></div>')
-				  .css({
-				      margin: '10px 10px 0 0',
-				      textAlign: 'right'
-				  })
-				  .appendTo(this.el)
-
-        //add comment button
-        this.commentButtonEl = $('<button></button>')
-				  .addClass('ui-btn ui-btn-inline')
-				  .css({
-				      fontSize: '11px',
-				  })
-				  .text('Comment')
-				  .on(TOUCHEND, this.onTouchCommentButton.bind(this))
-				  .appendTo(buttonsEl);
-
-        //add share button
-        this.shareButtonEl = $('<button></button>')
-				  .addClass('ui-btn ui-btn-inline')
-				  .css({
-				      fontSize: '11px',
-				      marginRight: 0
-				  })
-				  .text('Share')
-				  .on(TOUCHEND, this.onTouchShareButton.bind(this))
-				  .appendTo(buttonsEl);
-
-        return this.el;
-        
+        return this.el;        
     },
 
     /**
      * Creates the main picture element and inserts it into the dom.
      */
     createPicturesEl: function () {
-        var picturesContainerEl = $(
-				'<div>' +
-						'<div style="padding-top: 100%"></div>' +
-				'</div>')
+        var picturesContainerEl = $('<div></div>')
 						.css({
 						    position: 'relative'
 						})
 						.appendTo(this.el);
 
-        this.pictureEl = $('<div></div>')
-				.css({
-				    backgroundImage:
-						'url(' + this.share.sharedAssets[0].url + ')',
-				    backgroundSize: 'cover',
-				    bottom: 0,
-				    left: 0,
-				    position: 'absolute',
-				    right: 0,
-				    top: 0
-				})
-				.on(TOUCHEND, function (e) {
-				    e.preventDefault();
-				})
-				.on(TOUCHEND, this.onTouchPicture.bind(this))
-				.appendTo(picturesContainerEl);
+        this.pictureViewer =
+            new FeedPictureViewer(this.width, this.share.sharedAssets);
+        this.pictureViewer.getEl()
+            .appendTo(picturesContainerEl);
     },
 
     /**
@@ -357,13 +318,17 @@ var FeedItem = Class.extend({
 				    backgroundImage:
 						'url(' + this.share.sharedAssets[this.currentIdx].url + ')'
 				});
-    }
+    },
 
+    stepAnimation: function() {
+      this.pictureViewer.stepAnimation();
+    }
 })
 
 var FeedView = {
     newShareId: null,
-    isShown: false
+    isShown: false,
+    feedItems: []
 };
 
 FeedView.show = function (animate, newShareId, reload) {
@@ -373,7 +338,7 @@ FeedView.show = function (animate, newShareId, reload) {
     $.mobile.pageContainer.on('pagecontainerbeforetransition',
               FeedView.beforeTransition);
     $.mobile.pageContainer.pagecontainer('change', '#feed-view', {
-        changeHash: false,
+        changeHash: true,
         showLoadMsg: false,
         transition: animate ? 'slide' : 'none'
     });
@@ -402,17 +367,27 @@ FeedView.beforeTransition = function (event, ui) {
     //load shares
     FeedView.sharesEl = ui.toPage.find('#shares');
     FeedView.sharesEl.empty();
-    var feed = Shares.ajaxGetAll(FeedView.LoadShares.bind(FeedView));
+    var feed = Shares.ajaxGetAll(FeedView.LoadShares.bind(FeedView, ui.toPage));
 
     localStorage.setItem('current-view', FEED_VIEW_PAGE_IDX);
+    
+    Util.addAnimationHandler('feed-view', FeedView.stepAnimation);
 }
 
-FeedView.LoadShares = function (shares) {
+FeedView.LoadShares = function (pageEl, shares) {
     if (!shares)
         Util.alert('no shares were returned');
 
     for (var i = 0, share; share = shares[i]; i++) {
-        new FeedItem(share).getEl()
+        var feedItem = new FeedItem(pageEl.width(), share);
+        FeedView.feedItems.push(feedItem);
+        feedItem.getEl()
             .appendTo(FeedView.sharesEl);
     }
-}
+};
+
+FeedView.stepAnimation = function() {
+  for (var i = 0, feedItem; feedItem = FeedView.feedItems[i]; i++) {
+    feedItem.stepAnimation();
+  }
+};
