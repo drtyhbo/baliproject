@@ -58,23 +58,14 @@ CameraRoll.handleAjaxResponse = function (callback, data) {
  * Loads an array of asset properties.
  */
 CameraRoll.loadFromAssetProps = function (assetProps) {
-
-  //TODO: why are we even storing this in cache?
-  var found = false;
   for (var i = 0, props; props = assetProps[i]; i++) {
-    found = false;
-    for (var j = 0, asset; asset = CameraRoll.assetsById[j]; j++) {
-      if (props.id == asset.id) {
-        found = true;
-        break;
-      }
+    if (props.id in CameraRoll.assetsById) {
+      continue;
     }
 
-    if (!found) {
-      var asset = new Asset(props);
-      CameraRoll.cameraRoll.push(asset);
-      CameraRoll.assetsById[asset.id] = asset;
-    }
+    var asset = new Asset(props);
+    CameraRoll.cameraRoll.push(asset);
+    CameraRoll.assetsById[asset.id] = asset;
   }
 };
 
