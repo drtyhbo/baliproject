@@ -1,27 +1,27 @@
 var AssetViewer = AddPictures.extend({
-  init: function(width, scroller, assets) {
+  init: function (width, scroller, assets) {
     this.assets = assets;
     this.headerEls = [];
     this.infoLineEls = [];
     this.checkMarkEls = [];
     this._super(width, scroller, true);
   },
- 
- /**************************
-  *
-  * AddPictures overrides
-  *
-  **************************/
- 
-  getNumGroups: function() {
+
+  /**************************
+   *
+   * AddPictures overrides
+   *
+   **************************/
+
+  getNumGroups: function () {
     return 1;
   },
 
-  getAssetsForGroup: function(groupIndex) {
+  getAssetsForGroup: function (groupIndex) {
     return this.assets;
   },
- 
-  getGroupHeaderEl: function(groupIndex) {
+
+  getGroupHeaderEl: function (groupIndex) {
     if (this.headerEls[groupIndex]) {
       return this.headerEls[groupIndex];
     }
@@ -39,7 +39,7 @@ var AssetViewer = AddPictures.extend({
         .css('line-height', '35px')
         .appendTo(headerEl);
     this.infoLineEls[groupIndex] = infoLineEl;
-        
+
     var checkMarkEl = $('<div></div>')
         .css({
           backgroundImage: 'url(' + Images.getPath() + 'check-24.png' + ')',
@@ -58,7 +58,7 @@ var AssetViewer = AddPictures.extend({
 
     return headerEl;
   },
-  
+
   setSelectable: function (isSelectable, showSelectAll,
       selectionChangedCallback) {
     this._super(isSelectable, showSelectAll, selectionChangedCallback);
@@ -76,7 +76,7 @@ var AssetViewer = AddPictures.extend({
 var ReshareView = {
   pageEl: null,
   momentViewer: null,
-  assets : null
+  assets: null
 
 };
 
@@ -96,19 +96,17 @@ ReshareView.onShow = function (event) {
 
   var pageEl = $('#reshare-view');
   ReshareView.pageEl = pageEl;
-  
+
   //wire up buttons
   var bottomShareBtn = pageEl.find('#bottom-share-btn')
             .off(TOUCHSTART);
   bottomShareBtn.on(TOUCHSTART, function () {
-      
-        //get selected asset ids
-        var selectedAssetIds = [];
-        var selectedAssets = ReshareView.assetViewer.getSelected();
-        for (var i = 0, asset; asset = selectedAssets[i]; i++)
-          selectedAssetIds.push(asset.id);
+    var selectedAssetIds = [];
+    var selectedAssets = ReshareView.assetViewer.getSelected();
+    for (var i = 0, asset; asset = selectedAssets[i]; i++)
+      selectedAssetIds.push(asset.id);
 
-        SelectFriendsView.show(false, selectedAssetIds);
+    SelectFriendsView.show(false, selectedAssetIds);
   });
 
   var backBatn = pageEl.find('#top-share-btn')
@@ -133,11 +131,10 @@ ReshareView.onShow = function (event) {
   assetViewer.getEl()
       .appendTo(ReshareView.pageEl.find('#picture-viewer'));
   ReshareView.assetViewer = assetViewer;
-
-  //set selectable
   ReshareView.assetViewer.setSelectable(true, false,
             ReshareView.onSelectionChanged);
-  
+  ReshareView.assetViewer.toggleSelectAllGroups();
+
 
   //localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
 };

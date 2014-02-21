@@ -1022,7 +1022,7 @@ var AddPictures = VisibleElementRenderer.extend({
     if (this.isSelectable) {
       var assetElement = this.assetElements[assetElementIdx];
       assetElement.toggleSelected();
-      this.onSelectionChanged(assetElement, assetElement.getSelected())
+      this.onSelectionChanged(assetElement.getSelected())
     } else {
       PictureView.show(this.assetElements, assetElementIdx);
     }
@@ -1059,7 +1059,7 @@ var AddPictures = VisibleElementRenderer.extend({
    * Called when the user taps one of the asset elements.
    */
   onSelectionChanged: function(isSelected) {
-    this.numSelected += !isSelected ? 1 : -1;
+    this.numSelected += isSelected ? 1 : -1;
     if (this.selectionChangedCallback) {
       this.selectionChangedCallback(this.numSelected);
     }
@@ -1126,6 +1126,16 @@ var AddPictures = VisibleElementRenderer.extend({
     this.setSelectStatus(this.numSelected != this.assetElements.length);
   },
   
+  /**
+   * Selects all items in all groups
+   */
+  toggleSelectAllGroups: function(){
+    for (var i = 0; i < this.getNumGroups(); i++) {
+      this.toggleSelectGroup(i);
+    }
+
+  },
+
   /**
    * Selects all items in a specific group.
    */
