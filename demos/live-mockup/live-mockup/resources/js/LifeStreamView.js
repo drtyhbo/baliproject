@@ -150,6 +150,8 @@ LifeStreamView.onShow = function(event) {
   LifeStreamView.shown = true;
       
   LifeStreamView.loadMoments(Moments.getMoments());
+  
+  Util.addAnimationHandler('life-stream', LifeStreamView.stepAnimation);
 
   localStorage.setItem('current-view', LIFE_STREAM_VIEW_PAGE_IDX);
 };
@@ -172,4 +174,8 @@ LifeStreamView.loadMoments = function (moments) {
 LifeStreamView.onSelectionChanged = function(numSelected) {
   LifeStreamView.pageEl.find('#bottom-share-btn')
       .text(!numSelected ? 'Share' : 'Share ' + numSelected);
+};
+
+LifeStreamView.stepAnimation = function() {
+  LifeStreamView.momentViewer.stepAnimation();
 };
